@@ -1,3 +1,25 @@
+# Ignore all hidden files
+.*
+
+# Do not exlude this hidden file
+!.gitignore
+!.pre-commit-config.yaml
+!.github/
+!.git/hooks
+
+# Exclude files in this folder
+archive/
+
+# Exclude these files
+config.py 
+
+
+# Mac related hidden files
+.DS_Store
+
+# Google Drive
+desktop.ini
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
