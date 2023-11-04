@@ -1,15 +1,18 @@
-DROP TABLE IF EXISTS key_junction;
-DROP TABLE IF EXISTS keys;
+DROP TABLE IF EXISTS key_inventory;
+DROP TABLE IF EXISTS keys_created;
+DROP TABLE IF EXISTS key_status;
+DROP TABLE IF EXISTS requests;
 DROP TABLE IF EXISTS access_pairs;
 DROP TABLE IF EXISTS access_codes;
 DROP TABLE IF EXISTS rooms;
 DROP TABLE IF EXISTS room_amenities;
 DROP TABLE IF EXISTS room_classification CASCADE;
-DROP TABLE IF EXISTS key_owner;
+DROP TABLE IF EXISTS key_orders;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS titles;
 DROP TABLE IF EXISTS roles;
 DROP TABLE IF EXISTS access_approvers;
+DROP TABLE IF EXISTS approval_status;
 DROP TABLE IF EXISTS access_zones;
 DROP TABLES IF EXISTS buildings;
 
@@ -58,15 +61,6 @@ VALUES ('erin', 'wills', 1, 1),
 		('jake', 'powers', 9, 3);
 		
 
-CREATE TABLE key_owner (
-	owner_id INT PRIMARY KEY REFERENCES users (user_id)
-);
-
-INSERT INTO key_owner (owner_id)
-VALUES (1),
-		(2),
-		(3);
-
 CREATE TABLE access_approvers (
 	access_approver_id SERIAL PRIMARY KEY,
 	approver_id INT REFERENCES users (user_id),
@@ -77,47 +71,6 @@ CREATE TABLE access_approvers (
 
 INSERT INTO access_approvers (approver_id, role_approved_by)
 VALUES (4, 9)
-
--- APPROVAL PROCESS ------------------------------------------------------------
-
-
-CREATE TABLE approval_status (
-	status_code SERIAL PRIMARY KEY,
-	status_code_name VARCHAR
-);
-
-INSERT INTO approval_status (status_code_name)
-VALUES ('REQUEST SUBMITTED'),
-		('REQUEST APPROVED'),
-		('KEY CREATED'),
-		('KEY READY FOR PICKUP'),
-		('KEY ISSUED');
-
--- requests table:  request_id, user_id, space, approver, status, dates, reasoning
--- logic updates record
--- logic on update adds record to key_owner table the deletes record
-CREATE TABLE requests (
-	request_id SERIAL PRIMARY KEY,
-	user_id INT,
-	space_number_id INT,
-	access_approver_id INT,
-	status_code INT REFERENCES approval_status (status_code),
-	request_date TIMESTAMP NOT NULL DEFAULT NOW(),
-	approved_date TIMESTAMP
-);
-
--- Form updates to show only appropriate approvers
--- Submit Form
--- Approver gets dashboard updates based on query using status code
--- Approver approves and status changes
--- Key shop gets dashboard updates based on query using status code
--- Key shop makes key and enters key number and status updates and key/user_id updates
--- User picks up key and status updates
-
--- update requests status_code then update key_owner table then create key_junction entry 
-
-
-
 
 
 -- SPACE & GRANTED APPROVAL ------------------------------------------------------------
@@ -177,7 +130,81 @@ VALUES ('24-01-01-01', TRUE, 50),
 		('24-02-01-01', FALSE, 1),
 		('24-02-01-02', FALSE, 4);
 
+-- APPROVAL PROCESS ------------------------------------------------------------
 
+
+CREATE TABLE approval_status (
+	status_code SERIAL PRIMARY KEY,
+	status_code_name VARCHAR
+);
+
+INSERT INTO approval_status (status_code_name)
+VALUES ('REQUEST SUBMITTED'),
+		('REQUEST APPROVED'),
+		('KEY CREATED'),
+		('KEY READY FOR PICKUP'),
+		('KEY ASSIGNED');
+
+-- requests table:  request_id, user_id, space, approver, status, dates, reasoning
+-- logic updates record
+-- logic on update adds record to key_owner table the deletes record
+CREATE TABLE requests (
+	request_id SERIAL PRIMARY KEY,
+	user_id INT,
+	space_number_id INT,
+	building_number INT REFERENCES approver_zones (building_number),
+	access_approver_id INT REFERENCES approver_zones (access_approver_id),
+	access_code_id INT REFERENCES access_codes (access_code_id),
+	status_code INT REFERENCES approval_status (status_code),
+	request_date TIMESTAMP NOT NULL DEFAULT NOW(),
+	approved_date TIMESTAMP
+);
+
+
+-- create function that is triggered by status_code = 2 (approved)
+CREATE OR REPLACE FUNCTION log_key_order()
+  RETURNS TRIGGER 
+  LANGUAGE PLPGSQL
+  AS
+$$
+BEGIN
+	IF NEW.status_code == 2 THEN
+		 INSERT INTO key_order (transaction_id, access_code_id)
+		 VALUES(OLD.request_id, OLD.access_code_id);
+	END IF;
+
+	RETURN NEW;
+END;
+$$
+
+CREATE TRIGGER log_key_order
+  AFTER UPDATE
+  ON requests
+  FOR EACH ROW
+  EXECUTE PROCEDURE log_last_name_changes();
+
+-- Form updates to show only appropriate approvers
+-- Submit Form
+-- Approver gets dashboard updates based on query using status code
+-- Approver approves and status changes
+-- Key shop gets dashboard updates based on query using status code
+-- Key shop makes key and enters key number and status updates and key/user_id updates
+-- User picks up key and status updates
+
+-- update requests status_code then update key_owner table then create key_junction entry 
+
+CREATE TABLE key_orders (
+	transaction_id INT PRIMARY KEY REFERENCES requests (request_id),
+	access_code_id INT REFERENCES requests (access_code_id)
+);
+		
+-- Need to add logic so access code is programatically obtained
+INSERT INTO key_orders (transaction_id, access_code_id)
+VALUES (1, 3),
+		(2, 1),
+		(3, 2),
+		(4, 2),
+		(5, 2);
 
 -- ACCESS ASSIGNMENT -------------------------------------------------------------------
 
@@ -196,14 +223,14 @@ VALUES (1, 'Classroom', 'ejw', 'T. Bundy'),
 
 
 CREATE TABLE access_pairs (
-	access_code INT REFERENCES access_codes (access_code_id),
+	access_code_id INT REFERENCES access_codes (access_code_id),
 	space_number_id INT REFERENCES rooms (space_number_id),
 	PRIMARY KEY (access_code_id, space_number_id) 
 );
 
 SELECT * FROM access_codes;
 
-INSERT INTO access_pairs (access_code, room_number)
+INSERT INTO access_pairs (access_code_id, space_number_id)
 VALUES (1, 100),
 		(2, 201),
 		(2, 202),
@@ -212,13 +239,14 @@ VALUES (1, 100),
 		(3, 202);
 		
 
-CREATE TABLE keys (
+
+CREATE TABLE keys_created (
 	key_number INT PRIMARY KEY,
-	key_copy INT,
-	access_code INT REFERENCES access_codes (access_code)
+	key_copy INT PRIMARY KEY,
+	access_code_id INT REFERENCES access_codes (access_code_id)
 );
 
-INSERT INTO keys (key_number, key_copy, access_code)
+INSERT INTO keys_created (key_number, key_copy, access_code_id)
 VALUES (43221, 1, 3),
 		(56432, 1, 1),
 		(34523, 1, 2),
@@ -226,13 +254,28 @@ VALUES (43221, 1, 3),
 		(59873, 3, 2);
 
 
-CREATE TABLE key_junction (
-	owner_id INT REFERENCES key_owner (owner_id),
-	key_number INT REFERENCES keys (key_number),
-	PRIMARY KEY (owner_id, key_number)
+CREATE TABLE key_status (
+	key_status_id SERIAL PRIMARY KEY,
+	key_status VARCHAR 
 );
 
-INSERT INTO key_junction (owner_id, key_number)
+INSERT INTO key_status (key_status)
+VALUES ('ISSUED'),
+		('INVENTORY'),
+		('BROKEN'),
+		('LOST');
+
+CREATE TABLE key_inventory (
+	transaction_id INT REFERENCES key_orderss (transaction_id),
+	key_number INT REFERENCES keys_created (key_number),
+	key_copy INT REFERENCES keys_created (key_copy),
+	key_status INT REFERENCES key_status (key_status_id),
+	date_transferred TIMESTAMP,
+	date_returned TIMESTAMP
+	PRIMARY KEY (transaction_id, key_number, key_copy)
+);
+
+INSERT INTO key_inventory (owner_id, key_number)
 VALUES (1, 43221),
 		(4, 56432),
 		(2, 59873),
