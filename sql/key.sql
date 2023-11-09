@@ -16,7 +16,7 @@ DROP TABLE IF EXISTS approval_status;
 DROP TABLE IF EXISTS approver_zones;
 DROP TABLE IF EXISTS buildings CASCADE;
 DROP TABLE IF EXISTS fabrication_status;
-
+DROP TABLE IF EXISTS authentication; 
 
 
 -- USERS ------------------------------------------------------
@@ -73,6 +73,19 @@ CREATE TABLE access_approvers (
 INSERT INTO access_approvers (approver_id, role_approved_by)
 VALUES (4, 9);
 
+-- LOGIN _____________________________________________________
+
+
+CREATE TABLE authentication (
+	login_id SERIAL PRIMARY KEY,
+	first_name VARCHAR,
+	last_name VARCHAR,
+	username VARCHAR,
+	password_hash VARCHAR
+);
+
+INSERT INTO authentication (first_name, last_name, username, password_hash)
+VALUES ('Erin', 'Wills', 'ejwadmin', 'alf344t4090j0aojfsfa');
 
 -- SPACE & GRANTED APPROVAL ------------------------------------------------------------
 
@@ -116,9 +129,9 @@ CREATE TABLE rooms (
 );
 
 INSERT INTO rooms (space_number_id, building_number, floor_number, wing_number, room_number, room_type)
-VALUES ('24-01-01-01', 24, 01, 01, 01, 210),
-		('24-02-01-01', 24, 02, 01, 01, 201),
-		('24-02-01-02', 24, 02, 01, 02, 220);
+VALUES ('B24010101', 24, 01, 01, 01, 210),
+		('B24020101', 24, 02, 01, 01, 201),
+		('B24020102', 24, 02, 01, 02, 220);
 
 
 CREATE TABLE room_amenities (
@@ -128,9 +141,9 @@ CREATE TABLE room_amenities (
 ); 
 
 INSERT INTO room_amenities (space_number_id, room_projector, room_seating)
-VALUES ('24-01-01-01', TRUE, 50),
-		('24-02-01-01', FALSE, 1),
-		('24-02-01-02', FALSE, 4);
+VALUES ('B24010101', TRUE, 50),
+		('B24020101', FALSE, 1),
+		('B24020102', FALSE, 4);
 
 
 -- ACCESS ASSIGNMENT -------------------------------------------------------------------
@@ -232,12 +245,12 @@ CREATE TABLE access_pairs (
 SELECT * FROM access_codes;
 
 INSERT INTO access_pairs (access_code_id, space_number_id)
-VALUES (1, '24-01-01-01'),
-		(2, '24-02-01-01'),
-		(2, '24-02-01-02'),
-		(3, '24-01-01-01'),
-		(3, '24-02-01-01'),
-		(3, '24-02-01-02');
+VALUES (1, 'B24010101'),
+		(2, 'B24020101'),
+		(2, 'B24020102'),
+		(3, 'B24010101'),
+		(3, 'B24020101'),
+		(3, 'B24020102');
 		
 CREATE TABLE fabrication_status (
 	fabrication_status_id SERIAL PRIMARY KEY,
@@ -292,11 +305,11 @@ CREATE TABLE key_inventory (
 -- This will initiate some of the logic
 -- logic needs built to complete this request via forms  
 INSERT INTO requests (user_id, space_number_id, building_number, access_approver_id, access_code_id, status_code)
-VALUES (1, '24-01-01-01', 24, 1, 1, 1),
-		(2, '24-01-01-01', 24, 1, 2, 1),
-		(3, '24-01-01-01', 24, 1, 2, 1),
-		(4, '24-01-01-01', 24, 1, 2, 1),
-		(5, '24-01-01-01', 24, 1, 3, 1);
+VALUES (1, 'B24010101', 24, 1, 1, 1),
+		(2, 'B24010101', 24, 1, 2, 1),
+		(3, 'B24010101', 24, 1, 2, 1),
+		(4, 'B24010101', 24, 1, 2, 1),
+		(5, 'B24010101', 24, 1, 3, 1);
 
 
 -- INSERT INTO key_inventory (transaction_id, key_number, key_copy, key_status_id)
