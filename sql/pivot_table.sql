@@ -137,11 +137,82 @@ begin
 end;
 $$;
 
+CREATE TEMPORARY TABLE temp_matrix AS
+SELECT access_code_id::text, space_number_id, 1 as Truth 
+FROM access_pairs 
+order by 1,2;
+
 DO $$
 BEGIN
     PERFORM pivotcode('temp_matrix', 'access_code_id', 'space_number_id', 'max(truth)', 'integer');
 END $$;
 
 SELECT * FROM temp_pivot
+
+Select *
+FROM temp_pivot
+WHERE (b24010101 = 1) and (b24020101 = 1);
+
+
+
+SELECT * FROM temp_matrix;
+-- can i do this without creating the view and without the lengthy WHERE clause
+WITH to_check (tags) as (
+	VALUES ('B24010101'), ('B24020101')
+)
+SELECT tc.tags,
+	exists(SELECT t.access_code_id FROM temp_matrix t WHERE t.space_number_id = tc.tags) as tag_exists
+FROM to_check tc;
+
+Select * 
+FROM temp_matrix
+
+
+
+
+-- Query shows that it contains all
+with room_selections as (
+	Select column1 as rooms FROM (VALUES ('B24010101'), ('B24020102'), ('B24020101')) as room
+),
+possibilities as (
+  select distinct tm.access_code_id
+  from temp_matrix tm
+  where tm.space_number_id in (Select rooms from room_selections)
+),
+all_combinations as (
+  select t.space_number_id, t.access_code_id, p.access_code_id is not null as contains_any
+  from temp_matrix t
+  Left join possibilities p on t.access_code_id = p.access_code_id
+),
+true_combinations as (
+	Select * 
+	From all_combinations
+	WHERE contains_any = true
+),
+not_possibilities as (
+  select distinct tc.access_code_id
+  from true_combinations tc
+  where tc.space_number_id not in (Select rooms from room_selections)
+),
+show_mismatches as (
+  select tco.space_number_id, tco.access_code_id, np.access_code_id is not null as not_exact
+  from true_combinations tco
+  Left join not_possibilities np on tco.access_code_id = np.access_code_id
+),
+remove_mismatches as (
+	select *
+	from show_mismatches
+	where not_exact = false
+)
+Select access_code_id, count(access_code_id) 
+From remove_mismatches
+Group by access_code_id
+Having count(access_code_id) = (Select count(rooms) FROM room_selections)
+
+
+
+
+
+
 
 
