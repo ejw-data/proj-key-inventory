@@ -74,8 +74,6 @@ WHERE (b24010101 = 1) and (b24020101 = 1);
 --
 -- ------------------------------------------------------------
 
-
--- Query shows that it contains all
 with room_selections as (
 	Select column1 as rooms FROM (VALUES ('B24010101'), ('B24020102'), ('B24020101')) as room
 ),
@@ -115,7 +113,18 @@ Group by access_code_id
 Having count(access_code_id) = (Select count(rooms) FROM room_selections)
 
 
+-- Notes -------------------------------------------------------
 
+-- Dynamic SQL produces a table (see above).  The key parts of this pgSQL code is that the
+-- 1.  function returns void 
+-- 2.  second query roduces a temporary table (CREATE TEMPORARY TABLE temp_pivot AS)
+-- 3.  second query is set to execute 
+
+-- To printout the sql query and not display the table then the following
+-- need to be changed.
+-- 1.  function returns varchar
+-- 2.  second query does not include 'CREATE TEMPORARY TABLE temp_pivot AS'
+-- 3.  second query is not executed but returned
 
 
 

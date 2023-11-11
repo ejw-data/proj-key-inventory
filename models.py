@@ -5,9 +5,10 @@ db = SQLAlchemy()
 
 
 class Authentication(db.Model):
-    '''
+    """
     App login
-    '''
+    """
+
     __bind_key__ = "key_inventory"
     __tablename__ = "authentication"
     login_id = db.Column(db.Integer, primary_key=True)
@@ -18,14 +19,27 @@ class Authentication(db.Model):
 
     @property
     def password(self):
-        raise AttributeError('Password is not a readable attribute.')
-    
+        raise AttributeError("Password is not a readable attribute.")
+
     @password.setter
     def password(self, password):
         self.password_hash = generate_password_hash(password)
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+
+class Users(db.Model):
+    """
+    User Table
+    """
+    __bind_key__ = "key_inventory"
+    __tablename__ = "users"
+    user_id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(25))
+    last_name = db.Column(db.String(25))
+    title_id = db.Column(db.Integer)
+    role_id = db.Column(db.Integer)
 
 
 # class Organizations(db.Model):
