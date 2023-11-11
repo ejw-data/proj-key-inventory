@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, jsonify, request, flash, redirect, url_for
 from query import login_request
-from models import db, Authentication
+from models import db, Authentication, Users
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from forms import LoginForm, CreateUserForm, CreateBuildingForm, CreateRoomForm
+from forms import LoginForm, CreateUserForm, userform_instance
 
 
 # views to not include
@@ -60,16 +60,39 @@ def users_page():
     """
     Administrator
     """
-    user_form = CreateUserForm()
 
-    # list of options
-    title_list = [(1, "Option 1"), (2, "Option 2")]
-    user_form.title.choices = title_list
-
-    role_list = [(1, "General user"), (2, "Admin")]
-    user_form.role.choices = role_list
-
+    user_form = userform_instance()
     return render_template("user.html", user_form=user_form)
+
+
+# User Addition by Administrator
+@site.route("/post/add_user", methods=["POST"])
+@include_login_form
+def add_user():
+    user_form = userform_instance(request.form)
+
+    if user_form.validate_on_submit():
+        # name = Authentication.query.filter_by(username=form.username.data).first()
+        name = None
+        if name is None:
+            user = Users(
+                first_name=user_form.first_name.data,
+                last_name=user_form.last_name.data,
+                title_id=user_form.title.data,
+                role_id=user_form.role.data,
+            )
+
+            db.session.add(user)
+            db.session.commit()
+
+        user_form.first_name.data = ""
+        user_form.last_name.data = ""
+        user_form.title.data = ""
+        user_form.role.data = ""
+        flash("User Added Successfully")
+
+    return redirect(request.referrer)
+    # return render_template("user.html", user_form=user_form)
 
 
 @site.route("/login", methods=["GET", "POST"])
@@ -89,4 +112,4 @@ def login():
 @include_login_form
 # @login_required
 def logout():
-    return redirect(url_for("login"))
+    return redirect(url_for("site.users_page"))

@@ -1,6 +1,14 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField, ValidationError, BooleanField, SelectField
+from wtforms import (
+    StringField,
+    SubmitField,
+    PasswordField,
+    ValidationError,
+    BooleanField,
+    SelectField,
+)
 from wtforms.validators import DataRequired, InputRequired, EqualTo, Length
+from models import db, Roles, Titles
 
 
 # Create Form Class
@@ -26,6 +34,16 @@ class CreateUserForm(FlaskForm):
     submit = SubmitField("Submit")
 
 
+def userform_instance(form_request=None):
+    user_form = CreateUserForm(form_request)
+
+    title_list = [(1, "Option 1"), (2, "Option 2")]
+    user_form.title.choices = title_list
+
+    role_list = [(1, "General user"), (2, "Admin")]
+    user_form.role.choices = role_list
+
+    return user_form
 class CreateBuildingForm(FlaskForm):
     """
     Building Form fields

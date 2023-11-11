@@ -33,6 +33,7 @@ class Users(db.Model):
     """
     User Table
     """
+
     __bind_key__ = "key_inventory"
     __tablename__ = "users"
     user_id = db.Column(db.Integer, primary_key=True)
@@ -40,6 +41,28 @@ class Users(db.Model):
     last_name = db.Column(db.String(25))
     title_id = db.Column(db.Integer)
     role_id = db.Column(db.Integer)
+
+
+class Titles(db.Model):
+    """
+    Title table
+    """
+
+    __bind_key__ = "key_inventory"
+    __tablename__ = "titles"
+    title_id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(25))
+
+
+class Roles(db.Model):
+    """
+    Role table
+    """
+
+    __bind_key = "key_inventory"
+    __tablename__ = "roles"
+    role_id = db.Column(db.Integer, primary_key=True)
+    user_role = db.Column(db.String(25))
 
 
 # class Organizations(db.Model):

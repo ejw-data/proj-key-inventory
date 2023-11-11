@@ -13,42 +13,6 @@ api = Blueprint("api", __name__, url_prefix="/api")
 
 # ---------------------------------------------------------- #
 
-
-# User Addition by Administrator
-@api.route("/post/add_user", methods=["POST"])
-def add_user():
-    user_form = CreateUserForm(request.form)
-
-    # list of options
-    title_list = [(1, "Option 1"), (2, "Option 2")]
-    user_form.title.choices = title_list
-
-    role_list = [(1, "General user"), (2, "Admin")]
-    user_form.role.choices = role_list
-
-    if user_form.validate_on_submit():
-        # name = Authentication.query.filter_by(username=form.username.data).first()
-        name = None
-        if name is None:
-            user = Users(
-                first_name=user_form.first_name.data,
-                last_name=user_form.last_name.data,
-                title_id=user_form.title.data,
-                role_id=user_form.role.data,
-            )
-
-            db.session.add(user)
-            db.session.commit()
-
-        user_form.first_name.data = ""
-        user_form.last_name.data = ""
-        user_form.title.data = ""
-        user_form.role.data = ""
-        flash("User Added Successfully")
-
-    return render_template("user.html", user_form=user_form)
-
-
 # Login routes
 @api.route("/login")
 def login():
