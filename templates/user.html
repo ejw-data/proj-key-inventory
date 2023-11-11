@@ -8,7 +8,13 @@
         <h1 class="h2">Create User</h1>
     </div>
 
-
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning alert-dismissible fade show col-md-4" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    
+    {% endfor %}
     
     <form name="user_form" action="/post/add_user" method="POST" class="col-md-4">
         {{ user_form.hidden_tag() }}

@@ -6,6 +6,7 @@
 * comparing hashed versus plain text passwords for authentication
 * webpages with login requirement decorator
 * passing template items to multiple pages with a decorator
+* uses flask flash messaging
 * add in upload section  
 * using flask login manager to track sessions
 * form validation

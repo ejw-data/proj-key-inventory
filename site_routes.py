@@ -54,6 +54,7 @@ def index():
     return render_template("index.html")
 
 
+# -------------------------- USERS ---------------------------------------------
 @site.route("/users")
 @include_login_form
 def users_page():
@@ -62,6 +63,7 @@ def users_page():
     """
 
     user_form = userform_instance()
+
     return render_template("user.html", user_form=user_form)
 
 
@@ -92,7 +94,9 @@ def add_user():
         flash("User Added Successfully")
 
     return redirect(request.referrer)
-    # return render_template("user.html", user_form=user_form)
+
+
+# -------------------------- USERS ---------------------------------------------
 
 
 @site.route("/login", methods=["GET", "POST"])

@@ -26,10 +26,10 @@ CREATE TABLE titles (
 );
 
 INSERT INTO titles (title)
-VALUES ('faculty'),
-		('undergraduate student'),
+VALUES ('undergraduate student'),
 		('graduate student'),
 		('staff'),
+		('faculty'),
 		('building manager'),
 		('department head'),
 		('dean'),
@@ -44,22 +44,23 @@ CREATE TABLE roles (
 INSERT INTO roles (user_role)
 VALUES ('requester'),
 		('approver'),
-		('admin');
+		('administrator');
 
 CREATE TABLE users (
 	user_id SERIAL PRIMARY KEY,
 	first_name VARCHAR,
 	last_name VARCHAR,
 	title_id INT REFERENCES titles (title_id),
-	role_id INT REFERENCES roles (role_id)
+	role_id INT REFERENCES roles (role_id),
+	email VARCHAR UNIQUE
 );
 
 INSERT INTO users (first_name, last_name, title_id, role_id)
-VALUES ('erin', 'wills', 1, 1),
-		('will', 'wright', 1, 1),
-		('andrew', 'ng', 1, 1),
-		('bob', 'turtle', 5, 3),
-		('jake', 'powers', 9, 3);
+VALUES ('erin', 'wills', 1, 1, 'ew@mysite.com',
+		('will', 'wright', 1, 1, 'ww@mysite.com'),
+		('andrew', 'ng', 1, 1, 'an@mysite.com'),
+		('bob', 'turtle', 5, 3, 'bt@mysite.com'),
+		('jake', 'powers', 9, 3, 'jp@mysite.com');
 		
 
 CREATE TABLE access_approvers (

@@ -31,19 +31,25 @@ class CreateUserForm(FlaskForm):
     last_name = StringField("Input your Last Name", validators=[DataRequired()])
     title = SelectField("Select Title", coerce=int, validators=[InputRequired()])
     role = SelectField("Select Role", coerce=int, validators=[InputRequired()])
+    email = StringField("Input your Email", validators=[DataRequired()])
     submit = SubmitField("Submit")
 
 
 def userform_instance(form_request=None):
     user_form = CreateUserForm(form_request)
 
-    title_list = [(1, "Option 1"), (2, "Option 2")]
-    user_form.title.choices = title_list
+    title_results = Titles.query.order_by(Titles.title_id.desc()).all()
+    title_query_list = [(i.title_id, i.title.title()) for i in title_results]
+    title_options = title_query_list
+    user_form.title.choices = title_options
 
-    role_list = [(1, "General user"), (2, "Admin")]
-    user_form.role.choices = role_list
+    role_results = Roles.query.order_by(Roles.role_id.desc()).all()
+    role_query_list = [(i.role_id, i.user_role.title()) for i in role_results]
+    user_form.role.choices = role_query_list
 
     return user_form
+
+
 class CreateBuildingForm(FlaskForm):
     """
     Building Form fields
