@@ -8,7 +8,7 @@ from wtforms import (
     SelectField,
 )
 from wtforms.validators import DataRequired, InputRequired, EqualTo, Length
-from models import db, Roles, Titles
+from models import Roles, Titles
 
 
 # Create Form Class
@@ -47,6 +47,9 @@ class CreateUserForm(FlaskForm):
 
 
 def userform_instance(form_request=None):
+    """
+    Create to dynamically populate title, role inputs to selector elements
+    """
     user_form = CreateUserForm(form_request)
 
     title_results = Titles.query.order_by(Titles.title_id.desc()).all()

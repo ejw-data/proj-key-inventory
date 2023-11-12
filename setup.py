@@ -4,30 +4,25 @@ from config import secret_key
 
 
 def create_app():
-    '''
+    """
     Initiate Flask
-    '''
+    """
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = secret_key
+    app.config["SECRET_KEY"] = secret_key
 
-    ENV = 'dev'
+    ENV = "dev"
 
-    if ENV == 'dev':
+    if ENV == "dev":
         app.debug = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = path["key_inventory"]
-        app.config['SQLALCHEMY_BINDS'] = {
-            'key_inventory':    path["key_inventory"]
-        }
-    elif ENV == 'prod':
+        app.config["SQLALCHEMY_DATABASE_URI"] = path["key_inventory"]
+        app.config["SQLALCHEMY_BINDS"] = {"key_inventory": path["key_inventory"]}
+    elif ENV == "prod":
         app.debug = False
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'webaddress'
-        app.config['SQLALCHEMY_BINDS'] = {
-            'login':    'sqlite:///login-flask.db',
-            'utility':  'sqlite:///utility.db'
-        }
+        app.config["SQLALCHEMY_DATABASE_URI"] = "hidden connection string"
+        app.config["SQLALCHEMY_BINDS"] = {"key_inventory": "hidden connection string"}
     else:
         print("Please select an environment:  developement or production.")
 
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     return app

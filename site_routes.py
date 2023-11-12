@@ -1,28 +1,23 @@
-from flask import Blueprint, render_template, jsonify, request, flash, redirect, url_for
-from query import login_request
-from models import db, Authentication, Users
-from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
-from forms import LoginForm, CreateUserForm, RegisterForm, userform_instance
+from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import (
-    UserMixin,
-    login_user,
-    LoginManager,
-    login_required,
-    logout_user,
-    current_user,
-)
+from models import db, Authentication, Users
+# from flask_sqlalchemy import SQLAlchemy
+from forms import LoginForm, RegisterForm, userform_instance
 
+
+# allow for multiple route types, see also api_routes.py
 site = Blueprint("site", __name__)
 
 
-# --------------- Send parameters to
-# views to not include
+# ---------- WIDELY USED PAGE PARAMETERS ----------------------------
+
+
+# views to include additional_parameters()
+# collect route function names.  Note:  "site." is needed becasue using blueprints
 login_form_views = []
 
 
-# "site." is needed becasue using blueprints
 def include_login_form(fn):
     login_form_views.append("site." + fn.__name__)
     return fn
@@ -36,43 +31,31 @@ def additional_parameters():
 
     login_user_id = current_user.get_id()
     user_record = Users.query.filter_by(user_id=login_user_id).first()
-    name = user_record.first_name.title()
+    first_name = user_record.first_name.title()
+    last_name = user_record.last_name.title()
     form = LoginForm()
 
-    # if form.validate_on_submit():
-    #     name = Authentication.query.filter_by(username=form.username.data).first()
-    #     if name is None:
-    #         user = Authentication(
-    #             id=name,
-    #             username=form.username.data,
-    #             password_hash=form.password.data,
-    #         )
-    #         db.session.add(user)
-    #         db.session.commit()
-    #     name = form.username.data
-    #     form.username.data = ""
-    #     form.password.data = ""
-    #     flash("User Added Successfully")
-
-    return {"name": name, "form": form}
+    return {"first_name": first_name, "last_name": last_name, "form": form}
 
 
-@site.route("/")
-# @login_required
+# ---------- PAGE ROUTES ----------------------------
+
+
+@site.route("/dashboard")
+@login_required
 @include_login_form
 def index():
     """
-    In future this will be the login page
+    Summary page for all users
     """
     return render_template("index.html")
 
 
-# -------------------------- USERS ---------------------------------------------
 @site.route("/users")
 @include_login_form
 def users_page():
     """
-    Administrator
+    User information page, currently holds add users form
     """
 
     user_form = userform_instance()
@@ -80,16 +63,22 @@ def users_page():
     return render_template("user.html", user_form=user_form)
 
 
+# ---------- FORM ROUTES ----------------------------
+
+
 # User Addition by Administrator
 # maybe rename route /post/user/add
 @site.route("/post/add_user", methods=["POST"])
 @include_login_form
 def add_user():
+    """
+    Route used to add users to database, applied on user.html
+    """
     user_form = userform_instance(request.form)
 
     if user_form.validate_on_submit():
-        # name = Authentication.query.filter_by(username=form.username.data).first()
-        name = None
+        name = Authentication.query.filter_by(username=user_form.username.data).first()
+
         if name is None:
             user = Users(
                 first_name=user_form.first_name.data,
@@ -98,7 +87,6 @@ def add_user():
                 role_id=user_form.role.data,
                 email=user_form.email,
             )
-
             db.session.add(user)
             db.session.commit()
 
@@ -111,18 +99,19 @@ def add_user():
     return redirect(request.referrer)
 
 
-# -------------------------- USERS ---------------------------------------------
+# -------------------------- SITE ACCESS -------------------------------------
 
 
 @site.route("/login", methods=["GET", "POST"])
+@site.route("/")
 def login():
     """
-    This will be merged with home route
+    Login page and default page for app
     """
 
     if current_user.is_authenticated:
         return redirect(url_for("site.index"))
-    
+
     username = None
     password = None
     passed_verification = None
@@ -154,7 +143,8 @@ def login():
 @site.route("/register", methods=["GET", "POST"])
 def register():
     """
-    This will be merged with home route
+    Registration page to create password
+    Note:  Need to add temporary password
     """
     # on unsuccessful login the below page is loaded
     form = RegisterForm()
@@ -194,6 +184,9 @@ def register():
 @include_login_form
 @login_required
 def logout():
+    """
+    Logout function
+    """
     logout_user()
     flash("You are now logged out")
     return redirect(url_for("site.login"))

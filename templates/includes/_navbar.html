@@ -1,5 +1,5 @@
 <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="/">Key Inventory Tracker</a>
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="{{ url_for('site.index') }}">Key Inventory Tracker</a>
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
         data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -10,9 +10,9 @@
 
             {% block content %}
 
-            {% if name %}
+            {% if first_name %}
                 <a class="btn-outline-secondary nav-link fs-6 px-3" data-bs-toggle="modal" data-bs-target="#connectionModal"
-                    href="index.html">Hello {{name}}</a>
+                    href="{{ url_for('site.index') }}">Hello {{ first_name }}</a>
                 
                 <div class="modal fade" id="connectionModal" tabindex="-1" aria-labelledby="connectionModalLabel" aria-hidden="true"
                     data-bs-backdrop="static" data-bs-keyboard="false">
@@ -25,7 +25,10 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <a href="./logout" class="btn btn-secondary">Logout</a>
+                                <p>You are logged in as {{ first_name }} {{ last_name }}.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <a href="{{ url_for('site.logout') }}" class="btn btn-secondary">Logout</a>
                                 <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModalToggle2"
                                     data-bs-dismiss="modal">Change User</a>
                                 <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModalToggle3" data-bs-dismiss="modal">Change
@@ -46,7 +49,7 @@
                             </div>
                             <div class="modal-body">
                                 
-                                <form name="frm1" action="/login" method="POST">
+                                <form name="frm1" action="{{ url_for('site.login') }}" method="POST">
                                     {{ form.hidden_tag() }}
                                 
                                     {% for message in get_flashed_messages() %}

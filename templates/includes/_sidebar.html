@@ -4,7 +4,7 @@
     <div class="position-sticky pt-3">
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if active_page == 'index' }}" aria-current="page" href="/">
+                <a class="nav-link {{ 'active' if active_page == 'index' }}" aria-current="page" href="{{ url_for('site.index') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         class="feather feather-home" aria-hidden="true">
@@ -15,7 +15,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if active_page == 'student' }}" href="/student">
+                <a class="nav-link {{ 'active' if active_page == 'student' }}" href="{{ url_for('site.index') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         class="feather feather-users" aria-hidden="true">
@@ -28,7 +28,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if active_page == 'unit' }}" href="/unit">
+                <a class="nav-link {{ 'active' if active_page == 'unit' }}" href="{{ url_for('site.index') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         class="feather feather-archive" aria-hidden="true">
@@ -40,7 +40,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if active_page == 'session' }}" href="/session">
+                <a class="nav-link {{ 'active' if active_page == 'session' }}" href="{{ url_for('site.index') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         class="feather feather-book" aria-hidden="true">
@@ -69,7 +69,7 @@
         </h6>
         <ul class="nav flex-column mb-2">
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if active_page == '#2' }}" href="#2">
+                <a class="nav-link {{ 'active' if active_page == '#2' }}" href="{{ url_for('site.index') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         class="feather feather-file-text" aria-hidden="true">
@@ -83,7 +83,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if active_page == '#3' }}" href="#3">
+                <a class="nav-link {{ 'active' if active_page == '#3' }}" href="{{ url_for('site.index') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         class="feather feather-file-text" aria-hidden="true">
@@ -97,7 +97,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if active_page == '#4' }}" href="#4">
+                <a class="nav-link {{ 'active' if active_page == '#4' }}" href="{{ url_for('site.index') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         class="feather feather-file-text" aria-hidden="true">

@@ -1,6 +1,10 @@
 from sqlalchemy import create_engine
 from config import username, password, hostname, database
 
+
+# Sample query of the database
+
+
 def login_request():
     '''
     App login
