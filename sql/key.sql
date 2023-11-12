@@ -55,8 +55,8 @@ CREATE TABLE users (
 	email VARCHAR UNIQUE
 );
 
-INSERT INTO users (first_name, last_name, title_id, role_id)
-VALUES ('erin', 'wills', 1, 1, 'ew@mysite.com',
+INSERT INTO users (first_name, last_name, title_id, role_id, email)
+VALUES ('erin', 'wills', 1, 1, 'ew@mysite.com'),
 		('will', 'wright', 1, 1, 'ww@mysite.com'),
 		('andrew', 'ng', 1, 1, 'an@mysite.com'),
 		('bob', 'turtle', 5, 3, 'bt@mysite.com'),
@@ -77,16 +77,15 @@ VALUES (4, 9);
 -- LOGIN _____________________________________________________
 
 
+-- change so that primary key is also foreign key to users (user_id), keep only username, password_hash
 CREATE TABLE authentication (
-	login_id SERIAL PRIMARY KEY,
-	first_name VARCHAR,
-	last_name VARCHAR,
+	id INT PRIMARY KEY REFERENCES users (user_id),
 	username VARCHAR,
 	password_hash VARCHAR
 );
 
-INSERT INTO authentication (first_name, last_name, username, password_hash)
-VALUES ('Erin', 'Wills', 'ejwadmin', 'alf344t4090j0aojfsfa');
+INSERT INTO authentication (login_id, username, password_hash)
+VALUES (1, 'ejwadmin', 'alf344t4090j0aojfsfa');
 
 -- SPACE & GRANTED APPROVAL ------------------------------------------------------------
 

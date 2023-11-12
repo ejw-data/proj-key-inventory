@@ -1,21 +1,25 @@
 from flask_sqlalchemy import SQLAlchemy
+
+# I can probably remove these part of the code - used in site_routes.py
 from werkzeug.security import generate_password_hash, check_password_hash
+
+from flask_login import UserMixin
 
 db = SQLAlchemy()
 
 
-class Authentication(db.Model):
+class Authentication(db.Model, UserMixin):
     """
     App login
+    need just user_id linked to Users and username and password_hash
+    Note:  Naming of 'id' matters because only 'id' is accepted by flask_login login_user()
     """
 
     __bind_key__ = "key_inventory"
     __tablename__ = "authentication"
-    login_id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(25))
-    last_name = db.Column(db.String(25))
+    id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(25))
-    password_hash = db.Column(db.String(25))
+    password_hash = db.Column(db.String(128))
 
     @property
     def password(self):
@@ -64,7 +68,6 @@ class Roles(db.Model):
     __tablename__ = "roles"
     role_id = db.Column(db.Integer, primary_key=True)
     user_role = db.Column(db.String(25))
-
 
 
 #     # Column types

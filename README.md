@@ -11,6 +11,7 @@ Scoping a future cloud application that will intelligently assign users to meeti
 * `pip install werkzeug`
 * `pip install flask-WTF`
 * `pip install psycopg2`
+* `pip install flask_login`
 
 ### Activate Environment
 * `. venv/Scripts/activate`

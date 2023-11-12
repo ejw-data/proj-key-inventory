@@ -119,8 +119,9 @@ body {
 }
 
 .modal .form-control{
-    border: #86b7fe solid 5px
+    border: #86b7fe solid 2px
 }
+
 .modal .col-form-label{
     font-size: 1.25rem;
 }
@@ -129,7 +130,7 @@ body {
     background-color: rgba(0,0,0,.03);
 }
 
-.modal i{
+.modal i {
     font-size: 1.75rem;
     padding: 0 10px;
     color:#0d6efd;
