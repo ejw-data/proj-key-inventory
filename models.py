@@ -64,17 +64,10 @@ class Roles(db.Model):
     Role table
     """
 
-    __bind_key = "key_inventory"
+    __bind_key__ = "key_inventory"
     __tablename__ = "roles"
     role_id = db.Column(db.Integer, primary_key=True)
     user_role = db.Column(db.String(25))
-
-
-#     # Column types
-#     db.Column(db.Integer)
-#     db.Column(db.String(25))
-#     db.Column(db.Date)
-#     db.Column(db.Float)
 
 
 class Approvers(db.Model):
@@ -189,7 +182,7 @@ class Key_Orders(db.Model):
     Approved keys being produced by key shop
     """
     __bind_key__ = "key_inventory"
-    __tablename__ = "key_status"
+    __tablename__ = "key_orders"
     transaction_id = db.Column(db.Integer, primary_key=True)
     access_code_id = db.Column(db.Integer)
 

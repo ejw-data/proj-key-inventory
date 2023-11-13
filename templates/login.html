@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Key Inventory</title>
 
+
     <!-- favicon  -->
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon/favicon.ico') }}">
     <link rel="apple-touch-icon" sizes="180x180"
@@ -21,6 +22,7 @@
     <link rel="stylesheet" href="/static/css/font-awsome-free-all.min.css">
     <link href="/static/css/style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+
 </head>
 
 <body>
@@ -40,13 +42,13 @@
         
         {% endfor %}
 
-        <div class="form-floating mb-3">
+        <div class="mb-3">
             {{ form.username.label(class="col-form-label") }}
             {{ form.username(class="form-control") }}
             <!-- <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
             <label for="floatingInput">Email address</label> -->
         </div>
-        <div class="form-floating mb-3">
+        <div class="mb-3">
             {{ form.password.label(class="col-form-label") }}
             {{ form.password(class="form-control") }}
             <!-- <input type="password" class="form-control" id="floatingPassword" placeholder="Password">

@@ -6,6 +6,7 @@ from wtforms import (
     ValidationError,
     BooleanField,
     SelectField,
+    EmailField
 )
 from wtforms.validators import DataRequired, InputRequired, EqualTo, Length
 from models import Roles, Titles
@@ -17,7 +18,7 @@ class LoginForm(FlaskForm):
     Login Form fields
     """
 
-    username = StringField("Input your Username", validators=[DataRequired()])
+    username = EmailField("Input your Username", validators=[DataRequired()])
     password = PasswordField("Input your Password", validators=[DataRequired()])
     submit = SubmitField("Submit")
 
@@ -27,7 +28,7 @@ class RegisterForm(FlaskForm):
     Registration Form fields
     """
 
-    username = StringField("Input your Username", validators=[DataRequired()])
+    username = EmailField("Input your Username", validators=[DataRequired()])
     password = PasswordField("Input your Password", validators=[DataRequired(), EqualTo('password2', message="Passwords must match")])
     password2 = PasswordField("Retype your Password", validators=[DataRequired()])
     submit = SubmitField("Submit")
@@ -42,7 +43,7 @@ class CreateUserForm(FlaskForm):
     last_name = StringField("Input your Last Name", validators=[DataRequired()])
     title = SelectField("Select Title", coerce=int, validators=[InputRequired()])
     role = SelectField("Select Role", coerce=int, validators=[InputRequired()])
-    email = StringField("Input your Email", validators=[DataRequired()])
+    email = EmailField("Input your Email", validators=[DataRequired()])
     submit = SubmitField("Submit")
 
 
