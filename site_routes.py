@@ -1,9 +1,17 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, Authentication, Users
+from models import db, Authentication, Users, Buildings, Rooms
+
 # from flask_sqlalchemy import SQLAlchemy
-from forms import LoginForm, RegisterForm, userform_instance
+from forms import (
+    LoginForm,
+    RegisterForm,
+    userform_instance,
+    spaceform_instance,
+    CreateBuildingForm,
+    CreateRoomForm,
+)
 
 
 # allow for multiple route types, see also api_routes.py
@@ -53,14 +61,56 @@ def index():
 
 @site.route("/users")
 @include_login_form
-def users_page():
+def users():
     """
     User information page, currently holds add users form
     """
 
     user_form = userform_instance()
 
-    return render_template("user.html", user_form=user_form)
+    return render_template("users.html", user_form=user_form)
+
+
+@site.route("/keys")
+@include_login_form
+def keys():
+    """
+    User information page, currently holds add users form
+    """
+
+    user_form = userform_instance()
+
+    return render_template("keys.html", user_form=user_form)
+
+
+@site.route("/access")
+@include_login_form
+def access():
+    """
+    User information page, currently holds add users form
+    """
+
+    user_form = userform_instance()
+
+    return render_template("access.html", user_form=user_form)
+
+
+@site.route("/admin")
+@include_login_form
+def admin():
+    """
+    User information page, currently holds add users form
+    """
+    user_form = userform_instance()
+    space_form = spaceform_instance()
+    building_form = CreateBuildingForm()
+
+    return render_template(
+        "admin.html",
+        user_form=user_form,
+        space_form=space_form,
+        building_form=building_form,
+    )
 
 
 # ---------- FORM ROUTES ----------------------------
@@ -68,33 +118,99 @@ def users_page():
 
 # User Addition by Administrator
 # maybe rename route /post/user/add
-@site.route("/post/add_user", methods=["POST"])
+@site.route("/post/user/add", methods=["POST"])
 @include_login_form
 def add_user():
     """
-    Route used to add users to database, applied on user.html
+    Route used to add users to database, applied on admin.html
     """
     user_form = userform_instance(request.form)
 
     if user_form.validate_on_submit():
-        name = Authentication.query.filter_by(username=user_form.username.data).first()
+        user_login_exists = Authentication.query.filter_by(
+            username=user_form.email.data
+        ).first()
+        user_account_exists = Users.query.filter_by(email=user_form.email.data).first()
 
-        if name is None:
+        if (user_login_exists is None) and (user_account_exists is None):
             user = Users(
                 first_name=user_form.first_name.data,
                 last_name=user_form.last_name.data,
                 title_id=user_form.title.data,
                 role_id=user_form.role.data,
-                email=user_form.email,
+                email=user_form.email.data,
             )
             db.session.add(user)
             db.session.commit()
 
-        user_form.first_name.data = ""
-        user_form.last_name.data = ""
-        user_form.title.data = ""
-        user_form.role.data = ""
-        flash("User Added Successfully")
+            user_form.first_name.data = ""
+            user_form.last_name.data = ""
+            user_form.title.data = ""
+            user_form.role.data = ""
+            flash("User Added Successfully")
+        elif user_login_exists is not None:
+            flash("User already has login and password.")
+        elif user_account_exists is not None:
+            flash(
+                f"User has account but no password.  User needs to register with {user_form.email.data}."
+            )
+        else:
+            flash("Error has occurred.  Contact key tracker administrator.")
+    return redirect(request.referrer)
+
+
+@site.route("/post/building/add", methods=["POST"])
+@include_login_form
+def add_buiding():
+    """
+    Route used to add buildings to database, applied on admin.html
+    """
+    user_form = CreateBuildingForm()
+
+    if user_form.validate_on_submit():
+        building = Buildings(
+            building_number=user_form.building_number.data,
+            building_name=user_form.building_name.data,
+            building_description=user_form.building_description.data,
+        )
+        db.session.add(building)
+        db.session.commit()
+
+        user_form.building_number.data = ""
+        user_form.building_name.data = ""
+        user_form.building_description.data = ""
+        flash("Building Added Successfully")
+
+    return redirect(request.referrer)
+
+
+@site.route("/post/room/add", methods=["POST"])
+@include_login_form
+def add_room():
+    """
+    Route used to add buildings to database, applied on admin.html
+    """
+    user_form = spaceform_instance()
+
+    if user_form.validate_on_submit():
+        room = Rooms(
+            space_number_id=user_form.space_number_id.data,
+            building_number=user_form.building_number.data,
+            floor_number=user_form.floor_number.data,
+            wing_number=user_form.wing_number.data,
+            room_number=user_form.room_number.data,
+            room_type=user_form.room_type.data,
+        )
+        db.session.add(room)
+        db.session.commit()
+
+        user_form.space_number_id.data = ""
+        user_form.building_number.data = ""
+        user_form.floor_number.data = ""
+        user_form.wing_number.data = ""
+        user_form.room_number.data = ""
+        user_form.room_type.data = ""
+        flash("Room Added Successfully")
 
     return redirect(request.referrer)
 

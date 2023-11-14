@@ -91,7 +91,7 @@ class Buildings(db.Model):
 
     __bind_key__ = "key_inventory"
     __tablename__ = "buildings"
-    buidlding_number = db.Column(db.Integer, primary_key=True)
+    building_number = db.Column(db.Integer, primary_key=True)
     building_name = db.Column(db.String(128))
     building_description = db.Column(db.String(128))
 
@@ -108,10 +108,10 @@ class Rooms(db.Model):
     floor_number = db.Column(db.Integer)
     wing_number = db.Column(db.Integer)
     room_number = db.Column(db.Integer)
-    room_type = db.Column(db.String(128))
+    room_type = db.Column(db.Integer)
 
 
-class Room_Classification(db.Model):
+class RoomClassification(db.Model):
     """
     Room Classification
     """
@@ -122,7 +122,7 @@ class Room_Classification(db.Model):
     room_type = db.Column(db.String(128))
 
 
-class Room_Amenities(db.Model):
+class RoomAmenities(db.Model):
     """
     Room Info
     """
@@ -155,7 +155,7 @@ class Requests(db.Model):
     rejection_comment = db.Column(db.String(128))
 
 
-class Keys_Created(db.Model):
+class KeysCreated(db.Model):
     """
     Keys fabricated
     """
@@ -167,7 +167,7 @@ class Keys_Created(db.Model):
     fabrication_status_id = db.Column(db.Integer)
 
 
-class Key_Status(db.Model):
+class KeyStatus(db.Model):
     """
     Key availability
     """
@@ -177,7 +177,7 @@ class Key_Status(db.Model):
     key_status = db.Column(db.String(128))
 
 
-class Key_Orders(db.Model):
+class KeyOrders(db.Model):
     """
     Approved keys being produced by key shop
     """
@@ -187,7 +187,7 @@ class Key_Orders(db.Model):
     access_code_id = db.Column(db.Integer)
 
 
-class Key_Inventory(db.Model):
+class KeyInventory(db.Model):
     """
     Key location
     """
@@ -200,7 +200,7 @@ class Key_Inventory(db.Model):
     date_returned = db.Column(db.Date)
 
 
-class Fabrication_Status(db.Model):
+class FabricationStatus(db.Model):
     """
     Status of Key being made
     """
@@ -210,7 +210,7 @@ class Fabrication_Status(db.Model):
     fabrication_status = db.Column(db.String(128))
 
 
-class Approver_Zones(db.Model):
+class ApproverZones(db.Model):
     """
     Approvers responsible for spaces
     """
@@ -220,7 +220,7 @@ class Approver_Zones(db.Model):
     access_approver_id = db.Column(db.Integer)
 
 
-class Approval_Status(db.Model):
+class ApprovalStatus(db.Model):
     """
     Status of key request from request to handoff
     """
@@ -230,7 +230,7 @@ class Approval_Status(db.Model):
     status_code_name = db.Column(db.String(128))
 
 
-class Access_Pairs(db.Model):
+class AccessPairs(db.Model):
     """
     Access codes for specific doors
     """
@@ -240,7 +240,7 @@ class Access_Pairs(db.Model):
     space_number_id = db.Column(db.Integer, primary_key=True)
 
 
-class Access_Codes(db.Model):
+class AccessCodes(db.Model):
     """
     Specific codes
     """

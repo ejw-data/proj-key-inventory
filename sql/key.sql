@@ -22,7 +22,7 @@ DROP TABLE IF EXISTS authentication;
 -- USERS ------------------------------------------------------
 CREATE TABLE titles (
 	title_id SERIAL PRIMARY KEY,
-	title VARCHAR
+	title VARCHAR UNIQUE NOT NULL
 );
 
 INSERT INTO titles (title)
