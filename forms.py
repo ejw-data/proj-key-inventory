@@ -10,7 +10,7 @@ from wtforms import (
     EmailField,
 )
 from wtforms.validators import DataRequired, InputRequired, EqualTo, Length
-from models import Roles, Titles, RoomClassification, Buildings, Rooms
+from models import Roles, Titles, RoomClassification, Buildings, Rooms, Approvers
 
 
 # Create Form Class
@@ -169,9 +169,9 @@ class CreateRoomAmenitiesForm(FlaskForm):
     submit = SubmitField("Submit")
 
 
-def amenitiesform_instance(form_request=None):
+def amenities_form_instance(form_request=None):
     """
-    Create to dynamically populate room type and building inputs to selector elements
+    Create to dynamically populate amenities
     """
     amenities_form = CreateRoomAmenitiesForm(form_request)
 
@@ -184,6 +184,8 @@ def amenitiesform_instance(form_request=None):
 
     amenities_form.room_type.choices = amenities_query_list
 
+    return amenities_form
+
 
 class CreateRequestsForm(FlaskForm):
     """
@@ -195,12 +197,9 @@ class CreateRequestsForm(FlaskForm):
     building_number = SelectField(
         "Select building name", coerce=int, validators=[DataRequired()]
     )
-    floor = SelectField(
-        "Select floor", coerce=int, validators=[DataRequired()]
-    )
-    room = SelectField(
-        "Select room", coerce=int, validators=[DataRequired()]
-    )
+    floor = SelectField("Select floor", coerce=int, validators=[DataRequired()])
+    wing = SelectField("Select wing", coerce=int, validators=[DataRequired()])
+    room = SelectField("Select room", coerce=int, validators=[DataRequired()])
     # Calc remaining options for wing for user to select
     # calc space_number_id in the background
     # calc available access approver for user to select
@@ -219,4 +218,137 @@ class CreateRequestsForm(FlaskForm):
     submit = SubmitField("Submit")
 
 
-# Need Approvers, KeysCreated, KeyStatus, KeyOrders
+def request_form_instance(form_request=None):
+    """
+    Create to dynamically update requests form
+    """
+    request_form = CreateRequestsForm(form_request)
+
+    building_numbers = (
+        Buildings.select(Buildings.building_number, Buildings.building_name)
+        .query.order_by(Buildings.building_name.desc())
+        .all()
+    )
+    building_list = [
+        (i.building_number, i.building_name.title()) for i in building_numbers
+    ]
+    request_form.room_type.choices = building_list
+
+    # for these simple queries can I convert the slalchemy object to a list with .to_list()
+    floor_numbers = (
+        Rooms.select(Rooms.floor_number).query.order_by(Rooms.floor_number.desc()).all()
+    )
+    floor_list = [i for i in floor_numbers]
+    request_form.type.choices = floor_list
+
+    wing_numbers = (
+        Rooms.select(Rooms.wing_number).query.order_by(Rooms.wing_number.desc()).all()
+    )
+    wing_list = [i for i in wing_numbers]
+    request_form.type.choices = wing_list
+
+    room_numbers = (
+        Rooms.select(Rooms.room_number).query.order_by(Rooms.room_number.desc()).all()
+    )
+    room_list = [i for i in room_numbers]
+    request_form.type.choices = room_list
+
+    approvers = Approvers.select(Approvers.approver_id).distinct().query.order_by(Approvers.approver_id).all()
+    approver_list = [i for i in approvers]
+    request_form.type.choices = approver_list 
+    
+    # I think this is the subquery that is needed get approver names
+    # thsi should replace the approvers variable above
+    subquery2 = ApproverZones.select(ApproverZones.access_approver_id.distinct()).query().filter(ApproverZones.building_number == 24).subquery()
+    subquery1 = Approvers.select(Approvers.approver_id).query().filter(Approvers.access_approver_id.in_(subquery2)).subquery()
+    query = Users.select(Users.first_name, Users.last_name).query().filter(Users.user_id.in_(subquery1))
+
+    # Select first_name, last_name
+    # From users 
+    # Where user_id in (
+    #     Select approver_id
+    #     From access_approvers
+    #     Where access_approver_id in (
+    #         Select Distinct access_approver_id
+    #         From approver_zones
+    #         Where building_number = <form input>
+    #     )
+    # )
+
+    return request_form
+
+
+class CreateKeysForm(FlaskForm):
+    """
+    Keys Fabricated Form fields
+    """
+
+    key_number = SelectField(
+        "Select key number", coerce=int, validators=[DataRequired()]
+    )
+    key_copy = StringField("Input key copy number", validators=[DataRequired()])
+    access_code_id = SelectField(
+        "Select access code", coerce=int, validators=[DataRequired()]
+    )
+    fabrication_status_id = 1  # set default to 'In queue'
+    submit = SubmitField("Submit")
+
+
+def keys_form_instance(form_request=None):
+    """
+    Create to dynamically update keys form
+    """
+
+    keys_form = CreateKeysForm(form_request)
+
+    # add choices for key_Number, access_code dynamically
+
+    return keys_form
+
+
+class CreateKeyStatusForm(FlaskForm):
+    """
+    Key status form fields
+    """
+
+    key_status = StringField("Input new key status", validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
+
+class CreateKeyOrdersForm(FlaskForm):
+    """
+    Key order status form fields
+    """
+
+    # calc transaction_id from requests table - add behind the scenes
+    access_code_id = StringField("Input new key status", validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
+
+class CreateKeyInventoryForm(FlaskForm):
+    """
+    Key inventory form fields
+    """
+
+    # calc transaction_id from requests table - add behind the scenes
+    transaction_id = 1
+    key_number = IntegerField("Input new key number", validators=[DataRequired()])
+    key_copy = IntegerField("Input new key copy number", validators=[DataRequired()])
+    date_transferred = 1  # set the date of the handoff
+    date_returned = 1  # set to default of null
+    submit = SubmitField("Submit")
+
+
+class CreateApproversForm(FlaskForm):
+    """
+    Key approver form fields
+    """
+
+    # calc transaction_id from requests table - add behind the scenes
+    access_approver_id = 1  # ???
+    approver_id = 1  #
+    role_approved_by = SelectField("Select approver name", validators=[DataRequired()])
+    key_copy = IntegerField("Input new key copy number", validators=[DataRequired()])
+    date_transferred = 1  # set the date of the handoff
+    date_returned = 1  # set to default of null
+    submit = SubmitField("Submit")

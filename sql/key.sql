@@ -266,7 +266,7 @@ CREATE TABLE keys_created (
 	key_number INT,
 	key_copy INT,
 	access_code_id INT REFERENCES access_codes (access_code_id),
-	fabrication_status_id INT REFERENCES fabrication_status (fabrication_status_id),
+	fabrication_status_id INT DEFAULT 1 REFERENCES fabrication_status (fabrication_status_id),
 	PRIMARY KEY (key_number, key_copy)
 );
 

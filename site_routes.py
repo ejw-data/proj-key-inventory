@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, Authentication, Users, Buildings, Rooms
+from models import db, Authentication, Users, Buildings, Rooms, Requests
 
 # from flask_sqlalchemy import SQLAlchemy
 from forms import (
@@ -11,6 +11,7 @@ from forms import (
     spaceform_instance,
     CreateBuildingForm,
     CreateRoomForm,
+    request_form_instance,
 )
 
 
@@ -210,6 +211,42 @@ def add_room():
         user_form.wing_number.data = ""
         user_form.room_number.data = ""
         user_form.room_type.data = ""
+        flash("Room Added Successfully")
+
+    return redirect(request.referrer)
+
+
+@site.route("/post/request/add", methods=["POST"])
+@include_login_form
+def add_request():
+    """
+    Route used to add buildings to database, applied on admin.html
+    """
+    user_form = request_form_instance()
+
+    floor_number = user_form.floor_number.data,
+    wing_number = user_form.wing_number.data,
+    room_number = user_form.room_number.data,
+    building_number = user_form.building_number.data
+
+    if user_form.validate_on_submit():
+        key_request = Requests(
+            user_id=current_user.get_id(),
+            building_number=building_number,
+            space_number_id=f"B{str(building_number).zfill(2)}{str(floor_number).zfill(2)}{str(wing_number).zfill(2)}{str(room_number).zfill(2)}",
+            access_approver_id=user_form.access_approver.data,
+            access_code_id=1,
+            status_code=1,
+            request_date=1,
+        )
+        db.session.add(key_request)
+        db.session.commit()
+
+        user_form.building_number.data = ""
+        user_form.floor.data = ""
+        user_form.wing.data = ""
+        user_form.room.data = ""
+        user_form.access_approver_id.data = ""
         flash("Room Added Successfully")
 
     return redirect(request.referrer)
