@@ -10,7 +10,7 @@ from wtforms import (
     EmailField,
 )
 from wtforms.validators import DataRequired, InputRequired, EqualTo, Length
-from models import Roles, Titles, RoomClassification, Buildings, Rooms, Approvers
+from models import Roles, Titles, RoomClassification, Buildings, Rooms, Approvers, Users
 
 
 # Create Form Class
@@ -225,46 +225,70 @@ def request_form_instance(form_request=None):
     request_form = CreateRequestsForm(form_request)
 
     building_numbers = (
-        Buildings.select(Buildings.building_number, Buildings.building_name)
-        .query.order_by(Buildings.building_name.desc())
+        Buildings.query.with_entities(
+            Buildings.building_number, Buildings.building_name
+        )
+        .order_by(Buildings.building_name.asc())
         .all()
     )
     building_list = [
         (i.building_number, i.building_name.title()) for i in building_numbers
     ]
-    request_form.room_type.choices = building_list
+    request_form.building_number.choices = building_list
 
-    # for these simple queries can I convert the slalchemy object to a list with .to_list()
     floor_numbers = (
-        Rooms.select(Rooms.floor_number).query.order_by(Rooms.floor_number.desc()).all()
+        Rooms.query.with_entities(Rooms.floor_number)
+        .distinct()
+        .order_by(Rooms.floor_number.asc())
+        .all()
     )
-    floor_list = [i for i in floor_numbers]
-    request_form.type.choices = floor_list
+    floor_list = [(i.floor_number, i.floor_number) for i in floor_numbers]
+    request_form.floor.choices = floor_list
 
     wing_numbers = (
-        Rooms.select(Rooms.wing_number).query.order_by(Rooms.wing_number.desc()).all()
+        Rooms.query.with_entities(Rooms.wing_number)
+        .distinct()
+        .order_by(Rooms.wing_number.asc())
+        .all()
     )
-    wing_list = [i for i in wing_numbers]
-    request_form.type.choices = wing_list
+    wing_list = [(i.wing_number, i.wing_number) for i in wing_numbers]
+    request_form.wing.choices = wing_list
 
     room_numbers = (
-        Rooms.select(Rooms.room_number).query.order_by(Rooms.room_number.desc()).all()
+        Rooms.query.with_entities(Rooms.room_number)
+        .order_by(Rooms.room_number.asc())
+        .all()
     )
-    room_list = [i for i in room_numbers]
-    request_form.type.choices = room_list
+    room_list = [(i.room_number, i.room_number) for i in room_numbers]
+    request_form.room.choices = room_list
 
-    approvers = Approvers.select(Approvers.approver_id).distinct().query.order_by(Approvers.approver_id).all()
-    approver_list = [i for i in approvers]
-    request_form.type.choices = approver_list 
-    
+    subquery = (
+        Approvers.query.with_entities(Approvers.approver_id)
+        .distinct()
+        .order_by(Approvers.approver_id.asc())
+    )
+    approvers = (
+        Users.query.with_entities(Users.first_name, Users.last_name, Approvers.access_approver_id)
+        .order_by(Users.last_name.asc())
+        .filter(Users.user_id.in_(subquery))
+        .join(Approvers, Approvers.approver_id == Users.user_id)
+        .all()
+    )
+
+    approvers_list = [
+        (i.access_approver_id, f"{i.first_name.title()} {i.last_name.title()}")
+        for i in approvers
+    ]
+    request_form.access_approver_id.choices = approvers_list
+
     # I think this is the subquery that is needed get approver names
-    # thsi should replace the approvers variable above
-    subquery2 = ApproverZones.select(ApproverZones.access_approver_id.distinct()).query().filter(ApproverZones.building_number == 24).subquery()
-    subquery1 = Approvers.select(Approvers.approver_id).query().filter(Approvers.access_approver_id.in_(subquery2)).subquery()
-    query = Users.select(Users.first_name, Users.last_name).query().filter(Users.user_id.in_(subquery1))
+    # this should replace the approvers variable above
+    # subquery2 = ApproverZones.select(ApproverZones.access_approver_id.distinct()).query().filter(ApproverZones.building_number == 24).subquery()
+    # subquery1 = Approvers.select(Approvers.approver_id).query().filter(Approvers.access_approver_id.in_(subquery2)).subquery()
+    # query = Users.select(Users.first_name, Users.last_name).query().filter(Users.user_id.in_(subquery1))
 
     # Select first_name, last_name
-    # From users 
+    # From users
     # Where user_id in (
     #     Select approver_id
     #     From access_approvers

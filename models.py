@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 
 # I can probably remove these part of the code - used in site_routes.py
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -148,7 +149,7 @@ class Requests(db.Model):
     access_approver_id = db.Column(db.Integer)
     access_code_id = db.Column(db.Integer)
     status_code = db.Column(db.Integer)
-    request_date = db.Column(db.Date)
+    request_date = db.Column(db.DateTime, server_default=func.now())
     approved_date = db.Column(db.Date)
     approved = db.Column(db.Boolean)
     approval_comment = db.Column(db.String(128))
@@ -159,6 +160,7 @@ class KeysCreated(db.Model):
     """
     Keys fabricated
     """
+
     __bind_key__ = "key_inventory"
     __tablename__ = "keys_created"
     key_number = db.Column(db.Integer, primary_key=True)
@@ -171,6 +173,7 @@ class KeyStatus(db.Model):
     """
     Key availability
     """
+
     __bind_key__ = "key_inventory"
     __tablename__ = "key_status"
     key_status_id = db.Column(db.Integer, primary_key=True)
@@ -181,6 +184,7 @@ class KeyOrders(db.Model):
     """
     Approved keys being produced by key shop
     """
+
     __bind_key__ = "key_inventory"
     __tablename__ = "key_orders"
     transaction_id = db.Column(db.Integer, primary_key=True)
@@ -191,6 +195,7 @@ class KeyInventory(db.Model):
     """
     Key location
     """
+
     __bind_key__ = "key_inventory"
     __tablename__ = "key_inventory"
     transaction_id = db.Column(db.Integer, primary_key=True)
@@ -204,6 +209,7 @@ class FabricationStatus(db.Model):
     """
     Status of Key being made
     """
+
     __bind_key__ = "key_inventory"
     __tablename__ = "fabrication_status"
     fabrication_status_id = db.Column(db.Integer, primary_key=True)
@@ -214,6 +220,7 @@ class ApproverZones(db.Model):
     """
     Approvers responsible for spaces
     """
+
     __bind_key__ = "key_inventory"
     __tablename__ = "approver_zones"
     building_number = db.Column(db.Integer, primary_key=True)
@@ -224,6 +231,7 @@ class ApprovalStatus(db.Model):
     """
     Status of key request from request to handoff
     """
+
     __bind_key__ = "key_inventory"
     __tablename__ = "approval_status"
     status_code = db.Column(db.Integer, primary_key=True)
@@ -234,6 +242,7 @@ class AccessPairs(db.Model):
     """
     Access codes for specific doors
     """
+
     __bind_key__ = "key_inventory"
     __tablename__ = "access_pairs"
     access_code_id = db.Column(db.Integer, primary_key=True)
@@ -244,6 +253,7 @@ class AccessCodes(db.Model):
     """
     Specific codes
     """
+
     __bind_key__ = "key_inventory"
     __tablename__ = "access_codes"
     access_code_id = db.Column(db.Integer, primary_key=True)

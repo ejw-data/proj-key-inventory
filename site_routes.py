@@ -1,7 +1,18 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, Authentication, Users, Buildings, Rooms, Requests
+from models import (
+    db,
+    Authentication,
+    Users,
+    Buildings,
+    Rooms,
+    Requests,
+    ApproverZones,
+    Approvers,
+)
+from query import get_access_code
+from sqlalchemy import null, func
 
 # from flask_sqlalchemy import SQLAlchemy
 from forms import (
@@ -67,7 +78,7 @@ def users():
     User information page, currently holds add users form
     """
 
-    user_form = userform_instance()
+    user_form = request_form_instance()
 
     return render_template("users.html", user_form=user_form)
 
@@ -222,22 +233,23 @@ def add_request():
     """
     Route used to add buildings to database, applied on admin.html
     """
-    user_form = request_form_instance()
+    user_form = request_form_instance(request.form)
 
-    floor_number = user_form.floor_number.data,
-    wing_number = user_form.wing_number.data,
-    room_number = user_form.room_number.data,
+    floor_number = user_form.floor.data
+    wing_number = user_form.wing.data
+    room_number = user_form.room.data
     building_number = user_form.building_number.data
-
+    room_list = ["B24010101"]
+    code = get_access_code(room_list)
+    space_id = f"B{str(building_number).zfill(2)}{str(floor_number).zfill(2)}{str(wing_number).zfill(2)}{str(room_number).zfill(2)}"
+   
     if user_form.validate_on_submit():
         key_request = Requests(
             user_id=current_user.get_id(),
             building_number=building_number,
-            space_number_id=f"B{str(building_number).zfill(2)}{str(floor_number).zfill(2)}{str(wing_number).zfill(2)}{str(room_number).zfill(2)}",
-            access_approver_id=user_form.access_approver.data,
-            access_code_id=1,
-            status_code=1,
-            request_date=1,
+            space_number_id=space_id,
+            access_approver_id=user_form.access_approver_id.data,
+            access_code_id=code,
         )
         db.session.add(key_request)
         db.session.commit()

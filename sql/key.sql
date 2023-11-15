@@ -186,7 +186,7 @@ CREATE TABLE requests (
 	building_number INT,
 	access_approver_id INT,
 	access_code_id INT REFERENCES access_codes (access_code_id),
-	status_code INT REFERENCES approval_status (status_code),
+	status_code INT DEFAULT 1 REFERENCES approval_status (status_code),
 	request_date TIMESTAMP NOT NULL DEFAULT NOW(),
 	approved_date TIMESTAMP,
 	approved BOOL DEFAULT FALSE,
@@ -194,6 +194,8 @@ CREATE TABLE requests (
 	rejection_comment VARCHAR,
 	FOREIGN KEY (building_number, access_approver_id) REFERENCES approver_zones (building_number, access_approver_id)
 );
+
+ALTER TABLE requests ALTER COLUMN request_date SET DEFAULT now();
 
 -- Logic 
 -- create function that is triggered by status_code = 2 (approved)
