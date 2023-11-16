@@ -16,11 +16,11 @@
     
     {% endfor %}
     
-    <form name="user_form" action="/post/request/add" method="POST" class="col-md-4">
+    <form name="request_form" action="/post/request/add" method="POST" class="col-md-4">
         {{ user_form.hidden_tag() }}
         <div class="mb-3">
             {{ user_form.building_number.label(class="col-form-label") }}
-            {{ user_form.building_number(class="form-control") }}
+            {{ user_form.building_number(class="form-control", id="building_number") }}
         </div>
         <div class="mb-3">
             {{ user_form.floor.label(class="col-form-label") }}

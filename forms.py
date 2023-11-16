@@ -13,7 +13,35 @@ from wtforms.validators import DataRequired, InputRequired, EqualTo, Length
 from models import Roles, Titles, RoomClassification, Buildings, Rooms, Approvers, Users
 
 
-# Create Form Class
+# add data to access_approvers table
+class CreateApproversForm(FlaskForm):
+    """
+    Key approver form fields
+    """
+
+    # calc transaction_id from requests table - add behind the scenes
+    access_approver_id = 1  # ???
+    approver_id = 1  #
+    role_approved_by = SelectField("Select approver name", validators=[DataRequired()])
+    key_copy = IntegerField("Input new key copy number", validators=[DataRequired()])
+    date_transferred = 1  # set the date of the handoff
+    date_returned = 1  # set to default of null
+    submit = SubmitField("Submit")
+
+
+# add data to access_codes table
+
+
+# add data to access_pairs table
+
+
+# add data to approval_status table
+
+
+# add data to approver_zones table
+
+
+# verify data and add data to authentication table
 class LoginForm(FlaskForm):
     """
     Login Form fields
@@ -41,37 +69,7 @@ class RegisterForm(FlaskForm):
     submit = SubmitField("Submit")
 
 
-class CreateUserForm(FlaskForm):
-    """
-    User Form fields
-    """
-
-    first_name = StringField("Input your First Name", validators=[DataRequired()])
-    last_name = StringField("Input your Last Name", validators=[DataRequired()])
-    title = SelectField("Select Title", coerce=int, validators=[InputRequired()])
-    role = SelectField("Select Role", coerce=int, validators=[InputRequired()])
-    email = EmailField("Input your Email", validators=[DataRequired()])
-    submit = SubmitField("Submit")
-
-
-def userform_instance(form_request=None):
-    """
-    Create to dynamically populate title, role inputs to selector elements
-    """
-    user_form = CreateUserForm(form_request)
-
-    title_results = Titles.query.order_by(Titles.title_id.desc()).all()
-    title_query_list = [(i.title_id, i.title.title()) for i in title_results]
-    title_options = title_query_list
-    user_form.title.choices = title_options
-
-    role_results = Roles.query.order_by(Roles.role_id.desc()).all()
-    role_query_list = [(i.role_id, i.user_role.title()) for i in role_results]
-    user_form.role.choices = role_query_list
-
-    return user_form
-
-
+# add data to buildings table
 class CreateBuildingForm(FlaskForm):
     """
     Building Form fields
@@ -87,6 +85,131 @@ class CreateBuildingForm(FlaskForm):
     submit = SubmitField("Submit")
 
 
+# add data to fabrication status table
+
+
+# add data to key_inventory table
+class CreateKeyInventoryForm(FlaskForm):
+    """
+    Key inventory form fields
+    """
+
+    # calc transaction_id from requests table - add behind the scenes
+    transaction_id = 1
+    key_number = IntegerField("Input new key number", validators=[DataRequired()])
+    key_copy = IntegerField("Input new key copy number", validators=[DataRequired()])
+    date_transferred = 1  # set the date of the handoff
+    date_returned = 1  # set to default of null
+    submit = SubmitField("Submit")
+
+
+# add data to key_orders table
+class CreateKeyOrdersForm(FlaskForm):
+    """
+    Key order status form fields
+    """
+
+    # calc transaction_id from requests table - add behind the scenes
+    access_code_id = StringField("Input new key status", validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
+
+# add data to key_status table
+class CreateKeyStatusForm(FlaskForm):
+    """
+    Key status form fields
+    """
+
+    key_status = StringField("Input new key status", validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
+
+# add data to keys_created table
+class CreateKeysForm(FlaskForm):
+    """
+    Keys Fabricated Form fields
+    """
+
+    key_number = SelectField(
+        "Select key number", coerce=int, validators=[DataRequired()]
+    )
+    key_copy = StringField("Input key copy number", validators=[DataRequired()])
+    access_code_id = SelectField(
+        "Select access code", coerce=int, validators=[DataRequired()]
+    )
+    fabrication_status_id = 1  # set default to 'In queue'
+    submit = SubmitField("Submit")
+
+
+def keys_form_instance(form_request=None):
+    """
+    Create to dynamically update keys form
+    """
+
+    keys_form = CreateKeysForm(form_request)
+
+    # add choices for key_Number, access_code dynamically
+
+    return keys_form
+
+
+# add data to requests table
+# moved this table to the end of the file
+
+
+# add data to roles table
+class CreateRolesForm(FlaskForm):
+    """
+    Roles Form fields
+    """
+
+    user_role = StringField("Input a new role", validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
+
+# add data to room_amenities table
+class CreateRoomAmenitiesForm(FlaskForm):
+    """
+    Room Amenities Form fields
+    """
+
+    space_number_id = SelectField(
+        "Select Room", coerce=int, validators=[DataRequired()]
+    )
+    room_projector = StringField("Room includes projector", validators=[DataRequired()])
+    room_seating = StringField("Input number of seats", validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
+
+def amenities_form_instance(form_request=None):
+    """
+    Create to dynamically populate amenities
+    """
+    amenities_form = CreateRoomAmenitiesForm(form_request)
+
+    amenities_results = (
+        Rooms.select(Rooms.space_number_id)
+        .query.order_by(Rooms.space_number_id.desc())
+        .all()
+    )
+    amenities_query_list = [i.title() for i in amenities_results]
+
+    amenities_form.room_type.choices = amenities_query_list
+
+    return amenities_form
+
+
+# add data to room_classification table
+class CreateRoomClassificationForm(FlaskForm):
+    """
+    Room Classification Form fields
+    """
+
+    room_type = StringField("Input a new room type", validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
+
+# add data to rooms table
 class CreateRoomForm(FlaskForm):
     """
     Room Form fields
@@ -129,6 +252,7 @@ def spaceform_instance(form_request=None):
     return user_form
 
 
+# add data to titles table
 class CreateTitleForm(FlaskForm):
     """
     Title Form fields
@@ -138,55 +262,40 @@ class CreateTitleForm(FlaskForm):
     submit = SubmitField("Submit")
 
 
-class CreateRolesForm(FlaskForm):
+# add data to users table
+class CreateUserForm(FlaskForm):
     """
-    Roles Form fields
+    User Form fields
     """
 
-    user_role = StringField("Input a new role", validators=[DataRequired()])
+    first_name = StringField("Input your First Name", validators=[DataRequired()])
+    last_name = StringField("Input your Last Name", validators=[DataRequired()])
+    title = SelectField("Select Title", coerce=int, validators=[InputRequired()])
+    role = SelectField("Select Role", coerce=int, validators=[InputRequired()])
+    email = EmailField("Input your Email", validators=[DataRequired()])
     submit = SubmitField("Submit")
 
 
-class CreateRoomClassificationForm(FlaskForm):
+def userform_instance(form_request=None):
     """
-    Room Classification Form fields
+    Create to dynamically populate title, role inputs to selector elements
     """
+    user_form = CreateUserForm(form_request)
 
-    room_type = StringField("Input a new room type", validators=[DataRequired()])
-    submit = SubmitField("Submit")
+    title_results = Titles.query.order_by(Titles.title_id.desc()).all()
+    title_query_list = [(i.title_id, i.title.title()) for i in title_results]
+    title_options = title_query_list
+    user_form.title.choices = title_options
 
+    role_results = Roles.query.order_by(Roles.role_id.desc()).all()
+    role_query_list = [(i.role_id, i.user_role.title()) for i in role_results]
+    user_form.role.choices = role_query_list
 
-class CreateRoomAmenitiesForm(FlaskForm):
-    """
-    Room Amenities Form fields
-    """
-
-    space_number_id = SelectField(
-        "Select Room", coerce=int, validators=[DataRequired()]
-    )
-    room_projector = StringField("Room includes projector", validators=[DataRequired()])
-    room_seating = StringField("Input number of seats", validators=[DataRequired()])
-    submit = SubmitField("Submit")
+    return user_form
 
 
-def amenities_form_instance(form_request=None):
-    """
-    Create to dynamically populate amenities
-    """
-    amenities_form = CreateRoomAmenitiesForm(form_request)
-
-    amenities_results = (
-        Rooms.select(Rooms.space_number_id)
-        .query.order_by(Rooms.space_number_id.desc())
-        .all()
-    )
-    amenities_query_list = [i.title() for i in amenities_results]
-
-    amenities_form.room_type.choices = amenities_query_list
-
-    return amenities_form
-
-
+# add data to requests table
+# this table is moved to the end bc it is the most complicated
 class CreateRequestsForm(FlaskForm):
     """
     Request Form fields
@@ -268,7 +377,9 @@ def request_form_instance(form_request=None):
         .order_by(Approvers.approver_id.asc())
     )
     approvers = (
-        Users.query.with_entities(Users.first_name, Users.last_name, Approvers.access_approver_id)
+        Users.query.with_entities(
+            Users.first_name, Users.last_name, Approvers.access_approver_id
+        )
         .order_by(Users.last_name.asc())
         .filter(Users.user_id.in_(subquery))
         .join(Approvers, Approvers.approver_id == Users.user_id)
@@ -300,79 +411,3 @@ def request_form_instance(form_request=None):
     # )
 
     return request_form
-
-
-class CreateKeysForm(FlaskForm):
-    """
-    Keys Fabricated Form fields
-    """
-
-    key_number = SelectField(
-        "Select key number", coerce=int, validators=[DataRequired()]
-    )
-    key_copy = StringField("Input key copy number", validators=[DataRequired()])
-    access_code_id = SelectField(
-        "Select access code", coerce=int, validators=[DataRequired()]
-    )
-    fabrication_status_id = 1  # set default to 'In queue'
-    submit = SubmitField("Submit")
-
-
-def keys_form_instance(form_request=None):
-    """
-    Create to dynamically update keys form
-    """
-
-    keys_form = CreateKeysForm(form_request)
-
-    # add choices for key_Number, access_code dynamically
-
-    return keys_form
-
-
-class CreateKeyStatusForm(FlaskForm):
-    """
-    Key status form fields
-    """
-
-    key_status = StringField("Input new key status", validators=[DataRequired()])
-    submit = SubmitField("Submit")
-
-
-class CreateKeyOrdersForm(FlaskForm):
-    """
-    Key order status form fields
-    """
-
-    # calc transaction_id from requests table - add behind the scenes
-    access_code_id = StringField("Input new key status", validators=[DataRequired()])
-    submit = SubmitField("Submit")
-
-
-class CreateKeyInventoryForm(FlaskForm):
-    """
-    Key inventory form fields
-    """
-
-    # calc transaction_id from requests table - add behind the scenes
-    transaction_id = 1
-    key_number = IntegerField("Input new key number", validators=[DataRequired()])
-    key_copy = IntegerField("Input new key copy number", validators=[DataRequired()])
-    date_transferred = 1  # set the date of the handoff
-    date_returned = 1  # set to default of null
-    submit = SubmitField("Submit")
-
-
-class CreateApproversForm(FlaskForm):
-    """
-    Key approver form fields
-    """
-
-    # calc transaction_id from requests table - add behind the scenes
-    access_approver_id = 1  # ???
-    approver_id = 1  #
-    role_approved_by = SelectField("Select approver name", validators=[DataRequired()])
-    key_copy = IntegerField("Input new key copy number", validators=[DataRequired()])
-    date_transferred = 1  # set the date of the handoff
-    date_returned = 1  # set to default of null
-    submit = SubmitField("Submit")

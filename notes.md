@@ -69,3 +69,10 @@ Requestors:
 ### Views
 
 * Buildings - allows building to be selected from dropdown and shows that buildings spaces.  Add/Update/Delete to that rooms list.
+
+
+### Interactive menus
+*  Since the dropdown form options are populated at the time of the page load, the form fields are not affected by the changes in other field settings.  
+*  To make it interactive, I will add an event listener on a field and it will modify the DOM of another field using D3.  I think I will just need an api that will take the parameter and return all the other form data.  
+* For example, the key quest form has building as an input.  The event listener will be triggered on the change of that field and this input will be used in an API that returns a dictionary of {'floors':[], 'wings':[], 'rooms':[]}.  The basic process would be to d3.select the 2nd dropdown and then bind the data to the element and then clear out the html and then pass a function that updates each element.  
+
