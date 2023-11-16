@@ -50,7 +50,8 @@
                             <div class="modal-body">
                                 
                                 <form name="frm1" action="{{ url_for('site.login') }}" method="POST">
-                                    {{ form.hidden_tag() }}
+                                    {{ form.csrf_token(id = "frm1_modal_id") }}
+                                    <!-- {{ form.hidden_tag() }} -->
                                 
                                     {% for message in get_flashed_messages() %}
                                     <div class="alert alert-warning alert-dismissible fade show col-md-12" role="alert">
@@ -71,7 +72,7 @@
 
                                     </div>
                                     <div class="modal-footer">
-                                        {{ form.submit(class="btn btn-primary") }}
+                                        {{ form.submit(class="btn btn-primary", id="site_login_submit") }}
                                         <button id="updateComplete" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                     </div>
                                 </form>

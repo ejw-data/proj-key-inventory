@@ -17,7 +17,8 @@
     {% endfor %}
     
     <form name="request_form" action="/post/request/add" method="POST" class="col-md-4">
-        {{ user_form.hidden_tag() }}
+        <!-- {{ user_form.hidden_tag() }} -->
+        {{ user_form.csrf_token(id = "request_form_add_id") }}
         <div class="mb-3">
             {{ user_form.building_number.label(class="col-form-label") }}
             {{ user_form.building_number(class="form-control", id="building_number") }}
@@ -39,7 +40,7 @@
             {{ user_form.access_approver_id(class="form-control") }}
         </div>
         <div class="modal-footer">
-            {{ user_form.submit(class="btn btn-secondary") }}
+            {{ user_form.submit(class="btn btn-secondary", id="request_submit") }}
         </div>
     </form>
 

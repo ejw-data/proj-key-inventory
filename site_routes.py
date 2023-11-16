@@ -207,7 +207,7 @@ def add_room():
     if user_form.validate_on_submit():
         room = Rooms(
             space_number_id=user_form.space_number_id.data,
-            building_number=user_form.building_number.data,
+            building_number=user_form.room_building_number.data,
             floor_number=user_form.floor_number.data,
             wing_number=user_form.wing_number.data,
             room_number=user_form.room_number.data,
@@ -217,7 +217,7 @@ def add_room():
         db.session.commit()
 
         user_form.space_number_id.data = ""
-        user_form.building_number.data = ""
+        user_form.room_building_number.data = ""
         user_form.floor_number.data = ""
         user_form.wing_number.data = ""
         user_form.room_number.data = ""

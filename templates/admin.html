@@ -19,7 +19,8 @@
     <h3>Add User</h3>
 
     <form name="user_form" action="/post/user/add" method="POST" class="col-md-4">
-        {{ user_form.hidden_tag() }}
+        <!-- {{ user_form.hidden_tag() }} -->
+        {{ user_form.csrf_token(id = "user_form_add_id") }}
         <div class="mb-3">
             {{ user_form.first_name.label(class="col-form-label") }}
             {{ user_form.first_name(class="form-control") }}
@@ -41,13 +42,14 @@
             {{ user_form.email(class="form-control") }}
         </div>
         <div class="modal-footer">
-            {{ user_form.submit(class="btn btn-secondary") }}
+            {{ user_form.submit(class="btn btn-secondary", id="user_add_submit") }}
         </div>
     </form>
 
     <h3>Building Form</h3>
     <form name="building_form" action="/post/building/add" method="POST" class="col-md-4">
-        {{ building_form.hidden_tag() }}
+        <!-- {{ building_form.hidden_tag() }} -->
+        {{ building_form.csrf_token(id = "building_form_add_id") }}
         <div class="mb-3">
             {{ building_form.building_number.label(class="col-form-label") }}
             {{ building_form.building_number(class="form-control") }}
@@ -61,21 +63,22 @@
             {{ building_form.building_description(class="form-control") }}
         </div>
         <div class="modal-footer">
-            {{ building_form.submit(class="btn btn-secondary") }}
+            {{ building_form.submit(class="btn btn-secondary", id="building_add_submit") }}
         </div>
     </form>
 
 
     <h3>Room Form</h3>
     <form name="space_form" action="/post/room/add" method="POST" class="col-md-4">
-        {{ space_form.hidden_tag() }}
+        <!-- {{ space_form.hidden_tag() }} -->
+        {{ space_form.csrf_token(id = "space_form_add_id") }}
         <div class="mb-3">
             {{ space_form.space_number_id.label(class="col-form-label") }}
             {{ space_form.space_number_id(class="form-control") }}
         </div>
         <div class="mb-3">
-            {{ space_form.building_number.label(class="col-form-label") }}
-            {{ space_form.building_number(class="form-control") }}
+            {{ space_form.room_building_number.label(class="col-form-label") }}
+            {{ space_form.room_building_number(class="form-control") }}
         </div>
         <div class="mb-3">
             {{ space_form.floor_number.label(class="col-form-label") }}
@@ -94,7 +97,7 @@
             {{ space_form.room_type(class="form-control") }}
         </div>
         <div class="modal-footer">
-            {{ space_form.submit(class="btn btn-secondary") }}
+            {{ space_form.submit(class="btn btn-secondary", id="room_add_submit") }}
         </div>
     </form>
 
