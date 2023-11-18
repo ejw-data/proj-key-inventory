@@ -101,8 +101,98 @@
         </div>
     </form>
 
+    <h3>Room Amenities Form</h3>
+    <form name="amenities_form" action="/post/amenities/add" method="POST" class="col-md-4">
+        <!-- {{ space_form.hidden_tag() }} -->
+        {{ amenities_form.csrf_token(id = "amenities_form_add_id") }}
+        <div class="mb-3">
+            {{ amenities_form.space_amenities.label(class="col-form-label") }}
+            {{ amenities_form.space_amenities(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ amenities_form.room_projector.label(class="col-form-label") }}
+            {{ amenities_form.room_projector(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ amenities_form.room_seating.label(class="col-form-label") }}
+            {{ amenities_form.room_seating(class="form-control") }}
+        </div>
+        <div class="modal-footer">
+            {{ amenities_form.submit(class="btn btn-secondary", id="amenities_add_submit") }}
+        </div>
+    </form>
 
+    <h3>Room Classification Form</h3>
+    <form name="room_type_form" action="/post/roomtype/add" method="POST" class="col-md-4">
+        <!-- {{ space_form.hidden_tag() }} -->
+        {{ room_type_form.csrf_token(id = "room_type_form_add_id") }}
+        <div class="mb-3">
+            {{ room_type_form.room_type_id.label(class="col-form-label") }}
+            {{ room_type_form.room_type_id(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ room_type_form.room_type_name.label(class="col-form-label") }}
+            {{ room_type_form.room_type_name(class="form-control") }}
+        </div>
+        <div class="modal-footer">
+            {{ room_type_form.submit(class="btn btn-secondary", id="room_type_add_submit") }}
+        </div>
+    </form>
 
+    <h3>Title Form</h3>
+    <form name="title_form" action="/post/title/add" method="POST" class="col-md-4">
+        <!-- {{ space_form.hidden_tag() }} -->
+        {{ title_form.csrf_token(id = "title_form_add_id") }}
+        <div class="mb-3">
+            {{ title_form.title.label(class="col-form-label") }}
+            {{ title_form.title(class="form-control") }}
+        </div>
+        <div class="modal-footer">
+            {{ title_form.submit(class="btn btn-secondary", id="title_add_submit") }}
+        </div>
+    </form>
+    <h3>Roles Form</h3>
+    <form name="role_form" action="/post/role/add" method="POST" class="col-md-4">
+        {{ role_form.csrf_token(id = "role_form_add_id") }}
+        <div class="mb-3">
+            {{ role_form.user_role.label(class="col-form-label") }}
+            {{ role_form.user_role(class="form-control") }}
+        </div>
+        <div class="modal-footer">
+            {{ role_form.submit(class="btn btn-secondary", id="role_add_submit") }}
+        </div>
+    </form>
+
+    <h3>Approver Zone Form</h3>
+    <form name="approver_zone_form" action="/post/spaceapprover/add" method="POST" class="col-md-4">
+        {{ approver_zone_form.csrf_token(id = "approver_zone_form_add_id") }}
+        <div class="mb-3">
+            {{ approver_zone_form.building_number.label(class="col-form-label") }}
+            {{ approver_zone_form.building_number(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ approver_zone_form.access_approver_id.label(class="col-form-label") }}
+            {{ approver_zone_form.access_approver_id(class="form-control") }}
+        </div>
+        <div class="modal-footer">
+            {{ approver_zone_form.submit(class="btn btn-secondary", id="approver_zone_add_submit") }}
+        </div>
+    </form>
+    <h3>Approvers Form</h3>
+    <form name="approver_form" action="/post/approver/add" method="POST" class="col-md-4">
+        {{ approver_form.csrf_token(id = "approver_form_add_id") }}
+        <div class="mb-3">
+            {{ approver_form.approver_id.label(class="col-form-label") }}
+            {{ approver_form.approver_id(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ approver_form.role_approved_by.label(class="col-form-label") }}
+            {{ approver_form.role_approved_by(class="form-control") }}
+        </div>
+        <div class="modal-footer">
+            {{ approver_form.submit(class="btn btn-secondary", id="approver_add_submit") }}
+        </div>
+    </form>
     
 </main>
 {% endblock %}

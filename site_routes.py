@@ -10,6 +10,13 @@ from models import (
     Requests,
     ApproverZones,
     Approvers,
+    RoomAmenities,
+    RoomClassification,
+    Titles,
+    Roles,
+    KeysCreated,
+    KeyStatus,
+    FabricationStatus,
 )
 from query import get_access_code
 from sqlalchemy import null, func
@@ -21,8 +28,19 @@ from forms import (
     userform_instance,
     spaceform_instance,
     CreateBuildingForm,
-    CreateRoomForm,
     request_form_instance,
+    amenities_form_instance,
+    CreateRoomClassificationForm,
+    CreateTitleForm,
+    CreateRolesForm,
+    keys_form_instance,
+    CreateKeyStatusForm,
+    CreateFabricationStatusForm,
+    approver_zones_instance,
+    CreateAccessPairsForm,
+    CreateApprovalStatusForm,
+    CreateApproversForm,
+    approver_instance,
 )
 
 
@@ -91,8 +109,19 @@ def keys():
     """
 
     user_form = userform_instance()
+    key_form = keys_form_instance()
+    key_status_form = CreateKeyStatusForm()
+    fabrication_form = CreateFabricationStatusForm()
 
-    return render_template("keys.html", user_form=user_form)
+    # Table KeyOrders and KeyInventory should be filled via triggers
+
+    return render_template(
+        "keys.html",
+        user_form=user_form,
+        key_form=key_form,
+        key_status_form=key_status_form,
+        fabrication_form=fabrication_form,
+    )
 
 
 @site.route("/access")
@@ -116,12 +145,24 @@ def admin():
     user_form = userform_instance()
     space_form = spaceform_instance()
     building_form = CreateBuildingForm()
+    amenities_form = amenities_form_instance()
+    room_type_form = CreateRoomClassificationForm()
+    title_form = CreateTitleForm()
+    role_form = CreateRolesForm()
+    approver_zone_form = approver_zones_instance()
+    approver_form = approver_instance()
 
     return render_template(
         "admin.html",
         user_form=user_form,
         space_form=space_form,
         building_form=building_form,
+        amenities_form=amenities_form,
+        room_type_form=room_type_form,
+        title_form=title_form,
+        role_form=role_form,
+        approver_zone_form=approver_zone_form,
+        approver_form=approver_form,
     )
 
 
@@ -227,6 +268,211 @@ def add_room():
     return redirect(request.referrer)
 
 
+@site.route("/post/amenities/add", methods=["POST"])
+@include_login_form
+def add_amenities():
+    """
+    Route used to add room amenities to database, applied on admin.html
+    """
+    user_form = amenities_form_instance(request.form)
+
+    if user_form.validate_on_submit():
+        room_amenity = RoomAmenities(
+            space_number_id=user_form.space_amenities.data,
+            room_projector=user_form.room_projector.data,
+            room_seating=user_form.room_seating.data,
+        )
+        db.session.add(room_amenity)
+        db.session.commit()
+
+        user_form.space_amenities.data = ""
+        user_form.room_projector.data = ""
+        user_form.room_seating.data = ""
+        flash("Room Details Added Successfully")
+
+    return redirect(request.referrer)
+
+
+@site.route("/post/roomtype/add", methods=["POST"])
+@include_login_form
+def add_room_type():
+    """
+    Route used to add room classifications to database, applied on admin.html
+    """
+    user_form = CreateRoomClassificationForm()
+
+    if user_form.validate_on_submit():
+        room_type = RoomClassification(
+            room_type_id=user_form.room_type_id.data,
+            room_type=user_form.room_type_name.data.lower(),
+        )
+        db.session.add(room_type)
+        db.session.commit()
+
+        user_form.room_type_id.data = ""
+        user_form.room_type_name.data = ""
+        flash("Room Type Added Successfully")
+
+    return redirect(request.referrer)
+
+
+@site.route("/post/title/add", methods=["POST"])
+@include_login_form
+def add_title():
+    """
+    Route used to add room classifications to database, applied on admin.html
+    """
+    user_form = CreateTitleForm()
+
+    if user_form.validate_on_submit():
+        title = Titles(
+            title=user_form.title.data.lower(),
+        )
+        db.session.add(title)
+        db.session.commit()
+
+        user_form.title.data = ""
+        flash("Title Added Successfully")
+
+    return redirect(request.referrer)
+
+
+@site.route("/post/role/add", methods=["POST"])
+@include_login_form
+def add_role():
+    """
+    Route used to add user role to database, applied on admin.html
+    """
+    user_form = CreateRolesForm()
+
+    if user_form.validate_on_submit():
+        user_role = Roles(
+            user_role=user_form.user_role.data.lower(),
+        )
+        db.session.add(user_role)
+        db.session.commit()
+
+        user_form.user_role.data = ""
+        flash("User Role Added Successfully")
+
+    return redirect(request.referrer)
+
+
+@site.route("/post/keys/add", methods=["POST"])
+@include_login_form
+def add_keys():
+    """
+    Route used to add keys to database, applied on admin.html
+    """
+    user_form = keys_form_instance(request.form)
+
+    if user_form.validate_on_submit():
+        key_copy = KeysCreated(
+            key_number=user_form.key_number.data,
+            key_copy=user_form.key_copy.data,
+            access_code_id=user_form.access_code_id.data,
+            # fabrication_status_id=user_form.fabrication_status_id.data,
+        )
+        db.session.add(key_copy)
+        db.session.commit()
+
+        user_form.key_number.data = ""
+        user_form.key_copy.data = ""
+        user_form.access_code_id.data = ""
+        # user_form.fabrication_status_id.data = ""
+        flash("Key Added Successfully")
+
+    return redirect(request.referrer)
+
+
+@site.route("/post/keystatus/add", methods=["POST"])
+@include_login_form
+def add_keystatus():
+    """
+    Route used to add key status to database, applied on admin.html
+    """
+    user_form = CreateKeyStatusForm()
+
+    if user_form.validate_on_submit():
+        key_status = KeyStatus(
+            key_status=user_form.key_status.data.upper(),
+        )
+        db.session.add(key_status)
+        db.session.commit()
+
+        user_form.key_status.data = ""
+        flash("Key Status Added Successfully")
+
+    return redirect(request.referrer)
+
+
+@site.route("/post/fabricationstatus/add", methods=["POST"])
+@include_login_form
+def add_fabricationstatus():
+    """
+    Route used to add fabrication status to database, applied on admin.html
+    """
+    user_form = CreateFabricationStatusForm()
+
+    if user_form.validate_on_submit():
+        fab_status = FabricationStatus(
+            fabrication_status=user_form.fabrication_status.data.upper(),
+        )
+        db.session.add(fab_status)
+        db.session.commit()
+
+        user_form.fabrication_status.data = ""
+        flash("Key Fabrication Status Added Successfully")
+
+    return redirect(request.referrer)
+
+
+@site.route("/post/spaceapprover/add", methods=["POST"])
+@include_login_form
+def add_spaceapprover():
+    """
+    Route used to add space approvers to database, applied on admin.html
+    """
+    user_form = approver_zones_instance(request.form)
+
+    if user_form.validate_on_submit():
+        approver = ApproverZones(
+            building_number=user_form.building_number.data,
+            access_approver_id=user_form.access_approver_id.data,
+        )
+        db.session.add(approver)
+        db.session.commit()
+
+        user_form.building_number.data = ""
+        user_form.access_approver_id.data = ""
+        flash("Space Approver Added Successfully")
+
+    return redirect(request.referrer)
+
+
+@site.route("/post/approver/add", methods=["POST"])
+@include_login_form
+def add_approver():
+    """
+    Route used to add approvers to database, applied on admin.html
+    """
+    user_form = approver_instance(request.form)
+
+    if user_form.validate_on_submit():
+        approver = Approvers(
+            approver_id=user_form.approver_id.data,
+            role_approved_by=current_user.get_id(),
+        )
+        db.session.add(approver)
+        db.session.commit()
+
+        user_form.building_number.data = ""
+        user_form.access_approver_id.data = ""
+        flash("Space Approver Added Successfully")
+
+    return redirect(request.referrer)
+
+
 @site.route("/post/request/add", methods=["POST"])
 @include_login_form
 def add_request():
@@ -242,7 +488,7 @@ def add_request():
     room_list = ["B24010101"]
     code = get_access_code(room_list)
     space_id = f"B{str(building_number).zfill(2)}{str(floor_number).zfill(2)}{str(wing_number).zfill(2)}{str(room_number).zfill(2)}"
-   
+
     if user_form.validate_on_submit():
         key_request = Requests(
             user_id=current_user.get_id(),

@@ -19,7 +19,7 @@ class Approvers(db.Model):
     access_approver_id = db.Column(db.Integer, primary_key=True)
     approver_id = db.Column(db.Integer)
     role_approved_by = db.Column(db.String(128))
-    date_approved = db.Column(db.Date)
+    date_approved = db.Column(db.Date, server_default=func.now())
     date_removed = db.Column(db.Date)
 
 
@@ -205,8 +205,8 @@ class RoomAmenities(db.Model):
     """
 
     __bind_key__ = "key_inventory"
-    __tablename__ = "room_amenitities"
-    space_number_id = db.Column(db.Integer, primary_key=True)
+    __tablename__ = "room_amenities"
+    space_number_id = db.Column(db.String(128), primary_key=True)
     room_projector = db.Column(db.Boolean)
     room_seating = db.Column(db.Integer)
 
