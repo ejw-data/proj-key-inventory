@@ -39,30 +39,35 @@ def approver_instance(form_request=None):
     )
     approvers = (
         Users.query.with_entities(
-            Users.first_name, Users.last_name, Approvers.access_approver_id
+            Users.first_name, Users.last_name, Approvers.access_approver_id, Users.email
         )
+        .distinct(Users.first_name, Users.last_name)
         .order_by(Users.last_name.asc())
         .filter(Users.user_id.in_(subquery))
         .join(Approvers, Approvers.approver_id == Users.user_id)
-        .distinct(Users.first_name, Users.last_name)
         .all()
     )
 
-    approvers_list = [
-        (i.access_approver_id, f"{i.first_name.title()} {i.last_name.title()}")
+    approvers_list = [(-1, "Select access approver")] + [
+        (
+            i.access_approver_id,
+            f"{i.first_name.title()} {i.last_name.title()} - {i.email}",
+        )
         for i in approvers
     ]
     approver_form.role_approved_by.choices = approvers_list
 
     approver_candidates = (
-        Users.query.with_entities(Users.user_id, Users.first_name, Users.last_name)
+        Users.query.with_entities(
+            Users.user_id, Users.first_name, Users.last_name, Users.email
+        )
         .distinct(Users.first_name, Users.last_name)
         .order_by(Users.last_name.asc())
         .filter(Users.user_id.not_in([3, 4]))
         .all()
     )
-    approveable_list = [
-        (i.user_id, f"{i.first_name.title()} {i.last_name.title()}")
+    approveable_list = [(-1, "Select general user")] + [
+        (i.user_id, f"{i.first_name.title()} {i.last_name.title()} - {i.email}")
         for i in approver_candidates
     ]
 
@@ -79,7 +84,7 @@ class CreateAccessCodesForm(FlaskForm):
 
     access_description = StringField("Access description", validators=[DataRequired()])
     authorized_by = SelectField(
-        "Select buiding manager requestor", validators=[DataRequired()]
+        "Select building manager requestor", validators=[DataRequired()]
     )
     # created_by is automatically filled in by using current_user
     # created_on is automatically filled in via postgres defaults
@@ -142,7 +147,10 @@ def approver_zones_instance(form_request=None):
         .order_by(Buildings.building_name.asc())
         .all()
     )
-    buildings_list = [(i.building_number, i.building_name.title()) for i in buildings]
+    buildings_list = [(-1, "Select building")] + [
+        (i.building_number, f"{i.building_name.title()} - ({i.building_number})")
+        for i in buildings
+    ]
     approver_zones_form.building_number.choices = buildings_list
 
     subquery = (
@@ -152,7 +160,7 @@ def approver_zones_instance(form_request=None):
     )
     approvers = (
         Users.query.with_entities(
-            Users.first_name, Users.last_name, Approvers.access_approver_id
+            Users.first_name, Users.last_name, Approvers.access_approver_id, Users.email
         )
         .order_by(Users.last_name.asc())
         .filter(Users.user_id.in_(subquery))
@@ -160,8 +168,11 @@ def approver_zones_instance(form_request=None):
         .all()
     )
 
-    approvers_list = [
-        (i.access_approver_id, f"{i.first_name.title()} {i.last_name.title()}")
+    approvers_list = [(-1, "Select approver")] + [
+        (
+            i.access_approver_id,
+            f"{i.first_name.title()} {i.last_name.title()} - {i.email}",
+        )
         for i in approvers
     ]
     approver_zones_form.access_approver_id.choices = approvers_list
@@ -206,7 +217,7 @@ class CreateBuildingForm(FlaskForm):
     building_number = IntegerField(
         "Input the building number", validators=[DataRequired()]
     )
-    building_name = StringField("Provide buiding name", validators=[DataRequired()])
+    building_name = StringField("Provide building name", validators=[DataRequired()])
     building_description = StringField(
         "Building Description", validators=[InputRequired()]
     )
@@ -315,7 +326,7 @@ class CreateRoomAmenitiesForm(FlaskForm):
         "Select Room", coerce=str, validators=[DataRequired()]
     )
     room_projector = SelectField(
-        "Room includes projector", choices=[(0, "False"), (1, "True")], coerce=int
+        "Room includes projector", choices=[(-1, "Make Selection"),(0, "False"), (1, "True")], coerce=int
     )
     room_seating = IntegerField("Input number of seats", validators=[DataRequired()])
     submit = SubmitField("Submit")
@@ -328,13 +339,26 @@ def amenities_form_instance(form_request=None):
     amenities_form = CreateRoomAmenitiesForm(form_request)
 
     space_results = (
-        Rooms.query.with_entities(Rooms.space_number_id)
+        Rooms.query.with_entities(
+            Rooms.space_number_id,
+            Buildings.building_name,
+            Rooms.floor_number,
+            Rooms.room_number,
+            Rooms.building_number,
+        )
         .order_by(Rooms.space_number_id.asc())
+        .join(Buildings, Buildings.building_number == Rooms.building_number)
         .all()
     )
 
-    space_list = [(i.space_number_id, i.space_number_id) for i in space_results]
-    amenities_form.space_amenities.choices = space_list
+    space_list = [
+        (
+            i.space_number_id,
+            f"{i.building_name} {i.floor_number}{str(i.room_number).zfill(2)} ({i.space_number_id})",
+        )
+        for i in space_results
+    ]
+    amenities_form.space_amenities.choices = [(-1, 'Select Room')] + space_list
 
     return amenities_form
 
@@ -358,7 +382,7 @@ class CreateRoomForm(FlaskForm):
 
     space_number_id = StringField("Input the space id", validators=[DataRequired()])
     room_building_number = SelectField(
-        "Provide buiding name", coerce=int, validators=[DataRequired()]
+        "Provide building name", coerce=int, validators=[DataRequired()]
     )
     floor_number = IntegerField("Provide floor number", validators=[DataRequired()])
     wing_number = IntegerField("Provide wing number", validators=[DataRequired()])
@@ -381,12 +405,13 @@ def spaceform_instance(form_request=None):
     room_type_query_list = [
         (i.room_type_id, i.room_type.title()) for i in room_type_results
     ]
-    room_options = room_type_query_list
-    user_form.room_type.choices = room_options
+    
+    user_form.room_type.choices = [(-1, 'Select Title')] + room_type_query_list
 
     building_results = Buildings.query.order_by(Buildings.building_name.asc()).all()
-    building_query_list = [
-        (i.building_number, i.building_name.title()) for i in building_results
+    building_query_list = [(-1, "Select Building")] + [
+        (i.building_number, f"{i.building_name.title()} - ({i.building_number})")
+        for i in building_results
     ]
     user_form.room_building_number.choices = building_query_list
 
@@ -424,12 +449,11 @@ def userform_instance(form_request=None):
     user_form = CreateUserForm(form_request)
 
     title_results = Titles.query.order_by(Titles.title_id.desc()).all()
-    title_query_list = [(i.title_id, i.title.title()) for i in title_results]
-    title_options = title_query_list
-    user_form.title.choices = title_options
+    title_query_list = [(-1, 'Select title')] + [(i.title_id, i.title.title()) for i in title_results]
+    user_form.title.choices = title_query_list
 
     role_results = Roles.query.order_by(Roles.role_id.desc()).all()
-    role_query_list = [(i.role_id, i.user_role.title()) for i in role_results]
+    role_query_list = [(-1, "Select role")] + [(i.role_id, i.user_role.title()) for i in role_results]
     user_form.role.choices = role_query_list
 
     return user_form
@@ -481,7 +505,7 @@ def request_form_instance(form_request=None):
         .order_by(Buildings.building_name.asc())
         .all()
     )
-    building_list = [
+    building_list = [(-1, "Select building")] + [
         (i.building_number, i.building_name.title()) for i in building_numbers
     ]
     request_form.building_number.choices = building_list
@@ -492,7 +516,7 @@ def request_form_instance(form_request=None):
         .order_by(Rooms.floor_number.asc())
         .all()
     )
-    floor_list = [(i.floor_number, i.floor_number) for i in floor_numbers]
+    floor_list = [(-1, 'Select floor')] + [(i.floor_number, i.floor_number) for i in floor_numbers]
     request_form.floor.choices = floor_list
 
     wing_numbers = (
@@ -501,7 +525,7 @@ def request_form_instance(form_request=None):
         .order_by(Rooms.wing_number.asc())
         .all()
     )
-    wing_list = [(i.wing_number, i.wing_number) for i in wing_numbers]
+    wing_list = [(-1, "Select wing")] + [(i.wing_number, i.wing_number) for i in wing_numbers]
     request_form.wing.choices = wing_list
 
     room_numbers = (
@@ -509,7 +533,7 @@ def request_form_instance(form_request=None):
         .order_by(Rooms.room_number.asc())
         .all()
     )
-    room_list = [(i.room_number, i.room_number) for i in room_numbers]
+    room_list = [(-1, "Select room")] + [(i.room_number, i.room_number) for i in room_numbers]
     request_form.room.choices = room_list
 
     subquery = (
@@ -527,7 +551,7 @@ def request_form_instance(form_request=None):
         .all()
     )
 
-    approvers_list = [
+    approvers_list = [(-1, "Select approver")] + [
         (i.access_approver_id, f"{i.first_name.title()} {i.last_name.title()}")
         for i in approvers
     ]

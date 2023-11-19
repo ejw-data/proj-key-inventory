@@ -230,7 +230,7 @@ class Rooms(db.Model):
     __bind_key__ = "key_inventory"
     __tablename__ = "rooms"
     space_number_id = db.Column(db.String(128), primary_key=True)
-    buidlding_number = db.Column(db.Integer)
+    building_number = db.Column(db.Integer)
     floor_number = db.Column(db.Integer)
     wing_number = db.Column(db.Integer)
     room_number = db.Column(db.Integer)
