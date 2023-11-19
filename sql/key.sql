@@ -148,18 +148,19 @@ VALUES ('B24010101', TRUE, 50),
 
 -- ACCESS ASSIGNMENT -------------------------------------------------------------------
 -- changed access_code to access_code_id - need to consider the effect
+-- created_by and authorized_by should be references to Users and Approvers
 CREATE TABLE access_codes (
 	access_code_id SERIAL PRIMARY KEY,
 	access_description VARCHAR,
-	created_by VARCHAR,
-	authorized_by VARCHAR,
+	created_by INT,
+	authorized_by INT,
 	created_on TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 INSERT INTO access_codes (access_description, created_by, authorized_by)
-VALUES ('Classroom', 'ejw', 'T. Bundy'),
-		('Faculty Office and Suite', 'ejw', 'Prof. Andrews'),
-		('Front Suite Only', 'ejw', 'Prof. Andrews');
+VALUES ('Classroom', 1, 1),
+		('Faculty Office and Suite', 1, 1),
+		('Front Suite Only', 1, 1);
 
 -- APPROVAL PROCESS ------------------------------------------------------------
 

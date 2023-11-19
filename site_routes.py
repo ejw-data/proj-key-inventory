@@ -3,20 +3,25 @@ from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import (
     db,
-    Authentication,
-    Users,
-    Buildings,
-    Rooms,
-    Requests,
-    ApproverZones,
     Approvers,
+    AccessCodes,
+    AccessPairs,
+    ApprovalStatus,
+    ApproverZones,
+    Authentication,
+    Buildings,
+    FabricationStatus,
+    # KeyInventory,
+    # KeyOrders,
+    KeyStatus,
+    KeysCreated,
+    Requests,
+    Roles,
     RoomAmenities,
     RoomClassification,
+    Rooms,
     Titles,
-    Roles,
-    KeysCreated,
-    KeyStatus,
-    FabricationStatus,
+    Users,
 )
 from query import get_access_code
 from sqlalchemy import null, func
@@ -37,10 +42,10 @@ from forms import (
     CreateKeyStatusForm,
     CreateFabricationStatusForm,
     approver_zones_instance,
-    CreateAccessPairsForm,
+    access_pair_instance,
     CreateApprovalStatusForm,
-    CreateApproversForm,
     approver_instance,
+    access_code_form_instance,
 )
 
 
@@ -151,6 +156,9 @@ def admin():
     role_form = CreateRolesForm()
     approver_zone_form = approver_zones_instance()
     approver_form = approver_instance()
+    approval_status_form = CreateApprovalStatusForm()
+    access_pair_form = access_pair_instance()
+    access_code_form = access_code_form_instance()
 
     return render_template(
         "admin.html",
@@ -163,6 +171,9 @@ def admin():
         role_form=role_form,
         approver_zone_form=approver_zone_form,
         approver_form=approver_form,
+        approval_status_form=approval_status_form,
+        access_pair_form=access_pair_form,
+        access_code_form=access_code_form,
     )
 
 
@@ -427,6 +438,27 @@ def add_fabricationstatus():
     return redirect(request.referrer)
 
 
+@site.route("/post/approvalstatus/add", methods=["POST"])
+@include_login_form
+def add_approvalstatus():
+    """
+    Route used to add approval status to database, applied on admin.html
+    """
+    user_form = CreateApprovalStatusForm()
+
+    if user_form.validate_on_submit():
+        approval_status = ApprovalStatus(
+            status_code_name=user_form.status_code_name.data.upper(),
+        )
+        db.session.add(approval_status)
+        db.session.commit()
+
+        user_form.status_code_name.data = ""
+        flash("Approval Status Added Successfully")
+
+    return redirect(request.referrer)
+
+
 @site.route("/post/spaceapprover/add", methods=["POST"])
 @include_login_form
 def add_spaceapprover():
@@ -450,6 +482,29 @@ def add_spaceapprover():
     return redirect(request.referrer)
 
 
+@site.route("/post/roomaccess/add", methods=["POST"])
+@include_login_form
+def add_accesspair():
+    """
+    Route used to add space assignments to database, applied on admin.html
+    """
+    user_form = access_pair_instance(request.form)
+
+    if user_form.validate_on_submit():
+        pairs = AccessPairs(
+            access_code_id=user_form.access_code_id.data,
+            space_number_id=user_form.space_number_id.data,
+        )
+        db.session.add(pairs)
+        db.session.commit()
+
+        user_form.access_code_id.data = ""
+        user_form.space_number_id.data = ""
+        flash("Space Assignment Added Successfully")
+
+    return redirect(request.referrer)
+
+
 @site.route("/post/approver/add", methods=["POST"])
 @include_login_form
 def add_approver():
@@ -469,6 +524,31 @@ def add_approver():
         user_form.building_number.data = ""
         user_form.access_approver_id.data = ""
         flash("Space Approver Added Successfully")
+
+    return redirect(request.referrer)
+
+
+@site.route("/post/code/add", methods=["POST"])
+@include_login_form
+def add_code():
+    """
+    Route used to add approvers to database, applied on admin.html
+    """
+    user_form = access_code_form_instance(request.form)
+
+    if user_form.validate_on_submit():
+        code = AccessCodes(
+            access_description=user_form.access_description.data,
+            created_by=current_user.get_id(),
+            authorized_by=user_form.authorized_by.data,
+            # created_on is has a db default value
+        )
+        db.session.add(code)
+        db.session.commit()
+
+        user_form.access_description.data = ""
+        user_form.authorized_by.data = ""
+        flash("Access Code Added Successfully")
 
     return redirect(request.referrer)
 

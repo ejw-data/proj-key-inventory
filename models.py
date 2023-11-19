@@ -23,6 +23,7 @@ class Approvers(db.Model):
     date_removed = db.Column(db.Date)
 
 
+# this is somewhat of an odd table that maybe can be merged into another table??
 class AccessCodes(db.Model):
     """
     Specific codes
@@ -32,9 +33,9 @@ class AccessCodes(db.Model):
     __tablename__ = "access_codes"
     access_code_id = db.Column(db.Integer, primary_key=True)
     access_description = db.Column(db.String(128))
-    created_by = db.Column(db.String(128))
-    authorized_by = db.Column(db.Date)
-    created_on = db.Column(db.Date)
+    created_by = db.Column(db.Integer)
+    authorized_by = db.Column(db.Integer)
+    created_on = db.Column(db.Date, server_default=func.now())
 
 
 class AccessPairs(db.Model):

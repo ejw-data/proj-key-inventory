@@ -193,6 +193,47 @@
             {{ approver_form.submit(class="btn btn-secondary", id="approver_add_submit") }}
         </div>
     </form>
+    <h3>Approval Status Form</h3>
+    <form name="approval_status_form" action="/post/approvalstatus/add" method="POST" class="col-md-4">
+        {{ approval_status_form.csrf_token(id = "approval_status_form_add_id") }}
+        <div class="mb-3">
+            {{ approval_status_form.status_code_name.label(class="col-form-label") }}
+            {{ approval_status_form.status_code_name(class="form-control") }}
+        </div>
+        <div class="modal-footer">
+            {{ approval_status_form.submit(class="btn btn-secondary", id="approval_status_add_submit") }}
+        </div>
+    </form>
+    <h3>Access Pair Form</h3>
+    <form name="access_pair_form" action="/post/roomaccess/add" method="POST" class="col-md-4">
+        {{ access_pair_form.csrf_token(id = "access_pair_form_add_id") }}
+        <div class="mb-3">
+            {{ access_pair_form.access_code_id.label(class="col-form-label") }}
+            {{ access_pair_form.access_code_id(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ access_pair_form.space_number_id.label(class="col-form-label") }}
+            {{ access_pair_form.space_number_id(class="form-control") }}
+        </div>
+        <div class="modal-footer">
+            {{ access_pair_form.submit(class="btn btn-secondary", id="access_pair_add_submit") }}
+        </div>
+    </form>
+    <h3>Access Pair Form</h3>
+    <form name="access_code_form" action="/post/code/add" method="POST" class="col-md-4">
+        {{ access_code_form.csrf_token(id = "access_code_form_add_id") }}
+        <div class="mb-3">
+            {{ access_code_form.access_description.label(class="col-form-label") }}
+            {{ access_code_form.access_description(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ access_code_form.authorized_by.label(class="col-form-label") }}
+            {{ access_code_form.authorized_by(class="form-control") }}
+        </div>
+        <div class="modal-footer">
+            {{ access_code_form.submit(class="btn btn-secondary", id="access_code_add_submit") }}
+        </div>
+    </form>
     
 </main>
 {% endblock %}
