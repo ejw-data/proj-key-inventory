@@ -154,7 +154,7 @@ class KeyStatus(db.Model):
     key_status_id = db.Column(db.Integer, primary_key=True)
     key_status = db.Column(db.String(128))
 
-
+# should this have two primary keys
 class KeysCreated(db.Model):
     """
     Keys fabricated
