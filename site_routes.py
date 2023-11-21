@@ -15,6 +15,7 @@ from models import (
     # KeyOrders,
     KeyStatus,
     KeysCreated,
+    OrderStatus,
     Requests,
     Roles,
     RoomAmenities,
@@ -46,6 +47,7 @@ from forms import (
     CreateApprovalStatusForm,
     approver_instance,
     access_code_form_instance,
+    CreateOrderStatusForm
 )
 
 
@@ -174,6 +176,7 @@ def admin():
         approval_status_form=approval_status_form,
         access_pair_form=access_pair_form,
         access_code_form=access_code_form,
+        # order_status not added yet
     )
 
 
@@ -365,6 +368,27 @@ def add_role():
 
         user_form.user_role.data = ""
         flash("User Role Added Successfully")
+
+    return redirect(request.referrer)
+
+
+@site.route("/post/orderstatus/add", methods=["POST"])
+@include_login_form
+def add_orderstatus():
+    """
+    Route used to add order status role to database, applied on admin.html
+    """
+    user_form = CreateOrderStatusForm()
+
+    if user_form.validate_on_submit():
+        order_status = OrderStatus(
+            order_status=user_form.order_status.data.upper(),
+        )
+        db.session.add(order_status)
+        db.session.commit()
+
+        user_form.user_role.data = ""
+        flash("Order Status Added Successfully")
 
     return redirect(request.referrer)
 

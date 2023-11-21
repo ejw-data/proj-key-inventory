@@ -295,17 +295,6 @@ class CreateKeyInventoryForm(FlaskForm):
     submit = SubmitField("Submit")
 
 
-# add data to key_orders table
-class CreateKeyOrdersForm(FlaskForm):
-    """
-    Key order status form fields
-    """
-
-    # calc transaction_id from requests table - add behind the scenes
-    access_code_id = StringField("Input new key status", validators=[DataRequired()])
-    submit = SubmitField("Submit")
-
-
 # add data to key_status table
 class CreateKeyStatusForm(FlaskForm):
     """
@@ -517,12 +506,13 @@ class CreateAccessCodesForm(FlaskForm):
     access_description = StringField(
         "Provide access description", validators=[DataRequired()]
     )
-    authorized_by = SelectField("Select authorizer", coerce=int, validators=[InputRequired()])
+    authorized_by = SelectField(
+        "Select authorizer", coerce=int, validators=[InputRequired()]
+    )
     submit = SubmitField("Submit")
 
 
 def access_code_form_instance(form_request=None):
-    
     accesscode_form = CreateAccessCodesForm(form_request)
 
     subquery = (
@@ -548,6 +538,8 @@ def access_code_form_instance(form_request=None):
     accesscode_form.authorized_by.choices = approvers_list
 
     return accesscode_form
+
+
 # add data to requests table
 # this table is moved to the end bc it is the most complicated
 class CreateRequestsForm(FlaskForm):
@@ -623,6 +615,7 @@ def request_form_instance(form_request=None):
 
     room_numbers = (
         Rooms.query.with_entities(Rooms.room_number)
+        .distinct()
         .order_by(Rooms.room_number.asc())
         .all()
     )
@@ -671,3 +664,13 @@ def request_form_instance(form_request=None):
     # )
 
     return request_form
+
+
+class CreateOrderStatusForm(FlaskForm):
+    """
+    Order Status Form fields
+    """
+
+    status = StringField(
+        "Input status", validators=[DataRequired()]
+    )

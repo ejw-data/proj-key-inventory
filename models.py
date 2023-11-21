@@ -119,6 +119,8 @@ class FabricationStatus(db.Model):
     fabrication_status = db.Column(db.String(128))
 
 
+# Key Inventory table is populated by trigger in postgreSQL DB
+# Only a status column nd an in_use column needs updated manually.
 class KeyInventory(db.Model):
     """
     Key location
@@ -126,13 +128,27 @@ class KeyInventory(db.Model):
 
     __bind_key__ = "key_inventory"
     __tablename__ = "key_inventory"
-    transaction_id = db.Column(db.Integer, primary_key=True)
-    key_number = db.Column(db.Integer)
+    request_id = db.Column(db.Integer, primary_key=True)
     key_copy = db.Column(db.Integer)
+    access_code_id = db.Column(db.Integer)
+    key_status_id = db.Column(db.Integer)
     date_transferred = db.Column(db.Date)
     date_returned = db.Column(db.Date)
 
 
+class OrderStatus(db.Model):
+    """
+    Order status options
+    """
+
+    __bind_key__ = "key_inventory"
+    __tablename__ = "order_status"
+    order_status_id = db.Column(db.Integer, primary_key=True)
+    order_status = db.Column(db.String(128))
+
+
+# Key Orders Table is populated by trigger in postgreSQL DB
+# add a status column that is updated by the admin office
 class KeyOrders(db.Model):
     """
     Approved keys being produced by key shop
@@ -140,8 +156,14 @@ class KeyOrders(db.Model):
 
     __bind_key__ = "key_inventory"
     __tablename__ = "key_orders"
-    transaction_id = db.Column(db.Integer, primary_key=True)
+    request_id = db.Column(db.Integer, primary_key=True)
     access_code_id = db.Column(db.Integer)
+    order_status_id = db.Column(db.Integer)
+    date_key_received = db.Column(db.Date)
+    date_key_handoff = db.Column(db.Date)
+    key_admin_user_id = db.Column(db.Integer)
+    key_pickup_user_id = db.Column(db.Integer)
+    hold_on_conditions = db.Column(db.Boolean)
 
 
 class KeyStatus(db.Model):
@@ -154,6 +176,7 @@ class KeyStatus(db.Model):
     key_status_id = db.Column(db.Integer, primary_key=True)
     key_status = db.Column(db.String(128))
 
+
 # should this have two primary keys
 class KeysCreated(db.Model):
     """
@@ -162,11 +185,12 @@ class KeysCreated(db.Model):
 
     __bind_key__ = "key_inventory"
     __tablename__ = "keys_created"
-    key_number = db.Column(db.Integer, primary_key=True)
+    request_id = db.Column(db.Integer, primary_key=True)
     key_copy = db.Column(db.Integer)
     access_code_id = db.Column(db.Integer)
     fabrication_status_id = db.Column(db.Integer)
-
+    key_maker_id = db.Column(db.Integer)
+    date_created = db.Column(db.Date)
 
 class Requests(db.Model):
     """
