@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION log_key_order()
   AS
 $$
 BEGIN
-	IF NEW.status_code = 2 THEN
+	IF (NEW.status_code <> OLD.status_code) AND (NEW.status_code = 2) THEN
 		 INSERT INTO key_orders (request_id, access_code_id)
 		 VALUES(OLD.request_id, OLD.access_code_id);
 	END IF;
@@ -25,6 +25,72 @@ CREATE TRIGGER request_approved_create_order
   ON requests
   FOR EACH ROW
   EXECUTE PROCEDURE log_key_order();
+
+
+
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+-- create function that is triggered by the update of the status column of the keys_created table. 
+-- upon this update, the key_inventory table is updated and the key_orders table updated
+CREATE OR REPLACE FUNCTION update_key_created()
+  RETURNS TRIGGER 
+  LANGUAGE PLPGSQL
+  AS
+$$
+BEGIN
+	IF (NEW.fabrication_status_id <> OLD.fabrication_status_id) AND (NEW.fabrication_status_id = 3)  THEN
+
+		-- Insert new key record into key inventory
+		 INSERT INTO key_inventory (request_id, access_code_id, key_copy, key_status_id)
+		 VALUES(NEW.request_id, NEW.access_code_id, NEW.key_copy, 1);  -- key_status_id = ISSUED
+	
+		-- Updated key_order status  
+		 UPDATE key_orders
+		 SET order_status_id = 3  -- WAITING FOR DELIVERY
+		 WHERE request_id = OLD.request_id;
+	END IF;
+
+	RETURN NEW;
+END;
+$$;
+
+-- create a trigger that updates the key_inventory and key_orders table
+CREATE TRIGGER update_key_order_status
+  AFTER UPDATE
+  ON keys_created
+  FOR EACH ROW
+  EXECUTE PROCEDURE update_key_created();
+
+
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+-- create function that is triggered by the update of the status column of the key_orders table. 
+-- 
+CREATE OR REPLACE FUNCTION update_requests()
+  RETURNS TRIGGER 
+  LANGUAGE PLPGSQL
+  AS
+$$
+BEGIN
+	IF NEW.order_status_id = 1 THEN   -- READY FOR PICKUP
+
+		-- Updated request status  
+		 UPDATE requests
+		 SET  status_code = 5 -- KEY READY FOR PICKUP
+		 WHERE request_id = OLD.request_id;
+	END IF;
+
+	RETURN NEW;
+END;
+$$;
+-- create a trigger that updates the key_inventory table
+CREATE TRIGGER update_request_status
+  AFTER UPDATE
+  ON key_orders
+  FOR EACH ROW
+  EXECUTE PROCEDURE update_requests();
+
+
 
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
@@ -91,4 +157,3 @@ CREATE TRIGGER set_key_order_status
   ON key_orders
   FOR EACH ROW
   EXECUTE PROCEDURE update_key_order();
-  
