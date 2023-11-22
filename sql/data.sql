@@ -88,7 +88,8 @@ VALUES ('ISSUED'),
 		('INVENTORY'),
 		('ASSIGNED FOR PICKUP'),
 		('BROKEN'),
-		('LOST');
+		('LOST'),
+		('TRANSFERRED');
 
 -- This will initiate some of the logic
 -- logic needs built to complete this request via forms  
