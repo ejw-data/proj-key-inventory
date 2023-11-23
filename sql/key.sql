@@ -11,13 +11,13 @@ DROP TABLE IF EXISTS key_orders CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS titles;
 DROP TABLE IF EXISTS roles;
-DROP TABLE IF EXISTS access_approvers CASCADE;
-DROP TABLE IF EXISTS approval_status;
+DROP TABLE IF EXISTS approvers CASCADE;
+DROP TABLE IF EXISTS request_status;
 DROP TABLE IF EXISTS approver_zones;
 DROP TABLE IF EXISTS buildings CASCADE;
 DROP TABLE IF EXISTS fabrication_status;
-DROP TABLE IF EXISTS authentication; 
-
+DROP TABLE IF EXISTS authentication;
+DROP TABLE IF EXISTS order_status;
 
 -- USERS ------------------------------------------------------
 CREATE TABLE titles (
@@ -25,114 +25,65 @@ CREATE TABLE titles (
 	title VARCHAR UNIQUE NOT NULL
 );
 
-INSERT INTO titles (title)
-VALUES ('undergraduate student'),
-		('graduate student'),
-		('staff'),
-		('faculty'),
-		('building manager'),
-		('department head'),
-		('dean'),
-		('senior administration'),
-		('facilities');
-
 CREATE TABLE roles (
 	role_id SERIAL PRIMARY KEY,
-	user_role VARCHAR
+	user_role VARCHAR UNIQUE NOT NULL
 );
-
-INSERT INTO roles (user_role)
-VALUES ('requester'),
-		('approver'),
-		('administrator');
 
 CREATE TABLE users (
 	user_id SERIAL PRIMARY KEY,
-	first_name VARCHAR,
-	last_name VARCHAR,
+	first_name VARCHAR NOT NULL,
+	last_name VARCHAR NOT NULL,
 	title_id INT REFERENCES titles (title_id),
 	role_id INT REFERENCES roles (role_id),
-	email VARCHAR UNIQUE
+	email VARCHAR UNIQUE NOT NULL
 );
 
-INSERT INTO users (first_name, last_name, title_id, role_id, email)
-VALUES ('erin', 'wills', 1, 1, 'ew@mysite.com'),
-		('will', 'wright', 1, 1, 'ww@mysite.com'),
-		('andrew', 'ng', 1, 1, 'an@mysite.com'),
-		('bob', 'turtle', 5, 3, 'bt@mysite.com'),
-		('jake', 'powers', 9, 3, 'jp@mysite.com');
-		
-
-CREATE TABLE access_approvers (
-	access_approver_id SERIAL PRIMARY KEY,
-	approver_id INT REFERENCES users (user_id),
-	role_approved_by VARCHAR,
+-- make FK for role_approved_by - may need new table
+CREATE TABLE approvers (
+	approver_id SERIAL PRIMARY KEY,
+	user_id INT REFERENCES users (user_id),
+	role_approved_by VARCHAR NOT NULL,
 	date_approved TIMESTAMP NOT NULL DEFAULT NOW(),
 	date_removed TIMESTAMP
 );
 
-INSERT INTO access_approvers (approver_id, role_approved_by)
-VALUES (4, 9);
-
 -- LOGIN _____________________________________________________
 
-
--- change so that primary key is also foreign key to users (user_id), keep only username, password_hash
 CREATE TABLE authentication (
 	id INT PRIMARY KEY REFERENCES users (user_id),
-	username VARCHAR,
-	password_hash VARCHAR
+	username VARCHAR UNIQUE NOT NULL,
+	password_hash VARCHAR UNIQUE NOT NULL
 );
-
-INSERT INTO authentication (login_id, username, password_hash)
-VALUES (1, 'ejwadmin', 'alf344t4090j0aojfsfa');
 
 -- SPACE & GRANTED APPROVAL ------------------------------------------------------------
 
 CREATE TABLE buildings (
 	building_number INT PRIMARY KEY,
-	building_name VARCHAR,
-	building_description VARCHAR
+	building_name VARCHAR UNIQUE NOT NULL,
+	building_description VARCHAR NOT NULL
 );
-
-INSERT INTO buildings (building_number, building_name, building_description)
-VALUES (24, 'Chemistry', 'Chemistry Department Research Space');
-
 
 CREATE TABLE approver_zones (
 	building_number INT REFERENCES buildings (building_number),
-	access_approver_id INT REFERENCES access_approvers (access_approver_id),
-	PRIMARY KEY (building_number, access_approver_id)
+	approver_id INT REFERENCES approvers (approver_id),
+	PRIMARY KEY (building_number, approver_id)
 );
-
-INSERT INTO approver_zones (building_number, access_approver_id)
-VALUES (24, 1);
 
 CREATE TABLE room_classification (
 	room_type_id INT PRIMARY KEY,
-	room_type VARCHAR
+	room_type VARCHAR UNIQUE NOT NULL
 );
 
-INSERT INTO room_classification (room_type_id, room_type)
-VALUES (201, 'private office'),
-		(205, 'conference room'),
-		(210, 'classroom'),
-		(220, 'shared office');
-
+-- wing_number should be varchar; change name to wing_id
 CREATE TABLE rooms (
 	space_number_id VARCHAR PRIMARY KEY,
 	building_number INT REFERENCES buildings (building_number),
+	wing_number INT,  
 	floor_number INT,
-	wing_number INT,
 	room_number INT,
 	room_type INT REFERENCES room_classification (room_type_id)
 );
-
-INSERT INTO rooms (space_number_id, building_number, floor_number, wing_number, room_number, room_type)
-VALUES ('B24010101', 24, 01, 01, 01, 210),
-		('B24020101', 24, 02, 01, 01, 201),
-		('B24020102', 24, 02, 01, 02, 220);
-
 
 CREATE TABLE room_amenities (
 	space_number_id VARCHAR PRIMARY KEY REFERENCES rooms (space_number_id),
@@ -140,14 +91,9 @@ CREATE TABLE room_amenities (
 	room_seating INT
 ); 
 
-INSERT INTO room_amenities (space_number_id, room_projector, room_seating)
-VALUES ('B24010101', TRUE, 50),
-		('B24020101', FALSE, 1),
-		('B24020102', FALSE, 4);
 
 
 -- ACCESS ASSIGNMENT -------------------------------------------------------------------
--- changed access_code to access_code_id - need to consider the effect
 -- created_by and authorized_by should be references to Users and Approvers
 CREATE TABLE access_codes (
 	access_code_id SERIAL PRIMARY KEY,
@@ -157,86 +103,51 @@ CREATE TABLE access_codes (
 	created_on TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-INSERT INTO access_codes (access_description, created_by, authorized_by)
-VALUES ('Classroom', 1, 1),
-		('Faculty Office and Suite', 1, 1),
-		('Front Suite Only', 1, 1);
-
 -- APPROVAL PROCESS ------------------------------------------------------------
-
-CREATE TABLE approval_status (
-	status_code SERIAL PRIMARY KEY,
-	status_code_name VARCHAR
+CREATE TABLE request_status (
+	request_status_id SERIAL PRIMARY KEY,
+	request_status_name VARCHAR UNIQUE NOT NULL
 );
 
-INSERT INTO approval_status (status_code_name)
-VALUES ('REQUEST SUBMITTED'),
-		('REQUEST APPROVED'),
-		('REQUEST REJECTED'),
-		('KEY CREATED'),
-		('KEY READY FOR PICKUP'),
-		('KEY ASSIGNED');
-
--- requests table:  request_id, user_id, space, approver, status, dates, reasoning
--- logic updates record
+-- logic updates status code
 -- logic on update adds record to key_owner table the deletes record
 CREATE TABLE requests (
 	request_id SERIAL PRIMARY KEY,
 	user_id INT,
 	space_number_id VARCHAR,
 	building_number INT,
-	access_approver_id INT,
+	approver_id INT,
 	access_code_id INT REFERENCES access_codes (access_code_id),
-	status_code INT DEFAULT 1 REFERENCES approval_status (status_code),
+	request_status_id INT DEFAULT 1 REFERENCES request_status (request_status_id),
 	request_date TIMESTAMP NOT NULL DEFAULT NOW(),
 	approved_date TIMESTAMP,
 	approved BOOL DEFAULT FALSE,
 	approval_comment VARCHAR,
 	rejection_comment VARCHAR,
-	FOREIGN KEY (building_number, access_approver_id) REFERENCES approver_zones (building_number, access_approver_id)
+	FOREIGN KEY (building_number, approver_id) REFERENCES approver_zones (building_number, approver_id)
 );
+-- ALTER TABLE requests ALTER COLUMN request_date SET DEFAULT now();
+-- in the future move the comment to a separate table that includes the request_id/transaction_id
 
-ALTER TABLE requests ALTER COLUMN request_date SET DEFAULT now();
 
--- Logic 
--- create function that is triggered by status_code = 2 (approved)
-CREATE OR REPLACE FUNCTION log_key_order()
-  RETURNS TRIGGER 
-  LANGUAGE PLPGSQL
-  AS
-$$
-BEGIN
-	IF NEW.status_code = 2 THEN
-		 INSERT INTO key_orders (transaction_id, access_code_id)
-		 VALUES(OLD.request_id, OLD.access_code_id);
-	END IF;
-
-	RETURN NEW;
-END;
-$$;
-
-CREATE TRIGGER request_approved_create_order
-  AFTER UPDATE
-  ON requests
-  FOR EACH ROW
-  EXECUTE PROCEDURE log_key_order();
-  
+CREATE TABLE order_status (
+	order_status_id SERIAL PRIMARY KEY,
+	order_status VARCHAR UNIQUE NOT NULL
+);
 
 -- cannot make access_code_id a FK since it is not a primary key in requests table
 -- instead of making a constraint, I will add this information via a trigger function
 CREATE TABLE key_orders (
-	transaction_id INT PRIMARY KEY REFERENCES requests (request_id),
-	access_code_id INT
+	request_id INT PRIMARY KEY REFERENCES requests (request_id),
+	access_code_id INT REFERENCES access_codes (access_code_id),
+	order_status_id INT REFERENCES order_status (order_status_id),
+	date_key_received DATE,
+	date_key_handoff DATE,
+	key_admin_user INT,
+	key_pickup_user INT,
+	hold_on_conditions BOOL
 );
-
-		
--- -- Need to add logic so access code is programatically obtained
--- INSERT INTO key_orders (transaction_id, access_code_id)
--- VALUES (1, 3),
--- 		(2, 1),
--- 		(3, 2),
--- 		(4, 2),
--- 		(5, 2);
+-- maybe add a comments field or a separate table where all comments can be stored
 
 
 CREATE TABLE access_pairs (
@@ -244,89 +155,40 @@ CREATE TABLE access_pairs (
 	space_number_id VARCHAR REFERENCES rooms (space_number_id),
 	PRIMARY KEY (access_code_id, space_number_id) 
 );
-
-SELECT * FROM access_codes;
-
-INSERT INTO access_pairs (access_code_id, space_number_id)
-VALUES (1, 'B24010101'),
-		(2, 'B24020101'),
-		(2, 'B24020102'),
-		(3, 'B24010101'),
-		(3, 'B24020101'),
-		(3, 'B24020102');
 		
 CREATE TABLE fabrication_status (
 	fabrication_status_id SERIAL PRIMARY KEY,
-	fabrication_status VARCHAR
+	fabrication_status VARCHAR UNIQUE NOT NULL
 );		
 
-INSERT INTO fabrication_status (fabrication_status)
-VALUES ('IN QUEUE'),
-		('SCHEDULED'),
-		('COMPLETED');
-
+-- need to add constraint on key_maker_user_id
+-- add logic to form that validates the key_copy number so duplicates are not possible
 CREATE TABLE keys_created (
-	key_number INT,
-	key_copy INT,
+	request_id INT PRIMARY KEY,
 	access_code_id INT REFERENCES access_codes (access_code_id),
+	key_copy INT,
 	fabrication_status_id INT DEFAULT 1 REFERENCES fabrication_status (fabrication_status_id),
-	PRIMARY KEY (key_number, key_copy)
+	key_maker_user_id INT,
+	date_created DATE
 );
 
-INSERT INTO keys_created (key_number, key_copy, access_code_id, fabrication_status_id)
-VALUES (43221, 1, 3, 3),
-		(56432, 1, 1, 3),
-		(34523, 1, 2, 3),
-		(46363, 2, 2, 3),
-		(59873, 3, 2, 3);
-
-
+-- When copy and fabrication status are complete then it updates the inventory and triggers the key_order check  logic. 
+-- The key_order needs a queue based on logic
+-- Base the order on the transaction_id
 CREATE TABLE key_status (
 	key_status_id SERIAL PRIMARY KEY,
-	key_status VARCHAR 
+	key_status VARCHAR UNIQUE NOT NULL
 );
 
-INSERT INTO key_status (key_status)
-VALUES ('ISSUED'),
-		('INVENTORY'),
-		('ASSIGNED FOR PICKUP'),
-		('BROKEN'),
-		('LOST');
-
+-- need constraint that prevents duplicate key_acces_code_id and key_copy combinations
+-- below will do this but there are no constrains on the keys_created table.
 CREATE TABLE key_inventory (
-	transaction_id INT REFERENCES key_orders (transaction_id),
-	key_number INT,
+	request_id INT PRIMARY KEY REFERENCES key_orders (request_id),
+	access_code_id INT,
 	key_copy INT,
 	key_status_id INT REFERENCES key_status (key_status_id),
 	date_transferred TIMESTAMP NOT NULL DEFAULT NOW(),
 	date_returned TIMESTAMP,
-	PRIMARY KEY (transaction_id, key_number, key_copy),
-	FOREIGN KEY (key_number, key_copy) REFERENCES keys_created (key_number, key_copy)
+	UNIQUE (access_code_id, key_copy)
 );
-
-
--- This will initiate some of the logic
--- logic needs built to complete this request via forms  
-INSERT INTO requests (user_id, space_number_id, building_number, access_approver_id, access_code_id, status_code)
-VALUES (1, 'B24010101', 24, 1, 1, 1),
-		(2, 'B24010101', 24, 1, 2, 1),
-		(3, 'B24010101', 24, 1, 2, 1),
-		(4, 'B24010101', 24, 1, 2, 1),
-		(5, 'B24010101', 24, 1, 3, 1);
-
-
--- INSERT INTO key_inventory (transaction_id, key_number, key_copy, key_status_id)
--- VALUES (1, 43221, 1, 1),
--- 		(2, 56432, 1, 1),
--- 		(3, 59873, 3, 1),
--- 		(4, 34523, 1, 1),
--- 		(5, 46363, 2, 1);
-
---  determine if key is available in inventory
-
-
-
-
- 
-		
-		
+-- Keys are first set by the keys_created in the key inventory table
