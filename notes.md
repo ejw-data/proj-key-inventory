@@ -69,3 +69,14 @@ Requestors:
 ### Views
 
 * Buildings - allows building to be selected from dropdown and shows that buildings spaces.  Add/Update/Delete to that rooms list.
+
+
+### Interactive menus
+*  Since the dropdown form options are populated at the time of the page load, the form fields are not affected by the changes in other field settings.  
+*  To make it interactive, I will add an event listener on a field and it will modify the DOM of another field using D3.  I think I will just need an api that will take the parameter and return all the other form data.  
+* For example, the key quest form has building as an input.  The event listener will be triggered on the change of that field and this input will be used in an API that returns a dictionary of {'floors':[], 'wings':[], 'rooms':[]}.  The basic process would be to d3.select the 2nd dropdown and then bind the data to the element and then clear out the html and then pass a function that updates each element.  
+
+### WTF Forms
+* note the variables assigned to the forms need to be unique becasue these become the input id's.
+* an id could be assigned in the jinja that could overwrite it but then there would be extra assignments and mismatches in the code.  This is probably not that important but for now I will keep the names unique until I determine if there are any other issues related to this.
+* WTF Forms has nice functionality but as I use it there are some less apparent issues with how the standard template generates ids.  This is only apparent if multiple forms are put on the same page or if forms have similar inputs.  My forms are introduced as popups so the form for adding a room and the form for making a room selection use the same variable name (until my last change where I removed these duplications.)

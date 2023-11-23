@@ -15,7 +15,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if active_page == 'student' }}" href="{{ url_for('site.index') }}">
+                <a class="nav-link {{ 'active' if active_page == 'users' }}" href="{{ url_for('site.users') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         class="feather feather-users" aria-hidden="true">
@@ -28,7 +28,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if active_page == 'unit' }}" href="{{ url_for('site.index') }}">
+                <a class="nav-link {{ 'active' if active_page == 'keys' }}" href="{{ url_for('site.keys') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         class="feather feather-archive" aria-hidden="true">
@@ -40,7 +40,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if active_page == 'session' }}" href="{{ url_for('site.index') }}">
+                <a class="nav-link {{ 'active' if active_page == 'access' }}" href="{{ url_for('site.access') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         class="feather feather-book" aria-hidden="true">
@@ -51,6 +51,19 @@
                         </svg>
                     </svg>
                     Access
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ 'active' if active_page == 'admin' }}" href="{{ url_for('site.admin') }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"
+                            stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                    </svg>
+                    Admin
                 </a>
             </li>
         </ul>

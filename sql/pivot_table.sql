@@ -28,7 +28,12 @@ DROP TABLE IF EXISTS temp_pivot;
 DROP TABLE IF EXISTS temp_matrix;
 
 -- create correctly structured table
-CREATE TEMPORARY TABLE temp_matrix AS
+-- CREATE TEMPORARY TABLE temp_matrix AS
+-- SELECT access_code_id::text, space_number_id, 1 as Truth 
+-- FROM access_pairs 
+-- order by 1,2;
+
+CREATE VIEW temp_matrix AS
 SELECT access_code_id::text, space_number_id, 1 as Truth 
 FROM access_pairs 
 order by 1,2;

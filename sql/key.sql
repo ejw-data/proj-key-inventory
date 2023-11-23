@@ -22,7 +22,7 @@ DROP TABLE IF EXISTS authentication;
 -- USERS ------------------------------------------------------
 CREATE TABLE titles (
 	title_id SERIAL PRIMARY KEY,
-	title VARCHAR
+	title VARCHAR UNIQUE NOT NULL
 );
 
 INSERT INTO titles (title)
@@ -148,18 +148,19 @@ VALUES ('B24010101', TRUE, 50),
 
 -- ACCESS ASSIGNMENT -------------------------------------------------------------------
 -- changed access_code to access_code_id - need to consider the effect
+-- created_by and authorized_by should be references to Users and Approvers
 CREATE TABLE access_codes (
 	access_code_id SERIAL PRIMARY KEY,
 	access_description VARCHAR,
-	created_by VARCHAR,
-	authorized_by VARCHAR,
+	created_by INT,
+	authorized_by INT,
 	created_on TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 INSERT INTO access_codes (access_description, created_by, authorized_by)
-VALUES ('Classroom', 'ejw', 'T. Bundy'),
-		('Faculty Office and Suite', 'ejw', 'Prof. Andrews'),
-		('Front Suite Only', 'ejw', 'Prof. Andrews');
+VALUES ('Classroom', 1, 1),
+		('Faculty Office and Suite', 1, 1),
+		('Front Suite Only', 1, 1);
 
 -- APPROVAL PROCESS ------------------------------------------------------------
 
@@ -186,7 +187,7 @@ CREATE TABLE requests (
 	building_number INT,
 	access_approver_id INT,
 	access_code_id INT REFERENCES access_codes (access_code_id),
-	status_code INT REFERENCES approval_status (status_code),
+	status_code INT DEFAULT 1 REFERENCES approval_status (status_code),
 	request_date TIMESTAMP NOT NULL DEFAULT NOW(),
 	approved_date TIMESTAMP,
 	approved BOOL DEFAULT FALSE,
@@ -194,6 +195,8 @@ CREATE TABLE requests (
 	rejection_comment VARCHAR,
 	FOREIGN KEY (building_number, access_approver_id) REFERENCES approver_zones (building_number, access_approver_id)
 );
+
+ALTER TABLE requests ALTER COLUMN request_date SET DEFAULT now();
 
 -- Logic 
 -- create function that is triggered by status_code = 2 (approved)
@@ -266,7 +269,7 @@ CREATE TABLE keys_created (
 	key_number INT,
 	key_copy INT,
 	access_code_id INT REFERENCES access_codes (access_code_id),
-	fabrication_status_id INT REFERENCES fabrication_status (fabrication_status_id),
+	fabrication_status_id INT DEFAULT 1 REFERENCES fabrication_status (fabrication_status_id),
 	PRIMARY KEY (key_number, key_copy)
 );
 

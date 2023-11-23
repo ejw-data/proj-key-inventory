@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 
 # I can probably remove these part of the code - used in site_routes.py
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -6,6 +7,68 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
 db = SQLAlchemy()
+
+
+class Approvers(db.Model):
+    """
+    Approvers
+    """
+
+    __bind_key__ = "key_inventory"
+    __tablename__ = "access_approvers"
+    access_approver_id = db.Column(db.Integer, primary_key=True)
+    approver_id = db.Column(db.Integer)
+    role_approved_by = db.Column(db.String(128))
+    date_approved = db.Column(db.Date, server_default=func.now())
+    date_removed = db.Column(db.Date)
+
+
+# this is somewhat of an odd table that maybe can be merged into another table??
+class AccessCodes(db.Model):
+    """
+    Specific codes
+    """
+
+    __bind_key__ = "key_inventory"
+    __tablename__ = "access_codes"
+    access_code_id = db.Column(db.Integer, primary_key=True)
+    access_description = db.Column(db.String(128))
+    created_by = db.Column(db.Integer)
+    authorized_by = db.Column(db.Integer)
+    created_on = db.Column(db.Date, server_default=func.now())
+
+
+class AccessPairs(db.Model):
+    """
+    Access codes for specific doors
+    """
+
+    __bind_key__ = "key_inventory"
+    __tablename__ = "access_pairs"
+    access_code_id = db.Column(db.Integer, primary_key=True)
+    space_number_id = db.Column(db.Integer, primary_key=True)
+
+
+class ApprovalStatus(db.Model):
+    """
+    Status of key request from request to handoff
+    """
+
+    __bind_key__ = "key_inventory"
+    __tablename__ = "approval_status"
+    status_code = db.Column(db.Integer, primary_key=True)
+    status_code_name = db.Column(db.String(128))
+
+
+class ApproverZones(db.Model):
+    """
+    Approvers responsible for spaces
+    """
+
+    __bind_key__ = "key_inventory"
+    __tablename__ = "approver_zones"
+    building_number = db.Column(db.Integer, primary_key=True)
+    access_approver_id = db.Column(db.Integer)
 
 
 class Authentication(db.Model, UserMixin):
@@ -33,19 +96,146 @@ class Authentication(db.Model, UserMixin):
         return check_password_hash(self.password_hash, password)
 
 
-class Users(db.Model):
+class Buildings(db.Model):
     """
-    User Table
+    Building Info
     """
 
     __bind_key__ = "key_inventory"
-    __tablename__ = "users"
-    user_id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(25))
-    last_name = db.Column(db.String(25))
-    title_id = db.Column(db.Integer)
-    role_id = db.Column(db.Integer)
-    email = db.Column(db.String(25))
+    __tablename__ = "buildings"
+    building_number = db.Column(db.Integer, primary_key=True)
+    building_name = db.Column(db.String(128))
+    building_description = db.Column(db.String(128))
+
+
+class FabricationStatus(db.Model):
+    """
+    Status of Key being made
+    """
+
+    __bind_key__ = "key_inventory"
+    __tablename__ = "fabrication_status"
+    fabrication_status_id = db.Column(db.Integer, primary_key=True)
+    fabrication_status = db.Column(db.String(128))
+
+
+class KeyInventory(db.Model):
+    """
+    Key location
+    """
+
+    __bind_key__ = "key_inventory"
+    __tablename__ = "key_inventory"
+    transaction_id = db.Column(db.Integer, primary_key=True)
+    key_number = db.Column(db.Integer)
+    key_copy = db.Column(db.Integer)
+    date_transferred = db.Column(db.Date)
+    date_returned = db.Column(db.Date)
+
+
+class KeyOrders(db.Model):
+    """
+    Approved keys being produced by key shop
+    """
+
+    __bind_key__ = "key_inventory"
+    __tablename__ = "key_orders"
+    transaction_id = db.Column(db.Integer, primary_key=True)
+    access_code_id = db.Column(db.Integer)
+
+
+class KeyStatus(db.Model):
+    """
+    Key availability
+    """
+
+    __bind_key__ = "key_inventory"
+    __tablename__ = "key_status"
+    key_status_id = db.Column(db.Integer, primary_key=True)
+    key_status = db.Column(db.String(128))
+
+
+class KeysCreated(db.Model):
+    """
+    Keys fabricated
+    """
+
+    __bind_key__ = "key_inventory"
+    __tablename__ = "keys_created"
+    key_number = db.Column(db.Integer, primary_key=True)
+    key_copy = db.Column(db.Integer)
+    access_code_id = db.Column(db.Integer)
+    fabrication_status_id = db.Column(db.Integer)
+
+
+class Requests(db.Model):
+    """
+    Key Requests
+    """
+
+    __bind_key__ = "key_inventory"
+    __tablename__ = "requests"
+    request_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    space_number_id = db.Column(db.String(128))
+    building_number = db.Column(db.Integer)
+    access_approver_id = db.Column(db.Integer)
+    access_code_id = db.Column(db.Integer)
+    status_code = db.Column(db.Integer)
+    request_date = db.Column(db.DateTime, server_default=func.now())
+    approved_date = db.Column(db.Date)
+    approved = db.Column(db.Boolean)
+    approval_comment = db.Column(db.String(128))
+    rejection_comment = db.Column(db.String(128))
+
+
+class Roles(db.Model):
+    """
+    Role table
+    """
+
+    __bind_key__ = "key_inventory"
+    __tablename__ = "roles"
+    role_id = db.Column(db.Integer, primary_key=True)
+    user_role = db.Column(db.String(25))
+
+
+class RoomAmenities(db.Model):
+    """
+    Room Info
+    """
+
+    __bind_key__ = "key_inventory"
+    __tablename__ = "room_amenities"
+    space_number_id = db.Column(db.String(128), primary_key=True)
+    room_projector = db.Column(db.Boolean)
+    room_seating = db.Column(db.Integer)
+
+
+class RoomClassification(db.Model):
+    """
+    Room Classification
+    """
+
+    __bind_key__ = "key_inventory"
+    __tablename__ = "room_classification"
+    room_type_id = db.Column(db.Integer, primary_key=True)
+    room_type = db.Column(db.String(128))
+
+
+class Rooms(db.Model):
+    """
+    Room Info
+    """
+
+    __bind_key__ = "key_inventory"
+    __tablename__ = "rooms"
+    space_number_id = db.Column(db.String(128), primary_key=True)
+    building_number = db.Column(db.Integer)
+    floor_number = db.Column(db.Integer)
+    wing_number = db.Column(db.Integer)
+    room_number = db.Column(db.Integer)
+    room_type = db.Column(db.Integer)
 
 
 class Titles(db.Model):
@@ -59,19 +249,16 @@ class Titles(db.Model):
     title = db.Column(db.String(25))
 
 
-class Roles(db.Model):
+class Users(db.Model):
     """
-    Role table
+    User Table
     """
 
-    __bind_key = "key_inventory"
-    __tablename__ = "roles"
-    role_id = db.Column(db.Integer, primary_key=True)
-    user_role = db.Column(db.String(25))
-
-
-#     # Column types
-#     db.Column(db.Integer)
-#     db.Column(db.String(25))
-#     db.Column(db.Date)
-#     db.Column(db.Float)
+    __bind_key__ = "key_inventory"
+    __tablename__ = "users"
+    user_id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(25))
+    last_name = db.Column(db.String(25))
+    title_id = db.Column(db.Integer)
+    role_id = db.Column(db.Integer)
+    email = db.Column(db.String(25))

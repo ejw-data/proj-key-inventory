@@ -29,7 +29,8 @@ def load_user(login_id):
     """
     Identifies users who can login, used in conjunction with login_user()
     """
-    return Authentication.query.get(int(login_id))
+    # return Authentication.query.get(int(login_id)) -- prior to sqlalchemy 2.0
+    return db.session.get(Authentication, int(login_id))
 
 
 # generate database if it doesn't exist
