@@ -15,9 +15,9 @@ class Approvers(db.Model):
     """
 
     __bind_key__ = "key_inventory"
-    __tablename__ = "access_approvers"
-    access_approver_id = db.Column(db.Integer, primary_key=True)
-    approver_id = db.Column(db.Integer)
+    __tablename__ = "approvers"
+    approver_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
     role_approved_by = db.Column(db.String(128))
     date_approved = db.Column(db.Date, server_default=func.now())
     date_removed = db.Column(db.Date)
@@ -60,15 +60,15 @@ class ApprovalStatus(db.Model):
     status_code_name = db.Column(db.String(128))
 
 
-class ApproverZones(db.Model):
+class Zones(db.Model):
     """
     Approvers responsible for spaces
     """
 
     __bind_key__ = "key_inventory"
-    __tablename__ = "approver_zones"
+    __tablename__ = "zones"
     building_number = db.Column(db.Integer, primary_key=True)
-    access_approver_id = db.Column(db.Integer)
+    approver_id = db.Column(db.Integer)
 
 
 class Authentication(db.Model, UserMixin):
@@ -203,7 +203,7 @@ class Requests(db.Model):
     user_id = db.Column(db.Integer)
     space_number_id = db.Column(db.String(128))
     building_number = db.Column(db.Integer)
-    access_approver_id = db.Column(db.Integer)
+    approver_id = db.Column(db.Integer)
     access_code_id = db.Column(db.Integer)
     status_code = db.Column(db.Integer)
     request_date = db.Column(db.DateTime, server_default=func.now())

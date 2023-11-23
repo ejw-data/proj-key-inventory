@@ -2,16 +2,16 @@
 
 ---------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------
--- create function that is triggered by the update of requests table with a status_code = 2 (approved) 
+-- create function that is triggered by the update of requests table with a request_status_id = 2 (approved) 
 -- and inserts part of the record into the key_orders
 
-CREATE OR REPLACE FUNCTION log_key_order()
+CREATE OR REPLACE FUNCTION insert_key_order()
   RETURNS TRIGGER 
   LANGUAGE PLPGSQL
   AS
 $$
 BEGIN
-	IF (NEW.status_code <> OLD.status_code) AND (NEW.status_code = 2) THEN
+	IF (NEW.request_status_id <> OLD.request_status_id) AND (NEW.request_status_id = 2) THEN
 		 INSERT INTO key_orders (request_id, access_code_id)
 		 VALUES(OLD.request_id, OLD.access_code_id);
 	END IF;
@@ -20,11 +20,11 @@ BEGIN
 END;
 $$;
 
-CREATE TRIGGER request_approved_create_order
+CREATE TRIGGER create_key_order
   AFTER UPDATE
   ON requests
   FOR EACH ROW
-  EXECUTE PROCEDURE log_key_order();
+  EXECUTE PROCEDURE insert_key_order();
 
 
 
@@ -32,7 +32,7 @@ CREATE TRIGGER request_approved_create_order
 -----------------------------------------------------------------------------------------
 -- create function that is triggered by the update of the status column of the keys_created table. 
 -- upon this update, the key_inventory table is updated and the key_orders table updated
-CREATE OR REPLACE FUNCTION update_key_created()
+CREATE OR REPLACE FUNCTION update_key_order()
   RETURNS TRIGGER 
   LANGUAGE PLPGSQL
   AS
@@ -59,7 +59,7 @@ CREATE TRIGGER update_key_order_status
   AFTER UPDATE
   ON keys_created
   FOR EACH ROW
-  EXECUTE PROCEDURE update_key_created();
+  EXECUTE PROCEDURE update_key_order();
 
 
 -----------------------------------------------------------------------------------------
@@ -76,7 +76,15 @@ BEGIN
 
 		-- Updated request status  
 		 UPDATE requests
-		 SET  status_code = 5 -- KEY READY FOR PICKUP
+		 SET  request_status_id = 5 -- KEY READY FOR PICKUP
+		 WHERE request_id = OLD.request_id;
+	END IF;
+
+	IF NEW.order_status_id = 4 THEN   -- PICKUP COMPLETE
+
+		-- Updated request status  
+		 UPDATE requests
+		 SET  request_status_id = 6 -- KEY ASSIGNED
 		 WHERE request_id = OLD.request_id;
 	END IF;
 
@@ -100,7 +108,7 @@ CREATE TRIGGER update_request_status
 -- OR 2) checks key_inventory  for a matching access_code_id and if NOT available
 -- inserts info to the keys_created table and updates the keys_orders table  
 
-CREATE OR REPLACE FUNCTION update_key_order()
+CREATE OR REPLACE FUNCTION check_for_key()
   RETURNS TRIGGER 
   LANGUAGE PLPGSQL
   AS
@@ -152,8 +160,8 @@ END;
 $$;
 
 -- create trigger to insert values when key_orders table has new record
-CREATE TRIGGER set_key_order_status
+CREATE TRIGGER check_key_status
   BEFORE INSERT
   ON key_orders
   FOR EACH ROW
-  EXECUTE PROCEDURE update_key_order();
+  EXECUTE PROCEDURE check_for_key();

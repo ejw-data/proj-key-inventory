@@ -42,24 +42,24 @@ def approver_instance(form_request=None):
     approver_form = CreateApproversForm(form_request)
 
     subquery = (
-        Approvers.query.with_entities(Approvers.approver_id)
+        Approvers.query.with_entities(Approvers.user_id)
         .distinct()
-        .order_by(Approvers.approver_id.asc())
+        .order_by(Approvers.user_id.asc())
     )
     approvers = (
         Users.query.with_entities(
-            Users.first_name, Users.last_name, Approvers.access_approver_id, Users.email
+            Users.first_name, Users.last_name, Approvers.approver_id, Users.email
         )
         .distinct(Users.first_name, Users.last_name)
         .order_by(Users.last_name.asc())
         .filter(Users.user_id.in_(subquery))
-        .join(Approvers, Approvers.approver_id == Users.user_id)
+        .join(Approvers, Approvers.user_id == Users.user_id)
         .all()
     )
 
     approvers_list = [(-1, "Select access approver")] + [
         (
-            i.access_approver_id,
+            i.approver_id,
             f"{i.first_name.title()} {i.last_name.title()} - {i.email}",
         )
         for i in approvers
@@ -159,7 +159,7 @@ class CreateApprovalStatusForm(FlaskForm):
 
 
 # add data to approver_zones table
-class CreateApproverZonesForm(FlaskForm):
+class CreateZonesForm(FlaskForm):
     """
     Building manager approval areas
     """
@@ -170,18 +170,18 @@ class CreateApproverZonesForm(FlaskForm):
         choices=[(24, "Silverman Hall"), (44, "Ford")],
         validators=[DataRequired()],
     )
-    access_approver_id = SelectField(
+    approver_id = SelectField(
         "Select building manager", validators=[DataRequired()]
     )
     submit = SubmitField("Submit")
 
 
-def approver_zones_instance(form_request=None):
+def zones_instance(form_request=None):
     """
     Create to dynamically update keys form
     """
 
-    approver_zones_form = CreateApproverZonesForm(form_request)
+    zones_form = CreateZonesForm(form_request)
 
     buildings = (
         Buildings.query.with_entities(
@@ -194,7 +194,7 @@ def approver_zones_instance(form_request=None):
         (i.building_number, f"{i.building_name.title()} - ({i.building_number})")
         for i in buildings
     ]
-    approver_zones_form.building_number.choices = buildings_list
+    zones_form.building_number.choices = buildings_list
 
     subquery = (
         Approvers.query.with_entities(Approvers.approver_id)
@@ -203,7 +203,7 @@ def approver_zones_instance(form_request=None):
     )
     approvers = (
         Users.query.with_entities(
-            Users.first_name, Users.last_name, Approvers.access_approver_id, Users.email
+            Users.first_name, Users.last_name, Approvers.approver_id, Users.email
         )
         .order_by(Users.last_name.asc())
         .filter(Users.user_id.in_(subquery))
@@ -213,14 +213,14 @@ def approver_zones_instance(form_request=None):
 
     approvers_list = [(-1, "Select approver")] + [
         (
-            i.access_approver_id,
+            i.approver_id,
             f"{i.first_name.title()} {i.last_name.title()} - {i.email}",
         )
         for i in approvers
     ]
-    approver_zones_form.access_approver_id.choices = approvers_list
+    zones_form.approver_id.choices = approvers_list
 
-    return approver_zones_form
+    return zones_form
 
 
 # verify data and add data to authentication table
@@ -516,22 +516,22 @@ def access_code_form_instance(form_request=None):
     accesscode_form = CreateAccessCodesForm(form_request)
 
     subquery = (
-        Approvers.query.with_entities(Approvers.approver_id)
+        Approvers.query.with_entities(Approvers.user_id)
         .distinct()
-        .order_by(Approvers.approver_id.asc())
+        .order_by(Approvers.user_id.asc())
     )
     approvers = (
         Users.query.with_entities(
-            Users.first_name, Users.last_name, Approvers.access_approver_id
+            Users.first_name, Users.last_name, Approvers.approver_id
         )
         .order_by(Users.last_name.asc())
         .filter(Users.user_id.in_(subquery))
-        .join(Approvers, Approvers.approver_id == Users.user_id)
+        .join(Approvers, Approvers.user_id == Users.user_id)
         .all()
     )
 
     approvers_list = [(-1, "Select approver")] + [
-        (i.access_approver_id, f"{i.first_name.title()} {i.last_name.title()}")
+        (i.approver_id, f"{i.first_name.title()} {i.last_name.title()}")
         for i in approvers
     ]
 
@@ -558,7 +558,7 @@ class CreateRequestsForm(FlaskForm):
     # Calc remaining options for wing for user to select
     # calc space_number_id in the background
     # calc available access approver for user to select
-    access_approver_id = SelectField(
+    approver_id = SelectField(
         "Select approver", coerce=int, validators=[DataRequired()]
     )
     # access_code_id = calculate behind the scene
@@ -631,19 +631,19 @@ def request_form_instance(form_request=None):
     )
     approvers = (
         Users.query.with_entities(
-            Users.first_name, Users.last_name, Approvers.access_approver_id
+            Users.first_name, Users.last_name, Approvers.approver_id
         )
         .order_by(Users.last_name.asc())
         .filter(Users.user_id.in_(subquery))
-        .join(Approvers, Approvers.approver_id == Users.user_id)
+        .join(Approvers, Approvers.user_id == Users.user_id)
         .all()
     )
 
     approvers_list = [(-1, "Select approver")] + [
-        (i.access_approver_id, f"{i.first_name.title()} {i.last_name.title()}")
+        (i.approver_id, f"{i.first_name.title()} {i.last_name.title()}")
         for i in approvers
     ]
-    request_form.access_approver_id.choices = approvers_list
+    request_form.approver_id.choices = approvers_list
 
     # I think this is the subquery that is needed get approver names
     # this should replace the approvers variable above

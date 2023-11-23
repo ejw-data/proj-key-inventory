@@ -164,18 +164,18 @@
     </form>
 
     <h3>Approver Zone Form</h3>
-    <form name="approver_zone_form" action="/post/spaceapprover/add" method="POST" class="col-md-4">
-        {{ approver_zone_form.csrf_token(id = "approver_zone_form_add_id") }}
+    <form name="approver_zone_form" action="/post/zones/add" method="POST" class="col-md-4">
+        {{ zone_form.csrf_token(id = "zone_form_add_id") }}
         <div class="mb-3">
-            {{ approver_zone_form.building_number.label(class="col-form-label") }}
-            {{ approver_zone_form.building_number(class="form-control") }}
+            {{ zone_form.building_number.label(class="col-form-label") }}
+            {{ zone_form.building_number(class="form-control") }}
         </div>
         <div class="mb-3">
-            {{ approver_zone_form.access_approver_id.label(class="col-form-label") }}
-            {{ approver_zone_form.access_approver_id(class="form-control") }}
+            {{ zone_form.approver_id.label(class="col-form-label") }}
+            {{ zone_form.approver_id(class="form-control") }}
         </div>
         <div class="modal-footer">
-            {{ approver_zone_form.submit(class="btn btn-secondary", id="approver_zone_add_submit") }}
+            {{ zone_form.submit(class="btn btn-secondary", id="zone_add_submit") }}
         </div>
     </form>
     <h3>Approvers Form</h3>

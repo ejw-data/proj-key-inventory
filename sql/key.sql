@@ -11,8 +11,8 @@ DROP TABLE IF EXISTS key_orders CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS titles;
 DROP TABLE IF EXISTS roles;
-DROP TABLE IF EXISTS access_approvers CASCADE;
-DROP TABLE IF EXISTS approval_status;
+DROP TABLE IF EXISTS approvers CASCADE;
+DROP TABLE IF EXISTS request_status;
 DROP TABLE IF EXISTS approver_zones;
 DROP TABLE IF EXISTS buildings CASCADE;
 DROP TABLE IF EXISTS fabrication_status;
@@ -40,16 +40,16 @@ CREATE TABLE users (
 );
 
 -- make FK for role_approved_by - may need new table
-CREATE TABLE access_approvers (
-	access_approver_id SERIAL PRIMARY KEY,
-	approver_id INT REFERENCES users (user_id),
+CREATE TABLE approvers (
+	approver_id SERIAL PRIMARY KEY,
+	user_id INT REFERENCES users (user_id),
 	role_approved_by VARCHAR NOT NULL,
 	date_approved TIMESTAMP NOT NULL DEFAULT NOW(),
 	date_removed TIMESTAMP
 );
 
 -- LOGIN _____________________________________________________
--- change so that primary key is also foreign key to users (user_id), keep only username, password_hash
+
 CREATE TABLE authentication (
 	id INT PRIMARY KEY REFERENCES users (user_id),
 	username VARCHAR UNIQUE NOT NULL,
@@ -66,8 +66,8 @@ CREATE TABLE buildings (
 
 CREATE TABLE approver_zones (
 	building_number INT REFERENCES buildings (building_number),
-	access_approver_id INT REFERENCES access_approvers (access_approver_id),
-	PRIMARY KEY (building_number, access_approver_id)
+	approver_id INT REFERENCES approvers (approver_id),
+	PRIMARY KEY (building_number, approver_id)
 );
 
 CREATE TABLE room_classification (
@@ -94,7 +94,6 @@ CREATE TABLE room_amenities (
 
 
 -- ACCESS ASSIGNMENT -------------------------------------------------------------------
--- changed access_code to access_code_id - need to consider the effect
 -- created_by and authorized_by should be references to Users and Approvers
 CREATE TABLE access_codes (
 	access_code_id SERIAL PRIMARY KEY,
@@ -105,28 +104,27 @@ CREATE TABLE access_codes (
 );
 
 -- APPROVAL PROCESS ------------------------------------------------------------
-CREATE TABLE approval_status (
-	status_code SERIAL PRIMARY KEY,
-	status_code_name VARCHAR UNIQUE NOT NULL
+CREATE TABLE request_status (
+	request_status_id SERIAL PRIMARY KEY,
+	request_status_name VARCHAR UNIQUE NOT NULL
 );
 
--- requests table:  request_id, user_id, space, approver, status, dates, reasoning
--- logic updates record
+-- logic updates status code
 -- logic on update adds record to key_owner table the deletes record
 CREATE TABLE requests (
 	request_id SERIAL PRIMARY KEY,
 	user_id INT,
 	space_number_id VARCHAR,
 	building_number INT,
-	access_approver_id INT,
+	approver_id INT,
 	access_code_id INT REFERENCES access_codes (access_code_id),
-	status_code INT DEFAULT 1 REFERENCES approval_status (status_code),
+	request_status_id INT DEFAULT 1 REFERENCES request_status (request_status_id),
 	request_date TIMESTAMP NOT NULL DEFAULT NOW(),
 	approved_date TIMESTAMP,
 	approved BOOL DEFAULT FALSE,
 	approval_comment VARCHAR,
 	rejection_comment VARCHAR,
-	FOREIGN KEY (building_number, access_approver_id) REFERENCES approver_zones (building_number, access_approver_id)
+	FOREIGN KEY (building_number, approver_id) REFERENCES approver_zones (building_number, approver_id)
 );
 -- ALTER TABLE requests ALTER COLUMN request_date SET DEFAULT now();
 -- in the future move the comment to a separate table that includes the request_id/transaction_id

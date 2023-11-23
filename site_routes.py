@@ -7,7 +7,7 @@ from models import (
     AccessCodes,
     AccessPairs,
     ApprovalStatus,
-    ApproverZones,
+    Zones,
     Authentication,
     Buildings,
     FabricationStatus,
@@ -42,7 +42,7 @@ from forms import (
     keys_form_instance,
     CreateKeyStatusForm,
     CreateFabricationStatusForm,
-    approver_zones_instance,
+    zones_instance,
     access_pair_instance,
     CreateApprovalStatusForm,
     approver_instance,
@@ -156,7 +156,7 @@ def admin():
     room_type_form = CreateRoomClassificationForm()
     title_form = CreateTitleForm()
     role_form = CreateRolesForm()
-    approver_zone_form = approver_zones_instance()
+    zone_form = zones_instance()
     approver_form = approver_instance()
     approval_status_form = CreateApprovalStatusForm()
     access_pair_form = access_pair_instance()
@@ -171,7 +171,7 @@ def admin():
         room_type_form=room_type_form,
         title_form=title_form,
         role_form=role_form,
-        approver_zone_form=approver_zone_form,
+        zone_form=zone_form,
         approver_form=approver_form,
         approval_status_form=approval_status_form,
         access_pair_form=access_pair_form,
@@ -483,24 +483,24 @@ def add_approvalstatus():
     return redirect(request.referrer)
 
 
-@site.route("/post/spaceapprover/add", methods=["POST"])
+@site.route("/post/zones/add", methods=["POST"])
 @include_login_form
 def add_spaceapprover():
     """
     Route used to add space approvers to database, applied on admin.html
     """
-    user_form = approver_zones_instance(request.form)
+    user_form = zones_instance(request.form)
 
     if user_form.validate_on_submit():
-        approver = ApproverZones(
+        approver = Zones(
             building_number=user_form.building_number.data,
-            access_approver_id=user_form.access_approver_id.data,
+            approver_id=user_form.approver_id.data,
         )
         db.session.add(approver)
         db.session.commit()
 
         user_form.building_number.data = ""
-        user_form.access_approver_id.data = ""
+        user_form.approver_id.data = ""
         flash("Space Approver Added Successfully")
 
     return redirect(request.referrer)
@@ -598,7 +598,7 @@ def add_request():
             user_id=current_user.get_id(),
             building_number=building_number,
             space_number_id=space_id,
-            access_approver_id=user_form.access_approver_id.data,
+            approver_id=user_form.approver_id.data,
             access_code_id=code,
         )
         db.session.add(key_request)
@@ -608,7 +608,7 @@ def add_request():
         user_form.floor.data = ""
         user_form.wing.data = ""
         user_form.room.data = ""
-        user_form.access_approver_id.data = ""
+        user_form.approver_id.data = ""
         flash("Room Added Successfully")
 
     return redirect(request.referrer)

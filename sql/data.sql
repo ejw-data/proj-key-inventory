@@ -24,7 +24,7 @@ VALUES (1,'erin', 'wills', 1, 1, 'ew@mysite.com'),
 		(4,'bob', 'turtle', 5, 3, 'bt@mysite.com'),
 		(5,'jake', 'powers', 9, 3, 'jp@mysite.com');
 
-INSERT INTO access_approvers (access_approver_id,approver_id, role_approved_by)
+INSERT INTO approvers (approver_id,user_id, role_approved_by)
 VALUES (1,4, 5);
 
 -- INSERT INTO authentication (id, username, password_hash)
@@ -34,7 +34,7 @@ VALUES (1,4, 5);
 INSERT INTO buildings (building_number, building_name, building_description)
 VALUES (24, 'Chemistry', 'Chemistry Department Research Space');
 
-INSERT INTO approver_zones (building_number, access_approver_id)
+INSERT INTO approver_zones (building_number, approver_id)
 VALUES (24, 1);
 
 INSERT INTO room_classification (room_type_id, room_type)
@@ -97,7 +97,7 @@ VALUES (1,'ISSUED'),
 
 -- This will initiate some of the logic
 -- logic needs built to complete this request via forms  
-INSERT INTO requests (user_id, space_number_id, building_number, access_approver_id, access_code_id, status_code)
+INSERT INTO requests (user_id, space_number_id, building_number, approver_id, access_code_id, status_code)
 VALUES (1, 'B24010101', 24, 1, 1, 1),
 		(2, 'B24010101', 24, 1, 2, 1),
 		(3, 'B24010101', 24, 1, 2, 1),
