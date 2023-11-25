@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import (
@@ -6,7 +6,7 @@ from models import (
     Approvers,
     AccessCodes,
     AccessPairs,
-    ApprovalStatus,
+    RequestStatus,
     Zones,
     Authentication,
     Buildings,
@@ -44,10 +44,10 @@ from forms import (
     CreateFabricationStatusForm,
     zones_instance,
     access_pair_instance,
-    CreateApprovalStatusForm,
+    CreateRequestStatusForm,
     approver_instance,
     access_code_form_instance,
-    CreateOrderStatusForm
+    CreateOrderStatusForm,
 )
 
 
@@ -56,6 +56,8 @@ site = Blueprint("site", __name__)
 
 
 # ---------- WIDELY USED PAGE PARAMETERS ----------------------------
+def logged_in_user():
+    return current_user.get_id()
 
 
 # views to include additional_parameters()
@@ -158,7 +160,7 @@ def admin():
     role_form = CreateRolesForm()
     zone_form = zones_instance()
     approver_form = approver_instance()
-    approval_status_form = CreateApprovalStatusForm()
+    request_status_form = CreateRequestStatusForm()
     access_pair_form = access_pair_instance()
     access_code_form = access_code_form_instance()
 
@@ -173,11 +175,52 @@ def admin():
         role_form=role_form,
         zone_form=zone_form,
         approver_form=approver_form,
-        approval_status_form=approval_status_form,
+        request_status_form=request_status_form,
         access_pair_form=access_pair_form,
         access_code_form=access_code_form,
         # order_status not added yet
     )
+
+
+# ---------- TABLE ROUTES ----------------------------
+
+
+# @site.route("/table/requests/<active>", methods=["GET"])
+# @include_login_form
+# def request_table(active):
+#     """
+#     Route used to get current user information
+#     """
+#     login_user_id = logged_in_user()
+#     # column_names = Requests.__table__.columns.keys()
+#     column_names = ["request_id", "user_id", "space_number_id", "approved", "request_status_id"]
+
+#     if active == "all":
+#         records = Requests.query.with_entities(Requests.request_id, Requests.user_id, Requests.space_number_id, Requests.approved, Requests.request_status_id).filter(Requests.user_id == login_user_id).all()
+
+#     elif active == "active":
+#         records = Requests.query.filter(
+#             Requests.user_id == login_user_id, Requests.request_status_id != 6
+#         ).all()
+
+#     elif active == "inactive":
+#         records = Requests.query.filter(
+#             Requests.user_id == login_user_id, Requests.request_status_id == 6
+#         ).all()
+
+#     # print(records.)
+#     data = []
+#     for record in records:
+#         data.append({name: getattr(record, name) for name in column_names})
+#         # data.append({
+#         #     'request_id': record[0],
+#         #     'user_id': record[1],
+#         #     'space_number_id': record[2],
+#         #     'approved': record[3],
+#         #     'request_status_id': record[4]
+#         # })
+
+#     return jsonify(data)
 
 
 # ---------- FORM ROUTES ----------------------------
@@ -462,16 +505,16 @@ def add_fabricationstatus():
     return redirect(request.referrer)
 
 
-@site.route("/post/approvalstatus/add", methods=["POST"])
+@site.route("/post/requeststatus/add", methods=["POST"])
 @include_login_form
-def add_approvalstatus():
+def add_requeststatus():
     """
     Route used to add approval status to database, applied on admin.html
     """
-    user_form = CreateApprovalStatusForm()
+    user_form = CreateRequestStatusForm()
 
     if user_form.validate_on_submit():
-        approval_status = ApprovalStatus(
+        approval_status = RequestStatus(
             status_code_name=user_form.status_code_name.data.upper(),
         )
         db.session.add(approval_status)
@@ -590,7 +633,7 @@ def add_request():
     room_number = user_form.room.data
     building_number = user_form.building_number.data
     room_list = ["B24010101"]
-    code = get_access_code(room_list)
+    code = get_access_code(room_list)[0]
     space_id = f"B{str(building_number).zfill(2)}{str(floor_number).zfill(2)}{str(wing_number).zfill(2)}{str(room_number).zfill(2)}"
 
     if user_form.validate_on_submit():

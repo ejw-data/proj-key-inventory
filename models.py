@@ -49,15 +49,15 @@ class AccessPairs(db.Model):
     space_number_id = db.Column(db.Integer, primary_key=True)
 
 
-class ApprovalStatus(db.Model):
+class RequestStatus(db.Model):
     """
     Status of key request from request to handoff
     """
 
     __bind_key__ = "key_inventory"
-    __tablename__ = "approval_status"
-    status_code = db.Column(db.Integer, primary_key=True)
-    status_code_name = db.Column(db.String(128))
+    __tablename__ = "request_status"
+    request_status_id = db.Column(db.Integer, primary_key=True)
+    request_status_name = db.Column(db.String(128))
 
 
 class Zones(db.Model):
@@ -192,6 +192,8 @@ class KeysCreated(db.Model):
     key_maker_id = db.Column(db.Integer)
     date_created = db.Column(db.Date)
 
+
+# change approved to Integer where it can be "Request Approved", "Waiting Approval", "Request Rejected"
 class Requests(db.Model):
     """
     Key Requests
@@ -205,7 +207,7 @@ class Requests(db.Model):
     building_number = db.Column(db.Integer)
     approver_id = db.Column(db.Integer)
     access_code_id = db.Column(db.Integer)
-    status_code = db.Column(db.Integer)
+    request_status_id = db.Column(db.Integer)
     request_date = db.Column(db.DateTime, server_default=func.now())
     approved_date = db.Column(db.Date)
     approved = db.Column(db.Boolean)

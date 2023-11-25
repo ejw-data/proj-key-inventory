@@ -8,6 +8,7 @@ def create_app():
     Initiate Flask
     """
     app = Flask(__name__)
+    app.json.sort_keys = False
     app.config["SECRET_KEY"] = secret_key
 
     ENV = "dev"
