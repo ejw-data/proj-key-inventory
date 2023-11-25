@@ -9,8 +9,8 @@ d3.json("/api/table/requests/active").then(data => {
 
     // use keys to create html header information
     let headerHTML = "";
-    let header_keywords = [...keys];
-    header_keywords.forEach(i => {headerHTML = headerHTML + `<th>${i}</th>`} );
+    let columns = [...keys];
+    columns.forEach(i => {headerHTML = headerHTML + `<th>${i}</th>`} );
 
     // create table 
     let table_loc = d3.select('#request-table');
@@ -23,23 +23,38 @@ d3.json("/api/table/requests/active").then(data => {
     table_head.html(headerHTML);
 
     // add table body and rows for each json object
-    let row = table.append('tbody')
+    let rows = table.append('tbody')
         .selectAll('tr')
         .data(data)
         .enter()
         .append('tr');
    
     // add data to each row from json objects
-    row.selectAll('td')
-        .data((d,i) => Object.values(d))
+    let cells = rows.selectAll('td')
+        .data((d) => Object.entries(d))
         .enter()
         .append('td')
-        .text(d=> d);
+        // .text(d => d[1]);
+
+    cells.filter(d => d[0] == "Request ID")
+    	.append("a")
+        .attr("href", function(d) {
+            return "https://www.google.com/search?q=" + d[1];
+        })
+        .html(function(d) {
+            return (d[1]);
+        });
+
+    cells.filter(d => d[0] != "Request ID")
+        .html(function(d) {
+            return (d[1]);
+        });
+
 
     table_head.append('td').text('')
     table_head.append('td').text('')
 
-    row.append('td').append('button').attr('class','btn btn-secondary').text('Report Lost')
-    row.append('td').append('button').attr('class','btn btn-secondary').text('Return')
+    rows.append('td').append('button').attr('class','btn btn-secondary').text('Report Lost')
+    rows.append('td').append('button').attr('class','btn btn-secondary').text('Return')
 
 });
