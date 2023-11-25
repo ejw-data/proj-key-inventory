@@ -306,8 +306,8 @@ def add_room():
         room = Rooms(
             space_number_id=user_form.space_number_id.data,
             building_number=user_form.room_building_number.data,
-            floor_number=user_form.floor_number.data,
             wing_number=user_form.wing_number.data,
+            floor_number=user_form.floor_number.data,
             room_number=user_form.room_number.data,
             room_type=user_form.room_type.data,
         )
@@ -350,7 +350,7 @@ def add_amenities():
     return redirect(request.referrer)
 
 
-@site.route("/post/roomtype/add", methods=["POST"])
+@site.route("/post/room/type/add", methods=["POST"])
 @include_login_form
 def add_room_type():
     """
@@ -415,7 +415,8 @@ def add_role():
     return redirect(request.referrer)
 
 
-@site.route("/post/orderstatus/add", methods=["POST"])
+# no form yet
+@site.route("/post/order/status/add", methods=["POST"])
 @include_login_form
 def add_orderstatus():
     """
@@ -436,7 +437,7 @@ def add_orderstatus():
     return redirect(request.referrer)
 
 
-@site.route("/post/keys/add", methods=["POST"])
+@site.route("/post/key/add", methods=["POST"])
 @include_login_form
 def add_keys():
     """
@@ -463,7 +464,7 @@ def add_keys():
     return redirect(request.referrer)
 
 
-@site.route("/post/keystatus/add", methods=["POST"])
+@site.route("/post/key/status/add", methods=["POST"])
 @include_login_form
 def add_keystatus():
     """
@@ -484,7 +485,7 @@ def add_keystatus():
     return redirect(request.referrer)
 
 
-@site.route("/post/fabricationstatus/add", methods=["POST"])
+@site.route("/post/fabrication/status/add", methods=["POST"])
 @include_login_form
 def add_fabricationstatus():
     """
@@ -505,7 +506,7 @@ def add_fabricationstatus():
     return redirect(request.referrer)
 
 
-@site.route("/post/requeststatus/add", methods=["POST"])
+@site.route("/post/request/status/add", methods=["POST"])
 @include_login_form
 def add_requeststatus():
     """
@@ -549,7 +550,7 @@ def add_spaceapprover():
     return redirect(request.referrer)
 
 
-@site.route("/post/roomaccess/add", methods=["POST"])
+@site.route("/post/access/add", methods=["POST"])
 @include_login_form
 def add_accesspair():
     """

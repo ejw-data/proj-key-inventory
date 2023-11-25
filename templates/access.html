@@ -31,7 +31,7 @@
                     
                     {% endfor %}
                     
-                    <form name="user_form" action="/post/add_user" method="POST" class="col-md-12">
+                    <form name="user_form" action="/post/user/add" method="POST" class="col-md-12">
                         {{ user_form.hidden_tag() }}
                         <div class="mb-3">
                             {{ user_form.first_name.label(class="col-form-label") }}

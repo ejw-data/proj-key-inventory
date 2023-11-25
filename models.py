@@ -258,8 +258,8 @@ class Rooms(db.Model):
     __tablename__ = "rooms"
     space_number_id = db.Column(db.String(128), primary_key=True)
     building_number = db.Column(db.Integer)
+    wing_number = db.Column(db.String(20))
     floor_number = db.Column(db.Integer)
-    wing_number = db.Column(db.Integer)
     room_number = db.Column(db.Integer)
     room_type = db.Column(db.Integer)
 

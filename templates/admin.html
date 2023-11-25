@@ -208,7 +208,7 @@
                 </div>
                 <div class="modal-body">
                     <h3>Room Classification Form</h3>
-                    <form name="room_type_form" action="/post/roomtype/add" method="POST" class="col-md-12">
+                    <form name="room_type_form" action="/post/room/type/add" method="POST" class="col-md-12">
                         <!-- {{ space_form.hidden_tag() }} -->
                         {{ room_type_form.csrf_token(id = "room_type_form_add_id") }}
                         <div class="mb-3">
@@ -365,7 +365,7 @@
                 </div>
                 <div class="modal-body">
                     <h3>Request Status Form</h3>
-                    <form name="request_status_form" action="/post/requeststatus/add" method="POST" class="col-md-12">
+                    <form name="request_status_form" action="/post/request/status/add" method="POST" class="col-md-12">
                         {{ request_status_form.csrf_token(id = "request_status_form_add_id") }}
                         <div class="mb-3">
                             {{ request_status_form.request_status_name.label(class="col-form-label") }}
@@ -393,7 +393,7 @@
                 </div>
                 <div class="modal-body">
                     <h3>Access Pair Form</h3>
-                    <form name="access_pair_form" action="/post/roomaccess/add" method="POST" class="col-md-12">
+                    <form name="access_pair_form" action="/post/access/add" method="POST" class="col-md-12">
                         {{ access_pair_form.csrf_token(id = "access_pair_form_add_id") }}
                         <div class="mb-3">
                             {{ access_pair_form.access_code_id.label(class="col-form-label") }}

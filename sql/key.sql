@@ -79,7 +79,7 @@ CREATE TABLE room_classification (
 CREATE TABLE rooms (
 	space_number_id VARCHAR PRIMARY KEY,
 	building_number INT REFERENCES buildings (building_number),
-	wing_number INT,  
+	wing_number VARCHAR,  
 	floor_number INT,
 	room_number INT,
 	room_type INT REFERENCES room_classification (room_type_id)

@@ -418,8 +418,8 @@ class CreateRoomForm(FlaskForm):
     room_building_number = SelectField(
         "Provide building name", coerce=int, validators=[DataRequired()]
     )
+    wing_number = StringField("Provide wing number", validators=[DataRequired()])
     floor_number = IntegerField("Provide floor number", validators=[DataRequired()])
-    wing_number = IntegerField("Provide wing number", validators=[DataRequired()])
     room_number = IntegerField("Provide room number", validators=[DataRequired()])
     room_type = SelectField(
         "Provide the room type", coerce=int, validators=[DataRequired()]
