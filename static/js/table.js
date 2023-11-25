@@ -21,6 +21,8 @@ d3.json("/api/table/requests/active").then(data => {
     let table_head = table.append('thead').append('tr')
         
     table_head.html(headerHTML);
+    table_head.append('td').text('')
+    table_head.append('td').text('')
 
     // add table body and rows for each json object
     let rows = table.append('tbody')
@@ -39,7 +41,7 @@ d3.json("/api/table/requests/active").then(data => {
     cells.filter(d => d[0] == "Request ID")
     	.append("a")
         .attr("href", function(d) {
-            return "https://www.google.com/search?q=" + d[1];
+            return "/api/request/details/" + d[1];
         })
         .html(function(d) {
             return (d[1]);
@@ -51,10 +53,17 @@ d3.json("/api/table/requests/active").then(data => {
         });
 
 
-    table_head.append('td').text('')
-    table_head.append('td').text('')
-
-    rows.append('td').append('button').attr('class','btn btn-secondary').text('Report Lost')
-    rows.append('td').append('button').attr('class','btn btn-secondary').text('Return')
+    rows.append('td')
+        .append('a')
+        .attr("href", function(d){return "/api/request/lost/" + d["Request ID"]})
+        .append('button')
+        .attr('class','btn btn-secondary')
+        .text('Report Lost')
+    rows.append('td')
+        .append('a')
+        .attr("href", function(d){return "/api/request/return/" + d["Request ID"]})
+        .append('button')
+        .attr('class','btn btn-secondary')
+        .text('Return')
 
 });
