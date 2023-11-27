@@ -1,5 +1,16 @@
 from flask import Blueprint, request, redirect, render_template, flash, jsonify
-from models import db, Requests, RequestStatus, Users
+from models import (
+    db,
+    Requests,
+    RequestStatus,
+    Users,
+    Buildings,
+    Rooms,
+    RoomClassification,
+    RoomAmenities,
+    Titles,
+    Roles,
+)
 from flask_login import current_user
 
 api = Blueprint("api", __name__, url_prefix="/api")
@@ -121,5 +132,87 @@ def request_table(active):
                     "Request Status": record[5],
                 }
             )
+
+    return jsonify(data)
+
+
+@api.route("/table/rooms/", methods=["GET"])
+@include_login_form
+def room_table():
+    """
+    Route used to get current room information
+    """
+
+    records = (
+        Rooms.query.with_entities(
+            Rooms.space_number_id,
+            Buildings.building_name,
+            Rooms.building_number,
+            Rooms.wing_number,
+            Rooms.floor_number,
+            Rooms.room_number,
+            RoomClassification.room_type,
+            RoomAmenities.room_projector,
+            RoomAmenities.room_seating,
+        )
+        .join(Buildings, Buildings.building_number == Rooms.building_number)
+        .join(RoomClassification, RoomClassification.room_type_id == Rooms.room_type_id)
+        .join(RoomAmenities, RoomAmenities.space_number_id == Rooms.space_number_id)
+        .all()
+    )
+
+    data = []
+    for record in records:
+        data.append(
+            {
+                "Space ID": record[0],
+                "Building Name": record[1],
+                "Building Number": record[2],
+                "Wing Number": record[3],
+                "Floor Number": record[4],
+                "Room Number": record[5],
+                "Room Type": record[6].title(),
+                "Room Projector": "Yes" if bool(record[7]) else "No",
+                "Room Seating": record[8],
+            }
+        )
+
+    return jsonify(data)
+
+
+@api.route("/table/users/", methods=["GET"])
+@include_login_form
+def users_table():
+    """
+    Route used to get current user information
+    """
+
+    records = (
+        Users.query.with_entities(
+            Users.user_id,
+            Users.first_name,
+            Users.last_name,
+            Titles.title,
+            Roles.user_role,
+            Users.email,
+        )
+        .join(Titles, Titles.title_id == Users.title_id)
+        .join(Roles, Roles.role_id == Users.role_id)
+        .order_by(Users.last_name)
+        .all()
+    )
+
+    data = []
+    for record in records:
+        data.append(
+            {
+                "User ID": record[0],
+                "First Name": record[1].title(),
+                "Last Name": record[2].title(),
+                "Title": record[3].title(),
+                "Role": record[4].title(),
+                "Email": record[5],
+            }
+        )
 
     return jsonify(data)

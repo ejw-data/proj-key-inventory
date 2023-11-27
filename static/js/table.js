@@ -1,27 +1,4 @@
-let data_url = "/api/table/requests/active";
-// let hyperlink_columns = {
-//     'columns_name': ['Request ID'],
-//     'column_url': ['/api/request/details/']
-// };
-
-let hyperlinks = [
-    {'column_name':'Request ID',
-     'column_url': '/api/request/details/'}
-];
-
-let buttons = [
-    {'name': 'Report Lost',
-     'url': '/api/request/lost/',
-     'column': 'Request ID' 
-    },
-    {'name': 'Return',
-     'url': '/api/request/return/',
-     'column': 'Request ID' 
-    }
-];
-
-
-function createTable(data, buttons){
+function createTable(data, id, buttons=[], hyperlinks=[]){
     d3.json(data).then(data => {
 
         // extract keys from json
@@ -30,15 +7,13 @@ function createTable(data, buttons){
             keys.add(key)
         };
 
-        console.log(buttons)
-
         // use keys to create html header information
         let headerHTML = "";
         let columns = [...keys];
         columns.forEach(i => {headerHTML = headerHTML + `<th>${i}</th>`} );
 
         // create table 
-        let table_loc = d3.select('#request-table');
+        let table_loc = d3.select(id);
         let table = table_loc.append('table');
         table.attr('class','styled-table');
         
@@ -59,23 +34,38 @@ function createTable(data, buttons){
             .data((d) => Object.entries(d))
             .enter()
             .append('td')
- 
 
-        // add data to each row from json objects
-        cells.filter(d => d[0] == "Request ID")
-            .append("a")
-            .attr("href", function(d) {
-                return "/api/request/details/" + d[1];
-            })
-            .html(function(d) {
-                return (d[1]);
-            });
 
-        cells.filter(d => d[0] != "Request ID")
-            .html(function(d) {
-                return (d[1]);
-            });
+        // add data to cells and hyperlinks as specificied
+        let hyper_columns = hyperlinks.map(i => i.column_name);
+        
+        columns.forEach(column =>{
+            
+            if (hyper_columns.includes(column)){
+                // get column url
+                let loop_url = hyperlinks.filter(i => i.column_name == column)[0].column_url;
 
+                cells.filter(d => d[0] == column)
+                    .append("a")
+                    .attr("href", function(d) {
+                        return loop_url + d[1];
+                    })
+                    .html(function(d) {
+                        return (d[1]);
+                    });
+            }
+            else if (!hyper_columns.includes(column)) {
+                cells.filter(d => d[0] == column)
+                .html(function(d) {
+                    return (d[1]);
+                });
+            }
+            else {
+                cells.html(function(d) {
+                    return (d[1]);
+                });
+            }
+        });
 
         // add empty header columns and buttons
         buttons.forEach( button => {
@@ -91,4 +81,36 @@ function createTable(data, buttons){
     });
 }
 
-createTable(data_url, buttons)
+
+let table_id = '#request-table'
+let data_url = "/api/table/requests/active";
+
+let hyperlinks = [
+    {'column_name':'Request ID',
+     'column_url': '/api/request/details/'},
+     {'column_name':'Room Code',
+      'column_url': '/api/room/details/'}
+];
+
+let buttons = [
+    {'name': 'Report Lost',
+     'url': '/api/request/lost/',
+     'column': 'Request ID' 
+    },
+    {'name': 'Return',
+     'url': '/api/request/return/',
+     'column': 'Request ID' 
+    }
+];
+
+createTable(data_url, table_id, buttons, hyperlinks)
+
+
+data_url = 'api/table/rooms/'
+table_id = '#room-table'
+createTable(data_url, table_id)
+
+
+data_url = '/api/table/users/'
+table_id = '#user-table'
+createTable(data_url, table_id)

@@ -82,7 +82,7 @@ CREATE TABLE rooms (
 	wing_number VARCHAR,  
 	floor_number INT,
 	room_number INT,
-	room_type INT REFERENCES room_classification (room_type_id)
+	room_type_id INT REFERENCES room_classification (room_type_id)
 );
 
 CREATE TABLE room_amenities (

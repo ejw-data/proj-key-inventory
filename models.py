@@ -261,7 +261,7 @@ class Rooms(db.Model):
     wing_number = db.Column(db.String(20))
     floor_number = db.Column(db.Integer)
     room_number = db.Column(db.Integer)
-    room_type = db.Column(db.Integer)
+    room_type_id = db.Column(db.Integer)
 
 
 class Titles(db.Model):

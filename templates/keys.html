@@ -10,6 +10,7 @@
 
     <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#keysModalusers" data-bs-dismiss="modal">Add
         User</a>
+
     
     <div class="modal fade" id="keysModalusers" aria-hidden="true" aria-labelledby="keysModalusers" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -39,8 +40,8 @@
                             {{ user_form.last_name(class="form-control") }}
                         </div>
                         <div class="mb-3">
-                            {{ user_form.title.label(class="col-form-label") }}
-                            {{ user_form.title(class="form-control") }}
+                            {{ user_form.title_fk.label(class="col-form-label") }}
+                            {{ user_form.title_fk(class="form-control") }}
                         </div>
                         <div class="mb-3">
                             {{ user_form.role.label(class="col-form-label") }}

@@ -27,7 +27,7 @@
 
 ### Pages
 * Login
-* Register (request goes to approver)
+* Register (admin must first add the persons email)
 * Dashboard
     * General Dashboard:  System Notices, Keys and Spaces Allowed, Profile
     * Key Shop Dashboard:  Key Fab Requests, Repair Requests, Lock Changes
@@ -36,7 +36,15 @@
     * Administrator Dashboard:  Can mimic anyones account, full view
     * Site Owner: only person allowed to add Administors.  Stats of each role.  
 
+* Table Views
+    * Requests - shows full summary of users all, active, and inactive requests.  Can report key lost or returned and request new keys.
+    * Space Updates - shows Space info and includes an option to add: building, room, amenities
+    * Access Updates - includes access matrix, add new codes, and add new code pairs.
+    * Users - add approvers, key shop, analyst, and general users.  Shows table of all users with filters by role, recently left, recently new,
+    * Key shop - (include access updates) add new keys, add status codes, orders status, stats
+    * Admin - see stats of users, approvers
 
+    - collect data of when people login and where they click.
 
 ### Case Studies  
 
@@ -80,3 +88,7 @@ Requestors:
 * note the variables assigned to the forms need to be unique becasue these become the input id's.
 * an id could be assigned in the jinja that could overwrite it but then there would be extra assignments and mismatches in the code.  This is probably not that important but for now I will keep the names unique until I determine if there are any other issues related to this.
 * WTF Forms has nice functionality but as I use it there are some less apparent issues with how the standard template generates ids.  This is only apparent if multiple forms are put on the same page or if forms have similar inputs.  My forms are introduced as popups so the form for adding a room and the form for making a room selection use the same variable name (until my last change where I removed these duplications.)
+
+
+### Tables
+* Use datatables.js for large tables 

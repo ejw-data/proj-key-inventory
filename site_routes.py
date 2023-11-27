@@ -87,7 +87,6 @@ def additional_parameters():
 
 # ---------- PAGE ROUTES ----------------------------
 
-
 @site.route("/dashboard")
 @login_required
 @include_login_form
@@ -95,7 +94,10 @@ def index():
     """
     Summary page for all users
     """
-    return render_template("index.html")
+
+    request_form = request_form_instance()
+
+    return render_template("index.html", request_form=request_form)
 
 
 @site.route("/users")
@@ -105,9 +107,7 @@ def users():
     User information page, currently holds add users form
     """
 
-    user_form = request_form_instance()
-
-    return render_template("users.html", user_form=user_form)
+    return render_template("users.html")
 
 
 @site.route("/keys")
@@ -246,7 +246,7 @@ def add_user():
             user = Users(
                 first_name=user_form.first_name.data,
                 last_name=user_form.last_name.data,
-                title_id=user_form.title.data,
+                title_id=user_form.title_fk.data,
                 role_id=user_form.role.data,
                 email=user_form.email.data,
             )
@@ -255,7 +255,7 @@ def add_user():
 
             user_form.first_name.data = ""
             user_form.last_name.data = ""
-            user_form.title.data = ""
+            user_form.title_fk.data = ""
             user_form.role.data = ""
             flash("User Added Successfully")
         elif user_login_exists is not None:
@@ -360,13 +360,13 @@ def add_room_type():
 
     if user_form.validate_on_submit():
         room_type = RoomClassification(
-            room_type_id=user_form.room_type_id.data,
+            room_type_id=user_form.room_type_id_fk.data,
             room_type=user_form.room_type_name.data.lower(),
         )
         db.session.add(room_type)
         db.session.commit()
 
-        user_form.room_type_id.data = ""
+        user_form.room_type_id_fk.data = ""
         user_form.room_type_name.data = ""
         flash("Room Type Added Successfully")
 
@@ -537,14 +537,14 @@ def add_spaceapprover():
 
     if user_form.validate_on_submit():
         approver = Zones(
-            building_number=user_form.building_number.data,
-            approver_id=user_form.approver_id.data,
+            building_number=user_form.building_number_fk.data,
+            approver_id=user_form.approver_id_fk.data,
         )
         db.session.add(approver)
         db.session.commit()
 
-        user_form.building_number.data = ""
-        user_form.approver_id.data = ""
+        user_form.building_number_fk.data = ""
+        user_form.approver_id_fk.data = ""
         flash("Space Approver Added Successfully")
 
     return redirect(request.referrer)
@@ -561,13 +561,13 @@ def add_accesspair():
     if user_form.validate_on_submit():
         pairs = AccessPairs(
             access_code_id=user_form.access_code_id.data,
-            space_number_id=user_form.space_number_id.data,
+            space_number_id=user_form.space_number_id_fk.data,
         )
         db.session.add(pairs)
         db.session.commit()
 
         user_form.access_code_id.data = ""
-        user_form.space_number_id.data = ""
+        user_form.space_number_id_fk.data = ""
         flash("Space Assignment Added Successfully")
 
     return redirect(request.referrer)
