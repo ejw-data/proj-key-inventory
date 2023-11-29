@@ -114,3 +114,15 @@ createTable(data_url, table_id)
 data_url = '/api/table/users/'
 table_id = '#user-table'
 createTable(data_url, table_id)
+
+data_url = '/api/table/matrix/'
+table_id = '#access-matrix'
+createTable(data_url, table_id)
+
+data_url = '/api/table/approver'
+table_id = '#approver-table'
+createTable(data_url, table_id)
+
+data_url = '/api/table/zones'
+table_id = '#zones-table'
+createTable(data_url, table_id)

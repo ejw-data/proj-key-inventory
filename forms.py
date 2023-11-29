@@ -170,9 +170,7 @@ class CreateZonesForm(FlaskForm):
         choices=[(24, "Silverman Hall"), (44, "Ford")],
         validators=[DataRequired()],
     )
-    approver_id_fk = SelectField(
-        "Select building manager", validators=[DataRequired()]
-    )
+    approver_id_fk = SelectField("Select building manager", validators=[DataRequired()])
     submit = SubmitField("Submit")
 
 
@@ -308,7 +306,7 @@ class CreateKeyStatusForm(FlaskForm):
 # add data to keys_created table
 class CreateKeysForm(FlaskForm):
     """
-    Keys Fabricated Form fields
+    Key Fabrication Form fields
     """
 
     key_number = SelectField(
@@ -670,7 +668,5 @@ class CreateOrderStatusForm(FlaskForm):
     """
     Order Status Form fields
     """
-
-    status = StringField(
-        "Input status", validators=[DataRequired()]
-    )
+    order_status = StringField("Input status", validators=[DataRequired()])
+    submit = SubmitField("Submit")

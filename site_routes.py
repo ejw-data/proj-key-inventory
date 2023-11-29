@@ -87,6 +87,7 @@ def additional_parameters():
 
 # ---------- PAGE ROUTES ----------------------------
 
+
 @site.route("/dashboard")
 @login_required
 @include_login_form
@@ -140,9 +141,14 @@ def access():
     User information page, currently holds add users form
     """
 
-    user_form = userform_instance()
+    access_pair_form = access_pair_instance()
+    access_code_form = access_code_form_instance()
 
-    return render_template("access.html", user_form=user_form)
+    return render_template(
+        "access.html",
+        access_pair_form=access_pair_form,
+        access_code_form=access_code_form,
+    )
 
 
 @site.route("/admin")
@@ -161,8 +167,9 @@ def admin():
     zone_form = zones_instance()
     approver_form = approver_instance()
     request_status_form = CreateRequestStatusForm()
-    access_pair_form = access_pair_instance()
-    access_code_form = access_code_form_instance()
+    order_status_form = CreateOrderStatusForm()
+    key_status_form = CreateKeyStatusForm()
+    fab_status_form = CreateFabricationStatusForm()
 
     return render_template(
         "admin.html",
@@ -176,52 +183,11 @@ def admin():
         zone_form=zone_form,
         approver_form=approver_form,
         request_status_form=request_status_form,
-        access_pair_form=access_pair_form,
-        access_code_form=access_code_form,
+        order_status_form=order_status_form,
+        key_status_form=key_status_form,
+        fab_status_form=fab_status_form,
         # order_status not added yet
     )
-
-
-# ---------- TABLE ROUTES ----------------------------
-
-
-# @site.route("/table/requests/<active>", methods=["GET"])
-# @include_login_form
-# def request_table(active):
-#     """
-#     Route used to get current user information
-#     """
-#     login_user_id = logged_in_user()
-#     # column_names = Requests.__table__.columns.keys()
-#     column_names = ["request_id", "user_id", "space_number_id", "approved", "request_status_id"]
-
-#     if active == "all":
-#         records = Requests.query.with_entities(Requests.request_id, Requests.user_id, Requests.space_number_id, Requests.approved, Requests.request_status_id).filter(Requests.user_id == login_user_id).all()
-
-#     elif active == "active":
-#         records = Requests.query.filter(
-#             Requests.user_id == login_user_id, Requests.request_status_id != 6
-#         ).all()
-
-#     elif active == "inactive":
-#         records = Requests.query.filter(
-#             Requests.user_id == login_user_id, Requests.request_status_id == 6
-#         ).all()
-
-#     # print(records.)
-#     data = []
-#     for record in records:
-#         data.append({name: getattr(record, name) for name in column_names})
-#         # data.append({
-#         #     'request_id': record[0],
-#         #     'user_id': record[1],
-#         #     'space_number_id': record[2],
-#         #     'approved': record[3],
-#         #     'request_status_id': record[4]
-#         # })
-
-#     return jsonify(data)
-
 
 # ---------- FORM ROUTES ----------------------------
 

@@ -43,7 +43,7 @@ CREATE TABLE users (
 CREATE TABLE approvers (
 	approver_id SERIAL PRIMARY KEY,
 	user_id INT REFERENCES users (user_id),
-	role_approved_by VARCHAR NOT NULL,
+	role_approved_by INT NOT NULL,
 	date_approved TIMESTAMP NOT NULL DEFAULT NOW(),
 	date_removed TIMESTAMP
 );

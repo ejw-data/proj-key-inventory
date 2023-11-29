@@ -10,8 +10,13 @@ from models import (
     RoomAmenities,
     Titles,
     Roles,
+    AccessPairs,
+    Approvers,
+    Zones,
 )
+from sqlalchemy.orm import aliased
 from flask_login import current_user
+import pandas as pd
 
 api = Blueprint("api", __name__, url_prefix="/api")
 
@@ -214,5 +219,106 @@ def users_table():
                 "Email": record[5],
             }
         )
+
+    return jsonify(data)
+
+
+@api.route("/table/matrix/", methods=["GET"])
+@include_login_form
+def matrix_table():
+    results = AccessPairs.query.all()
+    data = []
+    for result in results:
+        data.append(
+            {"Access Code": result.access_code_id, "space_id": result.space_number_id}
+        )
+
+    df = pd.DataFrame(data)
+
+    pivot_table = pd.crosstab(df["Access Code"], df.space_id)
+    pivot_table = pivot_table.astype(str)
+    pivot_table.iloc[0:, 0:] = pivot_table.iloc[0:, 0:].replace({"1": "X"})
+    pivot_table.iloc[0:, 0:] = pivot_table.iloc[0:, 0:].replace({"0": ""})
+    data = pivot_table.reset_index().to_dict(orient="records")
+
+    return jsonify(data)
+
+
+@api.route("/table/approver", methods=["GET"])
+@include_login_form
+def approver_table():
+    Users_alias_user_id = aliased(Users)
+    Users_alias_approved_by = aliased(Users)
+    results = (
+        Approvers.query.with_entities(
+            Approvers.approver_id,
+            Approvers.user_id,
+            Users_alias_user_id.first_name.label("f_name"),
+            Users_alias_user_id.last_name.label("l_name"),
+            Users_alias_user_id.email,
+            Users_alias_approved_by.first_name,
+            Users_alias_approved_by.last_name,
+            Approvers.date_approved,
+            Approvers.date_removed,
+        )
+        .join(Users_alias_user_id, Users_alias_user_id.user_id == Approvers.user_id)
+        .join(
+            Users_alias_approved_by,
+            Users_alias_approved_by.user_id == Approvers.role_approved_by,
+        )
+        .all()
+    )
+    data = []
+    for result in results:
+        data.append(
+            {
+                "Approver ID": result.approver_id,
+                "User ID": result.user_id,
+                "Approver Name": f"{result.f_name.title()} {result.l_name.title()}",
+                "Approver Email": result.email,
+                "System Approver ": f"{result.first_name.title()} {result.last_name.title()}",
+                "Date Approved": result.date_approved,
+                "Date Removed": result.date_removed,
+            }
+        )
+
+    return jsonify(data)
+
+
+@api.route("/table/zones", methods=["GET"])
+@include_login_form
+def zone_table():
+    results = (
+        Zones.query.with_entities(
+            Zones.building_number,
+            Buildings.building_name, 
+            Users.first_name, 
+            Users.last_name,
+            Users.email
+        )
+        .join(Buildings, 
+              Buildings.building_number == Zones.building_number
+        )
+        .join(Approvers,
+            Approvers.approver_id == Zones.approver_id
+        )
+        .join(Users, 
+              Users.user_id == Approvers.user_id
+        )
+        .all()
+    )
+    data = []
+    for result in results:
+        data.append(
+            {
+                "Approver Name": f"{result.first_name.title()} {result.last_name.title()} - {result.email}<br>",
+                "Approver Email": result.email,
+                "Building": result.building_name,
+            }
+        )
+
+    df = pd.DataFrame(data)
+    building_approvers = df.groupby('Building')['Approver Name'].apply(lambda x: ', '.join(x)).reset_index()
+    data = building_approvers.to_dict(orient='records')
 
     return jsonify(data)

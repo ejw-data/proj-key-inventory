@@ -28,6 +28,34 @@
 
     <div id = "user-table"></div>
 
+
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalapprovers" data-bs-dismiss="modal">Add
+        Approver</a>
+
+    <div id = "approver-table"></div>
+
+
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalzones" data-bs-dismiss="modal">Add
+        Approver Space</a>
+
+    <div id = "zones-table"></div>
+
+    <h4>Other System Inputs</h4>
+    <hr>
+
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalreqstat" data-bs-dismiss="modal">Add
+        Request Status</a>
+
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalordstat" data-bs-dismiss="modal">Add
+        Order Status</a>
+
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalkeystat" data-bs-dismiss="modal">Add
+        Key Status</a>
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalfabstat" data-bs-dismiss="modal">Add
+        Fabrication Status</a>
+
+    
+
 <!-- ####################################################################################################################### -->
     
     <div class="modal fade" id="adminModalbuilding" aria-hidden="true" aria-labelledby="adminModalbuilding" tabindex="-1">
@@ -179,8 +207,6 @@
     </div>
 
     <!-- ############################################################################################################ -->
-
-
     
     <div class="modal fade" id="adminModalusers" aria-hidden="true" aria-labelledby="adminModalusers" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -288,9 +314,6 @@
     </div>
 
 <!-- ############################################################################################### -->
-
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalzones" data-bs-dismiss="modal">Add
-        Approver Space</a>
     
     <div class="modal fade" id="adminModalzones" aria-hidden="true" aria-labelledby="adminModalzones" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -320,10 +343,6 @@
             </div>
         </div>
     </div>
-
-
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalapprovers" data-bs-dismiss="modal">Add
-        Approver</a>
     
     <div class="modal fade" id="adminModalapprovers" aria-hidden="true" aria-labelledby="adminModalapprovers" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -354,8 +373,7 @@
         </div>
     </div>
 
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalreqstat" data-bs-dismiss="modal">Add
-        Approver Status</a>
+    <!-- ########################################################################## -->
     
     <div class="modal fade" id="adminModalreqstat" aria-hidden="true" aria-labelledby="adminModalreqstat" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -374,7 +392,7 @@
                             {{ request_status_form.request_status_name(class="form-control") }}
                         </div>
                         <div class="modal-footer">
-                            {{ request_status_form.submit(class="btn btn-secondary", id="approval_status_add_submit") }}
+                            {{ request_status_form.submit(class="btn btn-secondary", id="request_status_add_submit") }}
                         </div>
                     </form>
                 </div>
@@ -382,31 +400,24 @@
         </div>
     </div>
 
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalaccess" data-bs-dismiss="modal">Add
-        Room Access</a>
-    
-    <div class="modal fade" id="adminModalaccess" aria-hidden="true" aria-labelledby="adminModalaccess" tabindex="-1">
+    <div class="modal fade" id="adminModalordstat" aria-hidden="true" aria-labelledby="adminModalordstat" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <i class="ion-android-alert mr-1" aria-hidden="true"></i>
-                    <h5 class="modal-title" id="adminModalaccessLabel">Add Room Access<h5>
+                    <h5 class="modal-title" id="adminModalordstatLabel">Add Order Status<h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Access Pair Form</h3>
-                    <form name="access_pair_form" action="/post/access/add" method="POST" class="col-md-12">
-                        {{ access_pair_form.csrf_token(id = "access_pair_form_add_id") }}
+                    <h3>Order Status Form</h3>
+                    <form name="request_status_form" action="/post/order/status/add" method="POST" class="col-md-12">
+                        {{ order_status_form.csrf_token(id = "order_status_form_add_id") }}
                         <div class="mb-3">
-                            {{ access_pair_form.access_code_id.label(class="col-form-label") }}
-                            {{ access_pair_form.access_code_id(class="form-control") }}
-                        </div>
-                        <div class="mb-3">
-                            {{ access_pair_form.space_number_id_fk.label(class="col-form-label") }}
-                            {{ access_pair_form.space_number_id_fk(class="form-control") }}
+                            {{ order_status_form.order_status.label(class="col-form-label") }}
+                            {{ order_status_form.order_status(class="form-control") }}
                         </div>
                         <div class="modal-footer">
-                            {{ access_pair_form.submit(class="btn btn-secondary", id="access_pair_add_submit") }}
+                            {{ order_status_form.submit(class="btn btn-secondary", id="order_status_add_submit") }}
                         </div>
                     </form>
                 </div>
@@ -414,38 +425,55 @@
         </div>
     </div>
 
-
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalcode" data-bs-dismiss="modal">Add
-        Access Code</a>
-    
-    <div class="modal fade" id="adminModalcode" aria-hidden="true" aria-labelledby="adminModalcode" tabindex="-1">
+    <div class="modal fade" id="adminModalkeystat" aria-hidden="true" aria-labelledby="adminModalkeystat" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <i class="ion-android-alert mr-1" aria-hidden="true"></i>
-                    <h5 class="modal-title" id="adminModalcodeLabel">Add Access Code<h5>
+                    <h5 class="modal-title" id="adminModalrolesLabel">Add Key Status<h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Access Code Form</h3>
-                    <form name="access_code_form" action="/post/code/add" method="POST" class="col-md-12">
-                        {{ access_code_form.csrf_token(id = "access_code_form_add_id") }}
+                    <h3>Key Status Form</h3>
+                    <form name="roles_form" action="/post/key/status/add" method="POST" class="col-md-12">
+                        {{ key_status_form.csrf_token(id = "key_status_form_add_id") }}
                         <div class="mb-3">
-                            {{ access_code_form.access_description.label(class="col-form-label") }}
-                            {{ access_code_form.access_description(class="form-control") }}
-                        </div>
-                        <div class="mb-3">
-                            {{ access_code_form.authorized_by.label(class="col-form-label") }}
-                            {{ access_code_form.authorized_by(class="form-control") }}
+                            {{ key_status_form.key_status.label(class="col-form-label") }}
+                            {{ key_status_form.key_status(class="form-control") }}
                         </div>
                         <div class="modal-footer">
-                            {{ access_code_form.submit(class="btn btn-secondary", id="access_code_add_submit") }}
+                            {{ key_status_form.submit(class="btn btn-secondary", id="key_status_add_submit") }}
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    
+
+    <div class="modal fade" id="adminModalfabstat" aria-hidden="true" aria-labelledby="adminModalfabstat" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <i class="ion-android-alert mr-1" aria-hidden="true"></i>
+                    <h5 class="modal-title" id="adminModalrolesLabel">Add Key Fabrication Status<h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h3>Key Fabrication Status Form</h3>
+                    <form name="roles_form" action="/post/fabrication/status/add" method="POST" class="col-md-12">
+                        {{ fab_status_form.csrf_token(id = "fab_status_form_add_id") }}
+                        <div class="mb-3">
+                            {{ fab_status_form.fabrication_status.label(class="col-form-label") }}
+                            {{ fab_status_form.fabrication_status(class="form-control") }}
+                        </div>
+                        <div class="modal-footer">
+                            {{ fab_status_form.submit(class="btn btn-secondary", id="fab_status_add_submit") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </main>
 {% endblock %}

@@ -7,60 +7,70 @@
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Something</h1>
     </div>
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#accessModalusers" data-bs-dismiss="modal">Add
-        User</a>
+
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalaccess" data-bs-dismiss="modal">Add
+        Room Access</a>
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalcode" data-bs-dismiss="modal">Add
+        Access Code</a>
+        
+    <div id = 'access-matrix'></div>
     
-    <div class="modal fade" id="accessModalusers" aria-hidden="true" aria-labelledby="accessModalusers" tabindex="-1">
+    <div class="modal fade" id="adminModalaccess" aria-hidden="true" aria-labelledby="adminModalaccess" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <i class="ion-android-alert mr-1" aria-hidden="true"></i>
-                    <h5 class="modal-title" id="accessModaluserLabel">Add User<h5>
+                    <h5 class="modal-title" id="adminModalaccessLabel">Add Room Access<h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h1 class="h2">Access Information</h1>
-                    </div>
-
-                    {% for message in get_flashed_messages() %}
-                        <div class="alert alert-warning alert-dismissible fade show col-md-12" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    
-                    {% endfor %}
-                    
-                    <form name="user_form" action="/post/user/add" method="POST" class="col-md-12">
-                        {{ user_form.hidden_tag() }}
+                    <h3>Access Pair Form</h3>
+                    <form name="access_pair_form" action="/post/access/add" method="POST" class="col-md-12">
+                        {{ access_pair_form.csrf_token(id = "access_pair_form_add_id") }}
                         <div class="mb-3">
-                            {{ user_form.first_name.label(class="col-form-label") }}
-                            {{ user_form.first_name(class="form-control") }}
+                            {{ access_pair_form.access_code_id.label(class="col-form-label") }}
+                            {{ access_pair_form.access_code_id(class="form-control") }}
                         </div>
                         <div class="mb-3">
-                            {{ user_form.last_name.label(class="col-form-label") }}
-                            {{ user_form.last_name(class="form-control") }}
-                        </div>
-                        <div class="mb-3">
-                            {{ user_form.title.label(class="col-form-label") }}
-                            {{ user_form.title(class="form-control") }}
-                        </div>
-                        <div class="mb-3">
-                            {{ user_form.role.label(class="col-form-label") }}
-                            {{ user_form.role(class="form-control") }}
-                        </div>
-                        <div class="mb-3">
-                            {{ user_form.email.label(class="col-form-label") }}
-                            {{ user_form.email(class="form-control") }}
+                            {{ access_pair_form.space_number_id_fk.label(class="col-form-label") }}
+                            {{ access_pair_form.space_number_id_fk(class="form-control") }}
                         </div>
                         <div class="modal-footer">
-                            {{ user_form.submit(class="btn btn-secondary") }}
+                            {{ access_pair_form.submit(class="btn btn-secondary", id="access_pair_add_submit") }}
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
+    
+    <div class="modal fade" id="adminModalcode" aria-hidden="true" aria-labelledby="adminModalcode" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <i class="ion-android-alert mr-1" aria-hidden="true"></i>
+                    <h5 class="modal-title" id="adminModalcodeLabel">Add Access Code<h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h3>Access Code Form</h3>
+                    <form name="access_code_form" action="/post/code/add" method="POST" class="col-md-12">
+                        {{ access_code_form.csrf_token(id = "access_code_form_add_id") }}
+                        <div class="mb-3">
+                            {{ access_code_form.access_description.label(class="col-form-label") }}
+                            {{ access_code_form.access_description(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ access_code_form.authorized_by.label(class="col-form-label") }}
+                            {{ access_code_form.authorized_by(class="form-control") }}
+                        </div>
+                        <div class="modal-footer">
+                            {{ access_code_form.submit(class="btn btn-secondary", id="access_code_add_submit") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 {% endblock %}

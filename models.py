@@ -8,6 +8,18 @@ from flask_login import UserMixin
 
 db = SQLAlchemy()
 
+# # create view
+# class AccessGridView(db.Model):
+#     """
+#     A PostgreSQL view that shows all the rooms available in each access code
+#     """
+#     __bind_key__ = "key_inventory"
+#     __tablename__ = 'temp_matrix'
+#     access_code_id = db.Column(db.String(10))
+#     b24010101 = db.Column(db.Integer)
+#     b24020101 = db.Column(db.Integer)
+#     b24020102 = db.Column(db.Integer)
+
 
 class Approvers(db.Model):
     """
@@ -18,7 +30,7 @@ class Approvers(db.Model):
     __tablename__ = "approvers"
     approver_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
-    role_approved_by = db.Column(db.String(128))
+    role_approved_by = db.Column(db.Integer)
     date_approved = db.Column(db.Date, server_default=func.now())
     date_removed = db.Column(db.Date)
 
