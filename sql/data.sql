@@ -65,7 +65,10 @@ VALUES (1,'REQUEST SUBMITTED'),
 		(3,'REQUEST REJECTED'),
 		(4,'KEY CREATED'),
 		(5,'KEY READY FOR PICKUP'),
-		(6,'KEY ASSIGNED');
+		(6,'KEY ASSIGNED'),
+		(7,'KEY READY FOR RETURN',
+		(8,'KEY RETURNED'),
+		(9,'KEY LOST');
 
 INSERT INTO access_pairs (access_code_id, space_number_id)
 VALUES (1, 'B24010101'),

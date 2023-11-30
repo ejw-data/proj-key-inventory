@@ -82,8 +82,9 @@ function createTable(data, id, buttons=[], hyperlinks=[]){
 }
 
 
-let table_id = '#request-table'
+let table_id = '#request-table';
 let data_url = "/api/table/requests/active";
+createTable(data_url, table_id)
 
 let hyperlinks = [
     {'column_name':'Request ID',
@@ -91,7 +92,6 @@ let hyperlinks = [
      {'column_name':'Room Code',
       'column_url': '/api/room/details/'}
 ];
-
 let buttons = [
     {'name': 'Report Lost',
      'url': '/api/request/lost/',
@@ -102,27 +102,29 @@ let buttons = [
      'column': 'Request ID' 
     }
 ];
-
+data_url = "/api/table/requests/inactive";
+table_id = '#keys-table';
 createTable(data_url, table_id, buttons, hyperlinks)
 
 
-data_url = 'api/table/rooms/'
-table_id = '#room-table'
+data_url = 'api/table/rooms/';
+table_id = '#room-table';
+createTable(data_url, table_id)
+
+data_url = '/api/table/users/';
+table_id = '#user-table';
+createTable(data_url, table_id)
+
+data_url = '/api/table/matrix/';
+table_id = '#access-matrix';
+createTable(data_url, table_id)
+
+data_url = '/api/table/approver';
+table_id = '#approver-table';
+createTable(data_url, table_id)
+
+data_url = '/api/table/zones';
+table_id = '#zones-table';
 createTable(data_url, table_id)
 
 
-data_url = '/api/table/users/'
-table_id = '#user-table'
-createTable(data_url, table_id)
-
-data_url = '/api/table/matrix/'
-table_id = '#access-matrix'
-createTable(data_url, table_id)
-
-data_url = '/api/table/approver'
-table_id = '#approver-table'
-createTable(data_url, table_id)
-
-data_url = '/api/table/zones'
-table_id = '#zones-table'
-createTable(data_url, table_id)

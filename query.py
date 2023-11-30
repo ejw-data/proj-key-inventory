@@ -1,6 +1,8 @@
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, and_
+from flask_login import current_user
+import json
 from config import username, password, hostname, database
-
+from models import Users, Titles, Roles, KeyOrders, Requests
 
 # Sample query of the database
 
@@ -18,7 +20,7 @@ def get_access_code(room_list):
     tuple_list = tuple([(i,) for i in room_list])
     query_test = str(tuple_list).replace(",)", ")")
 
-    query = fr"""
+    query = rf"""
     with temp_matrix as (
 	SELECT access_code_id::text, space_number_id, 1 as Truth 
 	FROM access_pairs 
@@ -63,7 +65,7 @@ def get_access_code(room_list):
     Having count(access_code_id) = (Select count(rooms) FROM room_selections);
 
     """
-    
+
     conn = engine.connect()
 
     results = conn.execute(text(query)).fetchall()
@@ -72,5 +74,52 @@ def get_access_code(room_list):
     engine.dispose()
 
     data = [int(i[0]) for i in results]
+
+    return data
+
+
+def get_profile():
+    login_user_id = current_user.get_id()
+
+    profile = (
+        Users.query.with_entities(
+            Users.first_name,
+            Users.last_name,
+            Users.email,
+            Titles.title,
+            Roles.user_role,
+        )
+        .filter_by(user_id=login_user_id)
+        .join(Titles, Titles.title_id == Users.title_id)
+        .join(Roles, Roles.role_id == Users.role_id)
+        .first()
+    )
+
+    # number_keys = (
+    #     KeyOrders.query.join(Requests, Requests.request_id == KeyOrders.request_id)
+    #     .join(Users, Users.user_id == Requests.user_id)
+    #     .filter(KeyOrders.request_id == login_user_id)
+    #     .count()
+    # )
+    assigned_keys = (
+        Requests.query.filter(Requests.user_id == login_user_id)
+        .filter(Requests.request_status_id == 6)
+        .count()
+    )
+
+    pending_keys = (
+        Requests.query.filter(Requests.user_id == login_user_id)
+        .filter(and_(Requests.request_status_id != 6, Requests.request_status_id !=3))
+        .count()
+    )
+    data = {
+        "first_name": profile.first_name.title(),
+        "last_name": profile.last_name.title(),
+        "email": profile.email,
+        "title": profile.title.title(),
+        "role": profile.user_role.title(),
+        "assigned_keys": assigned_keys,
+        "pending_keys": pending_keys,
+    }
 
     return data

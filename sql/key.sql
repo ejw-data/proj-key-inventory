@@ -143,8 +143,8 @@ CREATE TABLE key_orders (
 	order_status_id INT REFERENCES order_status (order_status_id),
 	date_key_received DATE,
 	date_key_handoff DATE,
-	key_admin_user INT,
-	key_pickup_user INT,
+	key_admin_user_id INT,
+	key_pickup_user_id INT,
 	hold_on_conditions BOOL
 );
 -- maybe add a comments field or a separate table where all comments can be stored

@@ -24,7 +24,7 @@ from models import (
     Titles,
     Users,
 )
-from query import get_access_code
+from query import get_access_code, get_profile
 from sqlalchemy import null, func
 
 # from flask_sqlalchemy import SQLAlchemy
@@ -96,9 +96,11 @@ def index():
     Summary page for all users
     """
 
+    profile = get_profile()
+
     request_form = request_form_instance()
 
-    return render_template("index.html", request_form=request_form)
+    return render_template("index.html", request_form=request_form, profile=profile)
 
 
 @site.route("/users")
@@ -188,6 +190,7 @@ def admin():
         fab_status_form=fab_status_form,
         # order_status not added yet
     )
+
 
 # ---------- FORM ROUTES ----------------------------
 
