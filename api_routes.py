@@ -1,4 +1,5 @@
-from flask import Blueprint, request, redirect, render_template, flash, jsonify
+from flask import Blueprint, request, jsonify, Response
+import json
 from models import (
     db,
     Requests,
@@ -15,6 +16,7 @@ from models import (
     Zones,
 )
 from sqlalchemy.orm import aliased
+from sqlalchemy import or_
 from flask_login import current_user
 import pandas as pd
 
@@ -87,7 +89,7 @@ def request_table(active):
                 Requests.approved,
                 RequestStatus.request_status_name,
             )
-            .filter(Requests.user_id == login_user_id, Requests.request_status_id != 6)
+            .filter(Requests.user_id == login_user_id, Requests.request_status_id < 6)
             .join(
                 RequestStatus,
                 RequestStatus.request_status_id == Requests.request_status_id,
@@ -106,7 +108,10 @@ def request_table(active):
                 Requests.approved,
                 RequestStatus.request_status_name,
             )
-            .filter(Requests.user_id == login_user_id, Requests.request_status_id == 6)
+            .filter(
+                Requests.user_id == login_user_id,
+                or_(Requests.request_status_id == 6, Requests.request_status_id == 7),
+            )
             .join(
                 RequestStatus,
                 RequestStatus.request_status_id == Requests.request_status_id,
@@ -114,6 +119,11 @@ def request_table(active):
             .join(Users, Users.user_id == Requests.user_id)
             .all()
         )
+
+        # print(records)
+        # if not records:
+        #     print(json.dumps([{"Title": "Response"}]))
+        #     return json.dumps([{"Status": "No keys appear to be issued at this time."}])
 
     data = []
     for record in records:
@@ -137,8 +147,27 @@ def request_table(active):
                     "Request Status": record[5],
                 }
             )
-
     return jsonify(data)
+
+
+@api.route("/key/lost/<lost_id>", methods=["GET"])
+@api.route("/key/return/<return_id>")
+@include_login_form
+def key_status_update(lost_id=None, return_id=None):
+    if lost_id:
+        status_id = 9
+        request_id = lost_id
+    elif return_id:
+        status_id = 7
+        request_id = return_id
+    else:
+        print("something went wrong")
+
+    record = Requests.query.get(request_id)
+    record.request_status_id = status_id
+    db.session.commit()
+
+    return Response(status=204)
 
 
 @api.route("/table/rooms/", methods=["GET"])
@@ -291,20 +320,14 @@ def zone_table():
     results = (
         Zones.query.with_entities(
             Zones.building_number,
-            Buildings.building_name, 
-            Users.first_name, 
+            Buildings.building_name,
+            Users.first_name,
             Users.last_name,
-            Users.email
+            Users.email,
         )
-        .join(Buildings, 
-              Buildings.building_number == Zones.building_number
-        )
-        .join(Approvers,
-            Approvers.approver_id == Zones.approver_id
-        )
-        .join(Users, 
-              Users.user_id == Approvers.user_id
-        )
+        .join(Buildings, Buildings.building_number == Zones.building_number)
+        .join(Approvers, Approvers.approver_id == Zones.approver_id)
+        .join(Users, Users.user_id == Approvers.user_id)
         .all()
     )
     data = []
@@ -318,7 +341,11 @@ def zone_table():
         )
 
     df = pd.DataFrame(data)
-    building_approvers = df.groupby('Building')['Approver Name'].apply(lambda x: ', '.join(x)).reset_index()
-    data = building_approvers.to_dict(orient='records')
+    building_approvers = (
+        df.groupby("Building")["Approver Name"]
+        .apply(lambda x: ", ".join(x))
+        .reset_index()
+    )
+    data = building_approvers.to_dict(orient="records")
 
     return jsonify(data)

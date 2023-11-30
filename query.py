@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, text, and_
+from sqlalchemy import create_engine, text, and_, or_
 from flask_login import current_user
 import json
 from config import username, password, hostname, database
@@ -95,21 +95,16 @@ def get_profile():
         .first()
     )
 
-    # number_keys = (
-    #     KeyOrders.query.join(Requests, Requests.request_id == KeyOrders.request_id)
-    #     .join(Users, Users.user_id == Requests.user_id)
-    #     .filter(KeyOrders.request_id == login_user_id)
-    #     .count()
-    # )
+
     assigned_keys = (
         Requests.query.filter(Requests.user_id == login_user_id)
-        .filter(Requests.request_status_id == 6)
+        .filter(or_(Requests.request_status_id == 6, Requests.request_status_id == 7))
         .count()
     )
 
     pending_keys = (
         Requests.query.filter(Requests.user_id == login_user_id)
-        .filter(and_(Requests.request_status_id != 6, Requests.request_status_id !=3))
+        .filter(and_(Requests.request_status_id < 6, Requests.request_status_id != 3))
         .count()
     )
     data = {

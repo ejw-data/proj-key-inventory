@@ -1,5 +1,12 @@
-function createTable(data, id, buttons=[], hyperlinks=[]){
+function createTable(data, id, buttons=[], hyperlinks=[], nullmessage="No results found."){
     d3.json(data).then(data => {
+
+        let include_buttons = true
+
+        if (data.length === 0){
+            data = [{"Status": nullmessage}]
+            include_buttons = false;
+        }
 
         // extract keys from json
         let keys = new Set();
@@ -67,20 +74,36 @@ function createTable(data, id, buttons=[], hyperlinks=[]){
             }
         });
 
-        // add empty header columns and buttons
-        buttons.forEach( button => {
-            table_head.append('td').text('');
-            rows.append('td')
-                .append('a')
-                .attr("href", function(d){return button.url + d[button.column]})
-                .append('button')
-                .attr('class','btn btn-secondary')
-                .text(button.name)
-        });
+        if (include_buttons){
+            // add empty header columns and buttons
+            buttons.forEach( button => {
+                table_head.append('td').text('');
+                rows.append('td')
+                    // .append('a')
+                    // .attr("href", function(d){return button.url + d[button.column]})
+                    .append('button')
+                    .attr('class','btn btn-secondary')
+                    .attr('data-bs-toggle', 'modal')
+                    .attr('data-bs-target', '#tableButtonModal')
+                    .attr('data-bs-dismiss', 'modal')
+                    .text(button.name)
+                    .on('click', d => tableModalHTML(button.url, d[button.column], button.message))
+                    
+            })
+        };
 
     });
 }
 
+function refreshPage() {
+    setTimeout(function(){window.parent.location = window.parent.location.href;}, 10);
+}
+
+// This function supplies the appropriate information to the modal
+function tableModalHTML(url, id, message){
+    d3.select("#button-message").text(message)
+    d3.select("#button-link").attr('href', url + id)
+}
 
 let table_id = '#request-table';
 let data_url = "/api/table/requests/active";
@@ -89,22 +112,24 @@ createTable(data_url, table_id)
 let hyperlinks = [
     {'column_name':'Request ID',
      'column_url': '/api/request/details/'},
-     {'column_name':'Room Code',
-      'column_url': '/api/room/details/'}
+    //  {'column_name':'Room Code',
+    //   'column_url': '/api/room/details/'}
 ];
 let buttons = [
     {'name': 'Report Lost',
-     'url': '/api/request/lost/',
-     'column': 'Request ID' 
+     'url': '/api/key/lost/',
+     'column': 'Request ID',
+     'message':"Please Confirm the key is lost."
     },
     {'name': 'Return',
-     'url': '/api/request/return/',
-     'column': 'Request ID' 
+     'url': '/api/key/return/',
+     'column': 'Request ID',
+     'message':"Please confirm that you are returning the key."
     }
 ];
 data_url = "/api/table/requests/inactive";
 table_id = '#keys-table';
-createTable(data_url, table_id, buttons, hyperlinks)
+createTable(data_url, table_id, buttons, hyperlinks, nullmessage="Records indicate no outstanding keys.")
 
 
 data_url = 'api/table/rooms/';
@@ -126,5 +151,3 @@ createTable(data_url, table_id)
 data_url = '/api/table/zones';
 table_id = '#zones-table';
 createTable(data_url, table_id)
-
-
