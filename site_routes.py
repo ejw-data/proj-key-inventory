@@ -48,6 +48,7 @@ from forms import (
     approver_instance,
     access_code_form_instance,
     CreateOrderStatusForm,
+    update_order_status_form_instance,
 )
 
 
@@ -119,20 +120,19 @@ def keys():
     """
     User information page, currently holds add users form
     """
-
-    user_form = userform_instance()
-    key_form = keys_form_instance()
     key_status_form = CreateKeyStatusForm()
     fabrication_form = CreateFabricationStatusForm()
+    order_status_form = CreateOrderStatusForm()
+    update_order_status_form = update_order_status_form_instance()
 
     # Table KeyOrders and KeyInventory should be filled via triggers
 
     return render_template(
         "keys.html",
-        user_form=user_form,
-        key_form=key_form,
         key_status_form=key_status_form,
         fabrication_form=fabrication_form,
+        order_status_form=order_status_form,
+        update_order_status_form=update_order_status_form,
     )
 
 
@@ -269,7 +269,7 @@ def add_room():
     """
     Route used to add buildings to database, applied on admin.html
     """
-    user_form = spaceform_instance()
+    user_form = spaceform_instance(request.form)
 
     if user_form.validate_on_submit():
         room = Rooms(
@@ -325,7 +325,7 @@ def add_room_type():
     """
     Route used to add room classifications to database, applied on admin.html
     """
-    user_form = CreateRoomClassificationForm()
+    user_form = CreateRoomClassificationForm(request.form)
 
     if user_form.validate_on_submit():
         room_type = RoomClassification(

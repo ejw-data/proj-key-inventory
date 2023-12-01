@@ -2,7 +2,8 @@ function createTable(data, id, buttons=[], hyperlinks=[], nullmessage="No result
     d3.json(data).then(data => {
 
         let include_buttons = true
-
+        console.log(data)
+        // check to see if no data exists
         if (data.length === 0){
             data = [{"Status": nullmessage}]
             include_buttons = false;
@@ -87,10 +88,10 @@ function createTable(data, id, buttons=[], hyperlinks=[], nullmessage="No result
                     .attr('data-bs-target', '#tableButtonModal')
                     .attr('data-bs-dismiss', 'modal')
                     .text(button.name)
-                    .on('click', d => tableModalHTML(button.url, d[button.column], button.message))
+                    .on('click', d => tableModalHTML(button.url, d[button.column], button.message, button.options))
                     
             })
-        };
+        }
 
     });
 }
@@ -100,9 +101,27 @@ function refreshPage() {
 }
 
 // This function supplies the appropriate information to the modal
-function tableModalHTML(url, id, message){
-    d3.select("#button-message").text(message)
-    d3.select("#button-link").attr('href', url + id)
+function tableModalHTML(url, id, message, options=None){
+    
+    if (options == 'dropdown'){
+
+        d3.select("#order-status-form-id").attr('action', url + id)    
+    }
+    else {
+        d3.select("#button-link").attr('href', url + id)    
+        d3.select("#button-message").text(message)
+    }
+    //     d3.select("#button-message").text(message)
+    //     d3.select("#button-link").attr('href', url + id)
+    // }
+    // else if (options == "drop-down"){
+    //     d3.select("#button-message").text(message)
+    //     d3.select("#button-link").attr('href', url + id + "/" +)
+    // }
+    // else {
+    //     d3.select("#button-message").text(message)
+    //     d3.select("#button-link").attr('href', url + id)
+    // }
 }
 
 let table_id = '#request-table';
@@ -150,4 +169,34 @@ createTable(data_url, table_id)
 
 data_url = '/api/table/zones';
 table_id = '#zones-table';
+createTable(data_url, table_id)
+
+data_url = '/api/table/users/group';
+table_id = '#user-group-table';
+createTable(data_url, table_id)
+
+
+data_url = '/api/table/buildings/group';
+table_id = '#building-access';
+createTable(data_url, table_id)
+
+data_url = '/api/table/inventory'
+table_id = '#key-inventory'
+createTable(data_url, table_id)
+
+// for tables, a custom modal could be made to meet the needs by adding a key called 'modal'
+buttons = [
+    {'name': 'Update Status',
+     'url': '/api/orders/status/',
+     'column': 'Request #',
+     'options': 'dropdown',
+     'message':"Please Confirm that you want to submit."
+    }
+];
+data_url = '/api/table/orders'
+table_id = '#orders'
+createTable(data_url, table_id, buttons)
+
+data_url = '/api/table/keyshop'
+table_id = '#key-shop'
 createTable(data_url, table_id)

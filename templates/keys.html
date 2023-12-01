@@ -9,103 +9,30 @@
     </div>
 
     <ul>Things to add:  
-        <li>Show keys in inventory</li>
-        <li>Show keys ready for pickup</li>
-        <li>Show keys being fabricated</li>
+  
+        <li>Add keys by status table (groupby status) and add key status button above table</li>
         <li>Show stats - weekly pickup totals, pickups by day</li>
-        <li>Remove Add User and Request Access </li>
         <li>Make dashboard very key shop friendly - setup table with buttons for key handoff</li>
     </ul>
 
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#keysModalusers" data-bs-dismiss="modal">Add
-        User</a>
+    <h3 class="d-inline">Orders in Progress</h3>
+    <a class="btn btn-secondary mb-1 mx-1 float-end d-inline" data-bs-toggle="modal" data-bs-target="#adminModalordstat" 
+        data-bs-dismiss="modal">Add Order Status</a>
+    <div id="orders"></div>  
 
-    
-    <div class="modal fade" id="keysModalusers" aria-hidden="true" aria-labelledby="keysModalusers" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <i class="ion-android-alert mr-1" aria-hidden="true"></i>
-                    <h5 class="modal-title" id="keysModaluserLabel">Add User<h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    {% for message in get_flashed_messages() %}
-                        <div class="alert alert-warning alert-dismissible fade show col-md-12" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    
-                    {% endfor %}
-                    
-                    <form name="user_form" action="/post/user/add" method="POST" class="col-md-12">
-                        {{ user_form.hidden_tag() }}
-                        <div class="mb-3">
-                            {{ user_form.first_name.label(class="col-form-label") }}
-                            {{ user_form.first_name(class="form-control") }}
-                        </div>
-                        <div class="mb-3">
-                            {{ user_form.last_name.label(class="col-form-label") }}
-                            {{ user_form.last_name(class="form-control") }}
-                        </div>
-                        <div class="mb-3">
-                            {{ user_form.title_fk.label(class="col-form-label") }}
-                            {{ user_form.title_fk(class="form-control") }}
-                        </div>
-                        <div class="mb-3">
-                            {{ user_form.role.label(class="col-form-label") }}
-                            {{ user_form.role(class="form-control") }}
-                        </div>
-                        <div class="mb-3">
-                            {{ user_form.email.label(class="col-form-label") }}
-                            {{ user_form.email(class="form-control") }}
-                        </div>
-                        <div class="modal-footer">
-                            {{ user_form.submit(class="btn btn-secondary") }}
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#keysModalkeys" data-bs-dismiss="modal">Request
-        Access</a>
-    
-    <div class="modal fade" id="keysModalkeys" aria-hidden="true" aria-labelledby="keysModalkeys" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <i class="ion-android-alert mr-1" aria-hidden="true"></i>
-                    <h5 class="modal-title" id="keysModalkeyLabel">Request Access<h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <h3>Key Form</h3>
-                    <form name="key_form" action="/post/key/add" method="POST" class="col-md-12">
-                        <!-- {{ key_form.hidden_tag() }} -->
-                        {{ key_form.csrf_token(id = "key_form_add_id") }}
-                        <div class="mb-3">
-                            {{ key_form.key_number.label(class="col-form-label") }}
-                            {{ key_form.key_number(class="form-control") }}
-                        </div>
-                        <div class="mb-3">
-                            {{ key_form.key_copy.label(class="col-form-label") }}
-                            {{ key_form.key_copy(class="form-control") }}
-                        </div>
-                        <div class="mb-3">
-                            {{ key_form.access_code_id.label(class="col-form-label") }}
-                            {{ key_form.access_code_id(class="form-control") }}
-                        </div>
-                        <div class="modal-footer">
-                            {{ key_form.submit(class="btn btn-secondary", id="key_add_submit") }}
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#keysModalkeystatus" data-bs-dismiss="modal">Add
-        Key Status</a>
+    <h3 class="d-inline">Key Shop Activity</h3>
+    <a class="btn btn-secondary mb-1 float-end d-inline" data-bs-toggle="modal" data-bs-target="#keysModalkeyfabrication"
+        data-bs-dismiss="modal">Add
+        Key Fabrication Status</a>
+    <div id="key-shop"></div>
+
+    <h3 class="d-inline">Current Key Inventory</h3>
+    <a class="btn btn-secondary mb-1 float-end d-inline" data-bs-toggle="modal" data-bs-target="#keysModalkeystatus"
+        data-bs-dismiss="modal">Add
+        Inventory Status</a>
+    <div id="key-inventory"></div>
+
+    <!-- Modals -->
     
     <div class="modal fade" id="keysModalkeystatus" aria-hidden="true" aria-labelledby="keysModalkeystatus" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -131,8 +58,7 @@
             </div>
         </div>
     </div>
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#keysModalkeyfabrication" data-bs-dismiss="modal">Add
-        Key Fabrication Status</a>
+
     
     <div class="modal fade" id="keysModalkeyfabrication" aria-hidden="true" aria-labelledby="keysModalkeyfabrication" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -154,6 +80,61 @@
                             {{ fabrication_form.submit(class="btn btn-secondary", id="fabrication_add_submit") }}
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="adminModalordstat" aria-hidden="true" aria-labelledby="adminModalordstat" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <i class="ion-android-alert mr-1" aria-hidden="true"></i>
+                    <h5 class="modal-title" id="adminModalordstatLabel">Add Order Status<h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h3>Order Status Form</h3>
+                    <form name="request_status_form" action="/post/order/status/add" method="POST" class="col-md-12">
+                        {{ order_status_form.csrf_token(id = "order_status_form_add_id") }}
+                        <div class="mb-3">
+                            {{ order_status_form.order_status.label(class="col-form-label") }}
+                            {{ order_status_form.order_status(class="form-control") }}
+                        </div>
+                        <div class="modal-footer">
+                            {{ order_status_form.submit(class="btn btn-secondary", id="order_status_add_submit") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Modals for in-table buttons -->
+    <div class="modal fade" id="tableButtonModal" tabindex="-1" aria-labelledby="tableButtonModalLabel" aria-hidden="true"
+        data-bs-backdrop="static" data-bs-keyboard="false">
+    
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <i class="ion-android-alert mr-1" aria-hidden="true"></i>
+                    <h5 class="modal-title" id="tableButtonModalLabel">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="button-message"></p>
+                    <form id="order-status-form-id" name="request_status_form" action="/api/orders/status/placeholder/placeholder" method="POST" class="col-md-12">
+                        {{ update_order_status_form.csrf_token(id = "update_order_status_form_add_id") }}
+                        <div class="mb-3">
+                            {{ update_order_status_form.order_status_id.label(class="col-form-label") }}
+                            {{ update_order_status_form.order_status_id(class="form-control") }}
+                        </div>
+                        <div class="modal-footer">
+                            {{ update_order_status_form.submit(class="btn btn-secondary", id="update_order_status_add_submit") }}
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
                 </div>
             </div>
         </div>

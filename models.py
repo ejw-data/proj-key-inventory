@@ -201,7 +201,7 @@ class KeysCreated(db.Model):
     key_copy = db.Column(db.Integer)
     access_code_id = db.Column(db.Integer)
     fabrication_status_id = db.Column(db.Integer)
-    key_maker_id = db.Column(db.Integer)
+    key_maker_user_id = db.Column(db.Integer)
     date_created = db.Column(db.Date)
 
 

@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, Response
+from flask import Blueprint, request, jsonify, Response, redirect, flash
 import json
 from models import (
     db,
@@ -14,9 +14,18 @@ from models import (
     AccessPairs,
     Approvers,
     Zones,
+    KeyInventory,
+    KeyOrders,
+    OrderStatus,
+    KeysCreated,
+    FabricationStatus,
+    KeyStatus
+    
 )
+from forms import update_order_status_form_instance
+
 from sqlalchemy.orm import aliased
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 from flask_login import current_user
 import pandas as pd
 
@@ -41,7 +50,78 @@ def include_login_form(fn):
 # Universal routes
 # ---------------------------------------------------------- #
 
-# API routes
+
+# API Update Routes
+
+
+@api.route("/key/lost/<lost_id>", methods=["GET"])
+@api.route("/key/return/<return_id>")
+@include_login_form
+def key_status_update(lost_id=None, return_id=None):
+    if lost_id:
+        status_id = 9
+        request_id = lost_id
+    elif return_id:
+        status_id = 7
+        request_id = return_id
+    else:
+        print("something went wrong")
+
+    record = Requests.query.get(request_id)
+    record.request_status_id = status_id
+    db.session.commit()
+
+    return Response(status=204)
+
+
+@api.route("/orders/status/<request_id>", methods=["POST"])
+@include_login_form
+def order_status_update(request_id=None):
+    
+    update_order_form = update_order_status_form_instance(request.form)
+
+    if update_order_form.validate_on_submit():
+   
+        update_record = KeyOrders.query.get(int(request_id))
+        update_record.order_status_id = update_order_form.order_status_id.data
+        db.session.commit()
+
+        update_order_form.order_status_id.data = ""
+        flash("Key Order Updated Successfully")
+
+    return redirect(request.referrer)
+
+
+@api.route("/orders/status/group", methods=["GET"])
+@include_login_form
+def order_status_group():
+
+    records = (
+        KeyInventory.query.with_entities(
+            KeyStatus.key_status,
+            func.count(KeyInventory.key_status_id)
+        )
+        .join(KeyStatus, KeyStatus.key_status_id == KeyInventory.key_status_id)
+        .group_by(KeyStatus.key_status)
+        .all()
+    )
+    
+    data = []
+    for record in records:
+        # data.append({name: getattr(record, name) for name in column_names})
+
+        data.append(
+            {
+                "Key Status": record[0],
+                "Number Keys": record[1],
+            }
+        )
+
+    return jsonify(data)
+
+
+
+# API table routes
 
 
 @api.route("/table/requests/<active>", methods=["GET"])
@@ -150,26 +230,6 @@ def request_table(active):
     return jsonify(data)
 
 
-@api.route("/key/lost/<lost_id>", methods=["GET"])
-@api.route("/key/return/<return_id>")
-@include_login_form
-def key_status_update(lost_id=None, return_id=None):
-    if lost_id:
-        status_id = 9
-        request_id = lost_id
-    elif return_id:
-        status_id = 7
-        request_id = return_id
-    else:
-        print("something went wrong")
-
-    record = Requests.query.get(request_id)
-    record.request_status_id = status_id
-    db.session.commit()
-
-    return Response(status=204)
-
-
 @api.route("/table/rooms/", methods=["GET"])
 @include_login_form
 def room_table():
@@ -248,6 +308,95 @@ def users_table():
                 "Email": record[5],
             }
         )
+
+    return jsonify(data)
+
+
+@api.route("/table/users/group", methods=["GET"])
+@include_login_form
+def users_grouped_table():
+    """
+    Route used to get all users access
+    """
+
+    records = (
+        Users.query.with_entities(
+            Users.user_id,
+            Users.first_name,
+            Users.last_name,
+            Users.email,
+            Requests.space_number_id,
+        )
+        .join(Requests, Requests.user_id == Users.user_id)
+        .order_by(Users.last_name)
+        .all()
+    )
+
+    data = []
+    for record in records:
+        data.append(
+            {
+                "User ID": record[0],
+                "First Name": record[1].title(),
+                "Last Name": record[2].title(),
+                "Email": record[3],
+                "Accessible Spaces": record[4],
+            }
+        )
+
+    df = pd.DataFrame(data)
+
+    users_and_spaces = (
+        df.groupby(["User ID", "First Name", "Last Name", "Email"])["Accessible Spaces"]
+        .apply(lambda x: ", ".join(x))
+        .reset_index()
+    )
+    data = users_and_spaces.to_dict(orient="records")
+
+    return jsonify(data)
+
+
+@api.route("/table/buildings/group", methods=["GET"])
+@include_login_form
+def buildings_grouped_table():
+    """
+    Route used to get all building access
+    """
+
+    records = (
+        Users.query.with_entities(
+            Users.user_id,
+            Users.first_name,
+            Users.last_name,
+            Users.email,
+            Requests.space_number_id,
+            RoomClassification.room_type,
+        )
+        .join(Requests, Requests.user_id == Users.user_id)
+        .join(Rooms, Rooms.space_number_id == Requests.space_number_id)
+        .join(RoomClassification, RoomClassification.room_type_id == Rooms.room_type_id)
+        .order_by(Users.last_name)
+        .all()
+    )
+
+    data = []
+    for record in records:
+        data.append(
+            {
+                "Room": record[4],
+                "Room Type": record[5].title(),
+                "People With Access": f"{record[1].title()} {record[2].title()} - {record[3]}",
+            }
+        )
+
+    df = pd.DataFrame(data)
+
+    users_and_spaces = (
+        df.groupby(["Room", "Room Type"])["People With Access"]
+        .apply(lambda x: "<br> ".join(x))
+        .reset_index()
+    )
+    data = users_and_spaces.to_dict(orient="records")
 
     return jsonify(data)
 
@@ -347,5 +496,103 @@ def zone_table():
         .reset_index()
     )
     data = building_approvers.to_dict(orient="records")
+
+    return jsonify(data)
+
+
+@api.route("/table/inventory", methods=["GET"])
+@include_login_form
+def inventory_table():
+    records = (
+        KeyInventory.query.with_entities(
+            KeyInventory.access_code_id, func.count(KeyInventory.access_code_id)
+        )
+        .filter(KeyInventory.key_status_id == 2)
+        .group_by(KeyInventory.access_code_id)
+        .all()
+    )
+
+    data = []
+    for record in records:
+        data.append({"Key": record[0], "Keys Available": record[1]})
+
+    return jsonify(data)
+
+
+@api.route("/table/orders", methods=["GET"])
+@include_login_form
+def orders_table():
+    records = (
+        KeyOrders.query.with_entities(
+            KeyOrders.access_code_id,
+            OrderStatus.order_status,
+            Users.first_name,
+            Users.last_name,
+            Users.email,
+            Requests.request_date,
+            KeyOrders.request_id,
+            KeyOrders.date_key_received,
+        )
+        .distinct()
+        .join(OrderStatus, OrderStatus.order_status_id == KeyOrders.order_status_id)
+        .join(Requests, Requests.request_id == KeyOrders.request_id)
+        .join(Users, Users.user_id == Requests.user_id)
+        .filter(KeyOrders.order_status_id < 4)
+        .order_by(KeyOrders.request_id.asc())
+        .all()
+    )
+
+    data = []
+    for record in records:
+        data.append(
+            {
+                "Request #": record[6],
+                "Ordered Key": record[0],
+                "Status": record[1],
+                "Name": f"{record[2].title()} {record[3].title()}",
+                "Email": record[4],
+                "Request Date": record[5],
+                "Date Ready for Pickup": record[7],
+            }
+        )
+
+    return jsonify(data)
+
+
+@api.route("/table/keyshop", methods=["GET"])
+@include_login_form
+def keyshop_table():
+    records = (
+        KeysCreated.query.with_entities(
+            KeysCreated.request_id,
+            KeysCreated.access_code_id,
+            KeysCreated.key_copy,
+            FabricationStatus.fabrication_status,
+            Users.first_name,
+            Users.last_name,
+        )
+        .distinct()
+        .join(
+            FabricationStatus,
+            FabricationStatus.fabrication_status_id
+            == KeysCreated.fabrication_status_id,
+        )
+        .join(Users, Users.user_id == KeysCreated.key_maker_user_id)
+        .filter(KeysCreated.fabrication_status_id < 3)
+        .order_by(KeysCreated.request_id.asc())
+        .all()
+    )
+
+    data = []
+    for record in records:
+        data.append(
+            {
+                "Request #": record[0],
+                "Access Code": record[1],
+                "Key Copy": record[2],
+                "Fabrication Status": record[3],
+                "Key Maker": f"{record[4].title()} {record[5].title()}",
+            }
+        )
 
     return jsonify(data)

@@ -19,6 +19,7 @@ from models import (
     Approvers,
     Users,
     AccessCodes,
+    OrderStatus
 )
 
 
@@ -668,5 +669,39 @@ class CreateOrderStatusForm(FlaskForm):
     """
     Order Status Form fields
     """
+
     order_status = StringField("Input status", validators=[DataRequired()])
     submit = SubmitField("Submit")
+
+
+class CreateUpdateOrderStatusForm(FlaskForm):
+    """
+    Update Order Status
+    """
+
+    order_status_id = SelectField(
+        "Select current status", coerce=int, validators=[DataRequired()]
+    )
+    submit = SubmitField("Submit")
+
+
+def update_order_status_form_instance(form_request=None):
+    """
+    Create to update orders status
+    """
+    order_status_form = CreateUpdateOrderStatusForm(form_request)
+
+    status_options = (
+        OrderStatus.query
+        .order_by(OrderStatus.order_status_id.asc())
+        .all()
+    )
+
+    order_status_list = [(-1, "Select order status")] + [
+        (i.order_status_id, i.order_status.title())
+        for i in status_options
+    ]
+
+    order_status_form.order_status_id.choices = order_status_list
+
+    return order_status_form
