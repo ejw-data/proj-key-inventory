@@ -11,7 +11,7 @@ def get_access_code(room_list):
     """
     Retrieve key access code
     """
-
+    # replace connection with 'path' from db_paths.py - in attempt to reduce duplications
     engine = create_engine(
         f"postgresql+psycopg2://{username}:{password}@{hostname}/{database}"
     )

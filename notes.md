@@ -1,3 +1,39 @@
+### Tasks
+1.  ! Improve interface
+1.  Add space owner, add student relationship on profile - reports to or sponsored
+    *  Also include role so that special rules can be added based on this association
+    *  Maybe have utilities vary based on this metric - checks for if student has left.
+1.  Create order basket for requests that utilize past and current information.  
+1.  ! Create restrictions on who can see what menu
+1.  ! Restrict who can access which routes
+1.  ! Move common html to template parts in flask
+1.  ! Allow to upload picture as profile image
+1.  ! Create messaging system that stores all messages per request
+1.  ! Create popup that displays the stats of a request and all messages
+    *  Request ID Title 
+    *  Start date - ready date - pickup date
+    *  Total days elapsed
+    *  Building Approver - Room Approver
+        *  Access Code (key) - Room(s)
+    *  Messages (listed as Date, Sender Group, Sender, Message) - Sender Group can also be 'Requester', 'PI'
+1.  !/- Separate routes into different files
+    * site_routes.py - pages loading (render_templates)
+    * api_routes.py - graphics/data
+    * form_routes.py - forms posting data
+    * table_routes.py - tables getting data
+    * workflow_routes.py - updates to the database that often trigger db procedures
+1.  ! Create Reports - these could be used in periodic emails request for checks for accuracy
+    * Space Owner - people access by Room per PI - each report could be emailed to PI
+    * Building Approver - All access under their building
+    * Recently removed by affiliation
+    * Recently added by affiliation
+    * Keyshop response time, keys issued, door maintenance, trends per week and weekday
+
+### key request form
+* Create new table that will hold the requests in a modal and the modal brings up another model for adding items
+* Each time the for has a new item added the page refreshes.  
+* Use separate button to contents of teh 
+
 
 
 ### Features
