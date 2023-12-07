@@ -1,4 +1,13 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
+from flask import (
+    Blueprint,
+    render_template,
+    request,
+    flash,
+    redirect,
+    url_for,
+    jsonify,
+    session,
+)
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import (
@@ -100,8 +109,20 @@ def index():
     profile = get_profile()
 
     request_form = request_form_instance()
+    basket_form = request_form_instance()
 
-    return render_template("index.html", request_form=request_form, profile=profile)
+    return render_template(
+        "index.html",
+        request_form=request_form,
+        profile=profile,
+        basket_form=basket_form,
+    )
+
+
+@site.route("/order-content")
+@include_login_form
+def ordercontent():
+    return render_template("dynamic/_orders.html")
 
 
 @site.route("/users")
@@ -598,33 +619,46 @@ def add_request():
     """
     user_form = request_form_instance(request.form)
 
-    floor_number = user_form.floor.data
-    wing_number = user_form.wing.data
-    room_number = user_form.room.data
-    building_number = user_form.building_number.data
-    room_list = ["B24010101"]
-    code = get_access_code(room_list)[0]
-    space_id = f"B{str(building_number).zfill(2)}{str(floor_number).zfill(2)}{str(wing_number).zfill(2)}{str(room_number).zfill(2)}"
+    # logic for storing sessions
+    session.modified = True
+
+    if session.get('order'):
+        pass
+    else:
+        session['order'] = []
+
+    # # I will need to clear the session on submit
+    # session.clear()
 
     if user_form.validate_on_submit():
-        key_request = Requests(
-            user_id=current_user.get_id(),
-            building_number=building_number,
-            space_number_id=space_id,
-            approver_id=user_form.approver_id.data,
-            access_code_id=code,
-        )
-        db.session.add(key_request)
-        db.session.commit()
+        floor_number = user_form.floor.data
+        wing_number = user_form.wing.data
+        room_number = user_form.room.data
+        building_number = user_form.building_number.data
+        # room_list = ["B24010101"]
+        # code = get_access_code(room_list)[0]
+        space_id = f"B{str(building_number).zfill(2)}{str(floor_number).zfill(2)}{str(wing_number).zfill(2)}{str(room_number).zfill(2)}"
+
+        new_key = {
+            'space_id': space_id,
+            'building_number': building_number,
+            'wing_number': wing_number,
+            'floor_number': floor_number,
+            'room_number': room_number,
+            'space_owner': "Ted",
+            'building_approver': "Joe"
+        }
+
+        session['order'].append(new_key)
 
         user_form.building_number.data = ""
-        user_form.floor.data = ""
         user_form.wing.data = ""
+        user_form.floor.data = ""
         user_form.room.data = ""
         user_form.approver_id.data = ""
-        flash("Room Added Successfully")
+        flash("Key Added Successfully")
 
-    return redirect(request.referrer)
+    return ('', 204)
 
 
 # -------------------------- SITE ACCESS -------------------------------------

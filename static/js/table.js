@@ -2,7 +2,7 @@ function createTable(data, id, buttons=[], hyperlinks=[], nullmessage="No result
     d3.json(data).then(data => {
 
         let include_buttons = true
-        console.log(data)
+        // console.log(data)
         // check to see if no data exists
         if (data.length === 0){
             data = [{"Status": nullmessage}]

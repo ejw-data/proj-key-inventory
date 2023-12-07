@@ -1,0 +1,47 @@
+<table id="basket-table" class="table">
+    <thead>
+        <tr>
+            <th>Space ID</th>
+            <th>Building</th>
+            <th>Wing</th>
+            <th>Floor</th>
+            <th>Room</th>
+            <th>Space Owner</th>
+            <th>Building Approver</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        {% if 'order' in session %}
+        <!-- disply orders -->
+            {% for record in session['order'] %}
+            <tr>
+                <td>{{ record['space_id'] }}</td>
+                <td>{{ record['building_number'] }}</td>
+                <td>{{ record['wing_number'] }}</td>
+                <td>{{ record['floor_number'] }}</td>
+                <td>{{ record['room_number'] }}</td>
+                <td>{{ record['space_owner'] }}</td>
+                <td>{{ record['building_approver'] }}</td>
+            </tr>
+            {% endfor %}
+
+        {% else %}
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        {% endif %}
+        
+    </tbody>
+    <tfoot>
+        <!-- footer content -->
+    </tfoot>
+</table>
+<a class="btn btn-secondary mb-1 float-end d-inline" data-bs-toggle="modal" data-bs-target="none"
+    data-bs-dismiss="modal">Submit Basket</a>

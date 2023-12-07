@@ -32,7 +32,23 @@
 ### key request form
 * Create new table that will hold the requests in a modal and the modal brings up another model for adding items
 * Each time the for has a new item added the page refreshes.  
-* Use separate button to contents of teh 
+* Use separate button to contents of the
+
+
+Types of Storage
+* Local Storage
+* Session Storage
+
+Types of Server Updating
+* AJAX
+* Websockets
+* SSE (server sent events) - 
+
+Streaming information (messaging queuing systems, )
+* RabbitMQ / ActiveMQ  (message broker / queue)
+* Kafta (full streaming system)
+* Amazon Kinesis / IBM MQ  (full streaming system)
+* Amazon SQS (simple queue )
 
 
 

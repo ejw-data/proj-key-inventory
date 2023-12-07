@@ -569,7 +569,7 @@ class CreateRequestsForm(FlaskForm):
     # approval_comment = keep null
     # rejection_comment = keep null
 
-    submit = SubmitField("Submit")
+    submit = SubmitField("Add Key")
 
 
 def request_form_instance(form_request=None):
