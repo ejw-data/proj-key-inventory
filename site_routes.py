@@ -622,10 +622,10 @@ def add_request():
     # logic for storing sessions
     session.modified = True
 
-    if session.get('order'):
+    if session.get("order"):
         pass
     else:
-        session['order'] = []
+        session["order"] = []
 
     # # I will need to clear the session on submit
     # session.clear()
@@ -640,16 +640,16 @@ def add_request():
         space_id = f"B{str(building_number).zfill(2)}{str(floor_number).zfill(2)}{str(wing_number).zfill(2)}{str(room_number).zfill(2)}"
 
         new_key = {
-            'space_id': space_id,
-            'building_number': building_number,
-            'wing_number': wing_number,
-            'floor_number': floor_number,
-            'room_number': room_number,
-            'space_owner': "Ted",
-            'building_approver': "Joe"
+            "space_id": space_id,
+            "building_number": building_number,
+            "wing_number": wing_number,
+            "floor_number": floor_number,
+            "room_number": room_number,
+            "space_owner": "Ted",
+            "building_approver": "Joe",
         }
 
-        session['order'].append(new_key)
+        session["order"].append(new_key)
 
         user_form.building_number.data = ""
         user_form.wing.data = ""
@@ -658,7 +658,31 @@ def add_request():
         user_form.approver_id.data = ""
         flash("Key Added Successfully")
 
-    return ('', 204)
+    return ("", 204)
+
+
+@site.route("/post/basket/add", methods=["GET", "POST"])
+@include_login_form
+def submit_basket():
+    order_entries = session["order"]
+    room_list = [i["space_id"] for i in order_entries]
+    unique_rooms_list = list(set(room_list))
+
+    # create many combinations of lists
+    # test each one and store the keys
+    # choose list with fewest entries
+    initial_test = get_access_code(unique_rooms_list)
+    if len(initial_test) == 1:
+        msg = f"There is a perfect match - Key #{get_access_code(unique_rooms_list)[0]}"
+    # add in elif logic that predicts best combination
+    else:
+        msg = "Multiple Keys are needed\n"
+        for space in unique_rooms_list:
+            msg += f"Key #{get_access_code([space])}\n"
+        
+    print(msg)
+    return msg
+    # return ("", 204)
 
 
 # -------------------------- SITE ACCESS -------------------------------------

@@ -18,7 +18,7 @@ def get_access_code(room_list):
 
     # values = ["B24010101", "B24020102", "B24020101"]
     tuple_list = tuple([(i,) for i in room_list])
-    query_test = str(tuple_list).replace(",)", ")")
+    query_test = str(tuple_list).replace(",)", ")")[1:-1]
 
     query = rf"""
     with temp_matrix as (
@@ -65,6 +65,7 @@ def get_access_code(room_list):
     Having count(access_code_id) = (Select count(rooms) FROM room_selections);
 
     """
+    print("Query", query)
 
     conn = engine.connect()
 
@@ -94,7 +95,6 @@ def get_profile():
         .join(Roles, Roles.role_id == Users.role_id)
         .first()
     )
-
 
     assigned_keys = (
         Requests.query.filter(Requests.user_id == login_user_id)

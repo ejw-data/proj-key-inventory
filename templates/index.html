@@ -193,31 +193,39 @@
         
                         <form name="basket_form" action="/post/request/add" method="POST" class="col-md-12">
                             {{ basket_form.csrf_token(id = "basket_form_add_id") }}
-                            <div class="mb-3">
-                                {{ basket_form.building_number.label(class="col-form-label") }}
-                                {{ basket_form.building_number(class="form-control", id="building_number") }}
+
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="mb-2">
+                                        {{ basket_form.building_number.label(class="col-form-label") }}
+                                        {{ basket_form.building_number(class="form-control w-50", id="building_number") }}
+                                    </div>
+                                    <div class="mb-2">
+                                        {{ basket_form.wing.label(class="col-form-label") }}
+                                        {{ basket_form.wing(class="form-control w-50") }}
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-2">
+                                        {{ basket_form.floor.label(class="col-form-label") }}
+                                        {{ basket_form.floor(class="form-control w-50") }}
+                                    </div>
+                                    <div class="mb-2">
+                                        {{ basket_form.room.label(class="col-form-label") }}
+                                        {{ basket_form.room(class="form-control w-50") }}
+                                    </div>
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                {{ basket_form.wing.label(class="col-form-label") }}
-                                {{ basket_form.wing(class="form-control") }}
-                            </div>
-                            <div class="mb-3">
-                                {{ basket_form.floor.label(class="col-form-label") }}
-                                {{ basket_form.floor(class="form-control") }}
-                            </div>
-                            <div class="mb-3">
-                                {{ basket_form.room.label(class="col-form-label") }}
-                                {{ basket_form.room(class="form-control") }}
-                            </div>
-                            <div class="mb-3">
+                            <div class="mb-2">
                                 {{ basket_form.approver_id.label(class="col-form-label") }}
-                                {{ basket_form.approver_id(class="form-control") }}
+                                {{ basket_form.approver_id(class="form-control w-25") }}
                             </div>
                             <div class="modal-footer">
-                                {{ basket_form.submit(class="btn btn-secondary", id="basket_submit") }}
+                                {{ basket_form.submit(class="btn btn-secondary", id="add-key-submit") }}
                             </div>
                         </form>
                     </div>
+                    <h3>Keys in Basket</h3>
                     <div id="basket-section"></div>
                 </div>
             </div>

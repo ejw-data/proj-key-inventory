@@ -15,19 +15,29 @@ function showForm(){
 let addKeyButton = d3.select('#add-key');
 addKeyButton.on('click', i => showForm());
 
-let submitKey = d3.select('#basket_submit')
+let submitKey = d3.select('#add-key-submit')
 submitKey.on('click', i => updateTable())
+submitKey.on('click', i => getMsg())
 
 function updateTable() {
     setTimeout(function (){
         d3.text("/order-content").then(html => {
         let basketDiv = d3.select('#basket-section');
-        console.log("updateTableRan", html)
         basketDiv.html(html);
+        });
+    }, 1000);
+}
+
+function getMsg(){
+    setTimeout(function (){
+        d3.text("/post/basket/add").then(d =>{
+            outcomeDiv = d3.select('#basket-section');
+            outcomeDiv.html(`<p>${d}</p>`);
         });
     }, 1000);
 }
 
 updateTable()
 
-//     d3.select('#basket-table').select('tbody').append('tr').append('td').text("No entries yet.")
+
+// let submitOrder('click', i => )
