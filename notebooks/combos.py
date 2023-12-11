@@ -43,7 +43,7 @@ def reduce_results(matrix: list, requested: list) -> list:
     """
 
     # remove entries that have too many options
-    filter1 = filter(lambda x: len(x) <= len(requested), matrix)
+    filter1 = filter(lambda x: len(x['value']) <= len(requested), matrix)
 
     def remove_extra_options(list_item, required: list) -> bool:
         """
@@ -58,7 +58,7 @@ def reduce_results(matrix: list, requested: list) -> list:
         return val
 
     # remove entries that include unnecessary entries
-    filter2 = filter(lambda x: remove_extra_options(x, requested), filter1)
+    filter2 = filter(lambda x: remove_extra_options(x['value'], requested), filter1)
 
     # convert filter object into list
     result = [i for i in filter2]
@@ -66,7 +66,7 @@ def reduce_results(matrix: list, requested: list) -> list:
     return result
 
 
-new_matrix = reduce_results(options, lst)
+new_matrix = reduce_results(option2, lst)
 
 
 def asc_length(e):
@@ -79,9 +79,10 @@ print(new_matrix)
 for i in range(len(new_matrix)):
     for j in range(i):
         if i != j:
-            val = new_matrix[i] + new_matrix[j]
+            val = new_matrix[i]['value'] + new_matrix[j]['value']
             if sorted(val) == sorted(lst):
-                print(new_matrix[i], new_matrix[j])
+                print(new_matrix[i]['id'], new_matrix[j]['id'])
+
 
 
 
