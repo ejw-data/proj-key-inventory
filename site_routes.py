@@ -239,6 +239,7 @@ def add_user():
                 title_id=user_form.title_fk.data,
                 role_id=user_form.role.data,
                 email=user_form.email.data,
+                sponsor_id=user_form.sponsor_id
             )
             db.session.add(user)
             db.session.commit()
@@ -247,6 +248,8 @@ def add_user():
             user_form.last_name.data = ""
             user_form.title_fk.data = ""
             user_form.role.data = ""
+            user_form.email = ""
+            user_form.sponsor_id = ""
             flash("User Added Successfully")
         elif user_login_exists is not None:
             flash("User already has login and password.")
@@ -615,7 +618,7 @@ def add_code():
 @include_login_form
 def add_request():
     """
-    Route used to add buildings to database, applied on admin.html
+    Route used to make an order basket that uses session storage
     """
     user_form = request_form_instance(request.form)
 
@@ -673,15 +676,50 @@ def submit_basket():
     # choose list with fewest entries
     initial_test = get_access_code(unique_rooms_list)
     if len(initial_test) == 1:
-        msg = f"There is a perfect match - Key #{get_access_code(unique_rooms_list)[0]}"
+        code = get_access_code(unique_rooms_list)[0]
+        msg = f"There is a perfect match - Key #{code}"
     # add in elif logic that predicts best combination
+        new_key = Requests(
+                user_id="from current_user()",
+                space_number_id=space_id,
+                building_number=building_number,
+                space_owner="needs added to db",
+                approver_id="from existing form",
+                access_code_id=code,
+            )
+        db.session.add(new_key)
+        db.session.commit()
     else:
         msg = "Multiple Keys are needed\n"
         for space in unique_rooms_list:
-            msg += f"Key #{get_access_code([space])}\n"
-        
+            code = get_access_code([space])
+            msg += f"Key #{code}\n"
+
+            # the request table probably only needs the following columns:
+            # access_code, space_owner, building_approver, list of space_id; the other info is built into the space_id
+            new_key = Requests(
+                user_id="from current_user()",
+                space_number_id=space_id,
+                building_number=building_number,
+                space_owner="needs added to db",
+                approver_id="from existing form",
+                access_code_id=code,
+            )
+            db.session.add(new_key)
+            db.session.commit()
+
     print(msg)
-    return msg
+
+    # logic for storing sessions
+    session.modified = True
+    if session.get("msg"):
+        pass
+    else:
+        session["msgs"] = []
+
+    session['msgs'].append(msg)
+
+    return render_template("_msg.html")
     # return ("", 204)
 
 

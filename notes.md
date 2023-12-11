@@ -29,6 +29,13 @@
     * Recently added by affiliation
     * Keyshop response time, keys issued, door maintenance, trends per week and weekday
 
+### Process Updates
+* Should I record all space requests or just the access codes?
+* I think I should record the access codes because each person will only have unique access codes
+* The original request can calculate the access codes and for each access code requested it will receive an request_id
+* In addition to the access_code, the space_ids requested will be added to a column to preserve the original request. 
+* This will require modifications to the requests table but none of the other tables. 
+
 ### key request form
 * Create new table that will hold the requests in a modal and the modal brings up another model for adding items
 * Each time the for has a new item added the page refreshes.  

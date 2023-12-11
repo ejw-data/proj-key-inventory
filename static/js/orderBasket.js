@@ -17,22 +17,22 @@ addKeyButton.on('click', i => showForm());
 
 let submitKey = d3.select('#add-key-submit')
 submitKey.on('click', i => updateTable())
-submitKey.on('click', i => getMsg())
+submitKey.on('click', i => addMsg())
 
 function updateTable() {
     setTimeout(function (){
         d3.text("/order-content").then(html => {
-        let basketDiv = d3.select('#basket-section');
-        basketDiv.html(html);
+            let basketDiv = d3.select('#basket-section');
+            basketDiv.html(html);
         });
     }, 1000);
 }
 
-function getMsg(){
+function addMsg(){
     setTimeout(function (){
-        d3.text("/post/basket/add").then(d =>{
-            outcomeDiv = d3.select('#basket-section');
-            outcomeDiv.html(`<p>${d}</p>`);
+        d3.text("/post/basket/add").then(html =>{
+            let outcomeDiv = d3.select('#basket-section');
+            outcomeDiv.html(html);
         });
     }, 1000);
 }

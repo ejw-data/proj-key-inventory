@@ -300,3 +300,4 @@ class Users(db.Model):
     title_id = db.Column(db.Integer)
     role_id = db.Column(db.Integer)
     email = db.Column(db.String(25))
+    sponsor_id = db.Column(db.String(25))

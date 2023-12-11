@@ -36,7 +36,8 @@ CREATE TABLE users (
 	last_name VARCHAR NOT NULL,
 	title_id INT REFERENCES titles (title_id),
 	role_id INT REFERENCES roles (role_id),
-	email VARCHAR UNIQUE NOT NULL
+	email VARCHAR UNIQUE NOT NULL,
+	sponsor_id REFERENCES users (user_id)
 );
 
 -- make FK for role_approved_by - may need new table

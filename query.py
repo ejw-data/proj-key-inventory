@@ -74,6 +74,10 @@ def get_access_code(room_list):
     conn.close()
     engine.dispose()
 
+    # check this if it is an empty list and return zero
+    # is there a case when this returns mutliple numbers? - I don't think so
+    # make this function return only a integer and if more than one integer 
+    # is returned then create error handling logic
     data = [int(i[0]) for i in results]
 
     return data

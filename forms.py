@@ -472,7 +472,8 @@ class CreateUserForm(FlaskForm):
     title_fk = SelectField("Select Title", coerce=int, validators=[InputRequired()])
     role = SelectField("Select Role", coerce=int, validators=[InputRequired()])
     email = EmailField("Input your Email", validators=[DataRequired()])
-    submit = SubmitField("Submit")
+    sponsor_id = SelectField("Select PI or Supervisor", coerce=int, validators=[InputRequired()])
+    submit = SubmitField("Submit") 
 
 
 def userform_instance(form_request=None):
@@ -486,6 +487,24 @@ def userform_instance(form_request=None):
         (i.title_id, i.title.title()) for i in title_results
     ]
     user_form.title_fk.choices = title_query_list
+
+    sponsors = (
+        Users.query.with_entities(
+            Users.first_name, Users.last_name, Users.user_id, Users.email
+        )
+        .order_by(Users.last_name.asc())
+        .filter(Users.role_id in [4,5,6])
+        .all()
+    )
+
+    sponsor_list = [(-1, "Select approver")] + [
+        (
+            i.user_id,
+            f"{i.first_name.title()} {i.last_name.title()} - {i.email}",
+        )
+        for i in sponsors
+    ]
+    user_form.sponsor_id.choices = sponsor_list
 
     role_results = Roles.query.order_by(Roles.role_id.desc()).all()
     role_query_list = [(-1, "Select role")] + [
