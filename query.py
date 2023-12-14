@@ -22,8 +22,8 @@ def get_access_code(room_list):
 
     query = rf"""
     with temp_matrix as (
-	SELECT access_code_id::text, space_number_id, 1 as Truth 
-	FROM access_pairs 
+	SELECT access_code_id::text, space_number_id, 1 as Truth
+	FROM access_pairs
 	order by 1,2
     ),
     room_selections as (
@@ -40,7 +40,7 @@ def get_access_code(room_list):
     Left join possibilities p on t.access_code_id = p.access_code_id
     ),
     true_combinations as (
-        Select * 
+        Select *
         From all_combinations
         WHERE contains_any = true
     ),
@@ -59,13 +59,13 @@ def get_access_code(room_list):
         from show_mismatches
         where not_exact = false
     )
-    Select access_code_id, count(access_code_id) 
+    Select access_code_id, count(access_code_id)
     From remove_mismatches
     Group by access_code_id
     Having count(access_code_id) = (Select count(rooms) FROM room_selections);
 
     """
-    print("Query", query)
+    # print("Query", query)
 
     conn = engine.connect()
 
@@ -78,9 +78,15 @@ def get_access_code(room_list):
     # is there a case when this returns mutliple numbers? - I don't think so
     # make this function return only a integer and if more than one integer 
     # is returned then create error handling logic
+    # I can simplify this to not include the list comprehension
+    print(results)
     data = [int(i[0]) for i in results]
+    if len(data[0]) == 0:
+        output = 0
+    else:
+        output = data[0]
 
-    return data
+    return output
 
 
 def get_profile():

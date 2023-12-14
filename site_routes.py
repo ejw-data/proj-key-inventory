@@ -674,9 +674,8 @@ def submit_basket():
     # create many combinations of lists
     # test each one and store the keys
     # choose list with fewest entries
-    initial_test = get_access_code(unique_rooms_list)
-    if len(initial_test) == 1:
-        code = get_access_code(unique_rooms_list)[0]
+    code = get_access_code(unique_rooms_list)
+    if code != 0:
         msg = f"There is a perfect match - Key #{code}"
     # add in elif logic that predicts best combination
         new_key = Requests(
@@ -690,23 +689,25 @@ def submit_basket():
         db.session.add(new_key)
         db.session.commit()
     else:
-        msg = "Multiple Keys are needed\n"
-        for space in unique_rooms_list:
-            code = get_access_code([space])
-            msg += f"Key #{code}\n"
+        msg = "There is no perfect match\n"
+        # for space in unique_rooms_list:
+        #     code = get_access_code([space])
+        #     msg += f"Key #{code}\n"
+        # execute function that looks for all results
+        
 
             # the request table probably only needs the following columns:
             # access_code, space_owner, building_approver, list of space_id; the other info is built into the space_id
-            new_key = Requests(
-                user_id="from current_user()",
-                space_number_id=space_id,
-                building_number=building_number,
-                space_owner="needs added to db",
-                approver_id="from existing form",
-                access_code_id=code,
-            )
-            db.session.add(new_key)
-            db.session.commit()
+        new_key = Requests(
+            user_id="from current_user()",
+            space_number_id=space_id,
+            building_number=building_number,
+            space_owner="needs added to db",
+            approver_id="from existing form",
+            access_code_id=code,
+        )
+        db.session.add(new_key)
+        db.session.commit()
 
     print(msg)
 
