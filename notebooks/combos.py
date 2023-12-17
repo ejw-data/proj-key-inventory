@@ -146,6 +146,12 @@ def find_codes(requested_rooms, room_access_codes):
                         filtered_codes[i]["id"],
                         filtered_codes[j]["id"],
                     )
+                    new_dict = []
+                    for code in resultant_codes:
+                        code_dict = list(
+                            filter(lambda x: x["id"] == code, room_access_codes)
+                        )
+                        new_dict.append({code: code_dict[0]["value"]})
                     missing_codes = tuple()
                     difference = 0
                     best_fit = (
@@ -153,6 +159,7 @@ def find_codes(requested_rooms, room_access_codes):
                         missing_codes,
                         difference,
                         requested_rooms,
+                        new_dict,
                     )
                     stored_codes = stored_codes + resultant_codes
                     no_break = False
@@ -186,6 +193,7 @@ def find_codes(requested_rooms, room_access_codes):
                     difference = len(missing_codes)
 
                     if difference <= best_fit[2]:
+                        # print("New Dict: ", new_dict)
                         print("Updated room requests: ", requested_rooms_lst)
                         print("Updated missing codes: ", missing_codes)
                         print(
@@ -198,11 +206,18 @@ def find_codes(requested_rooms, room_access_codes):
                             filtered_codes[i]["id"],
                             filtered_codes[j]["id"],
                         )
+                        new_dict = []
+                        for code in resultant_codes:
+                            code_dict = list(
+                                filter(lambda x: x["id"] == code, room_access_codes)
+                            )
+                            new_dict.append({code: code_dict[0]["value"]})
                         best_fit = (
                             resultant_codes,
                             missing_codes,
                             difference,
                             room_combination,
+                            new_dict,
                         )
                         # stored_codes = stored_codes + resultant_codes
                         print("Best fit for partial: ", best_fit)
@@ -211,6 +226,8 @@ def find_codes(requested_rooms, room_access_codes):
                     # on subsequent loops, it needs to replace the value if difference is smaller
 
         if difference == 0:
+            # miscellaneous test - show what code goes with which room
+
             print("Needed Keys Calculated")
             print(f"The access codes need are: {stored_codes}")
             print(f"The missing codes are:  {missing_codes}")
@@ -237,14 +254,15 @@ def find_codes(requested_rooms, room_access_codes):
     if best_fit[2] == 0:
         requested_spaces = list(best_fit[3])
         access_codes = list(best_fit[0])
-
+    else:
+        requested_spaces = [0]
         # query each code in the list to get the building number, space_owner, space_id, and access_code -
         # change it so the access_code_id is listed and and space_number_id becomes
         # part of a space_numbe_id list.
         # instead of query, extract first couple letters from room-request
 
     results = {"requested_spaces": requested_spaces, "access_codes": []}
-    return jsonify(results)
+    return results
 
 
 # new_matrix = reduce_results(room_access_codes, tuple(["r1"]))
@@ -262,6 +280,7 @@ requested_rooms = ("r1", "r4")
 requested_rooms = ("r1", "r4", "r7")
 requested_rooms = ("r1", "r4", "r3", "r5", "r6")
 requested_rooms = ("r1", "r2", "r3", "r4", "r5", "r6")
+requested_rooms = ("r22",)
 
 
 room_access_codes = [
@@ -281,3 +300,7 @@ room_access_codes = [
 ]
 
 find_codes(requested_rooms, room_access_codes)
+
+
+# string_item = 'R10200122'
+# string_item[0:3]
