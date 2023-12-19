@@ -8,6 +8,7 @@
             <th>Room</th>
             <th>Space Owner</th>
             <th>Building Approver</th>
+            <th>Access Code</th>
 
         </tr>
     </thead>
@@ -23,11 +24,13 @@
                 <td>{{ record['room_number'] }}</td>
                 <td>{{ record['space_owner'] }}</td>
                 <td>{{ record['building_approver'] }}</td>
+                <td>{{ record['access_code'] }}</td>
             </tr>
             {% endfor %}
 
         {% else %}
             <tr>
+                <td>No Keys Added Yet</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -43,5 +46,4 @@
         <!-- footer content -->
     </tfoot>
 </table>
-<a href="/post/basket/add" id="order-submit" class="btn btn-secondary mb-1 float-end d-inline">Submit Basket</a>
 

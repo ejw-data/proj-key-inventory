@@ -1,3 +1,6 @@
+from query import get_access_code
+
+
 def asc_length(e):
     return len(e["value"])
 
@@ -30,36 +33,36 @@ def reduce_results(matrix: list, requested: list) -> list:
 
     # convert filter object into list
     # result = list(filter2)
-    # print('results', result)
+    print("results", result)
     return result
 
 
 # fake get_access_code
-def get_access_code(lookup):
-    room_access_codes = [
-        {"id": 1, "value": ("r1",), "count": 1},
-        {"id": 2, "value": ("r2",), "count": 1},
-        {"id": 3, "value": ("r3",), "count": 1},
-        {"id": 4, "value": ("r4",), "count": 1},
-        {"id": 5, "value": ("r5",), "count": 1},
-        {"id": 6, "value": ("r6",), "count": 1},
-        {"id": 7, "value": ("r1", "r2"), "count": 2},
-        {"id": 8, "value": ("r3", "r5"), "count": 2},
-        {"id": 9, "value": ("r3", "r4", "r5"), "count": 3},
-        {"id": 10, "value": ("r1", "r2", "r3"), "count": 3},
-        {"id": 11, "value": ("r5", "r6"), "count": 2},
-        {"id": 12, "value": ("r1", "r2", "r3", "r5", "r6"), "count": 5},
-        {"id": 13, "value": ("r1", "r2", "r3", "r5", "r6", "r7"), "count": 6},
-    ]
+# def get_access_code(lookup):
+#     room_access_codes = [
+#         {"id": 1, "value": ("r1",), "count": 1},
+#         {"id": 2, "value": ("r2",), "count": 1},
+#         {"id": 3, "value": ("r3",), "count": 1},
+#         {"id": 4, "value": ("r4",), "count": 1},
+#         {"id": 5, "value": ("r5",), "count": 1},
+#         {"id": 6, "value": ("r6",), "count": 1},
+#         {"id": 7, "value": ("r1", "r2"), "count": 2},
+#         {"id": 8, "value": ("r3", "r5"), "count": 2},
+#         {"id": 9, "value": ("r3", "r4", "r5"), "count": 3},
+#         {"id": 10, "value": ("r1", "r2", "r3"), "count": 3},
+#         {"id": 11, "value": ("r5", "r6"), "count": 2},
+#         {"id": 12, "value": ("r1", "r2", "r3", "r5", "r6"), "count": 5},
+#         {"id": 13, "value": ("r1", "r2", "r3", "r5", "r6", "r7"), "count": 6},
+#     ]
 
-    result = [i["id"] for i in room_access_codes if i["value"] == tuple(lookup)]
+#     result = [i["id"] for i in room_access_codes if i["value"] == tuple(lookup)]
 
-    if len(result) == 0:
-        result = 0
-    else:
-        result = result[0]
+#     if len(result) == 0:
+#         result = 0
+#     else:
+#         result = result[0]
 
-    return result
+#     return result
 
 
 # Assume the list above of options is already filtered by building and by list containing any options in lst
@@ -86,17 +89,19 @@ def find_codes(requested_rooms, room_access_codes):
         # with only one key
 
         print("section a, check if one code exists", requested_rooms)
+
         resultant_codes = get_access_code(requested_rooms)
-        # code not found
+
         print("Zero indicates one code does not exist: ", resultant_codes)
 
+        # single access code found for all requested rooms
         if resultant_codes != 0:
             stored_codes = stored_codes + tuple([resultant_codes])
             # best fit has tuple of codes, missing codes, and total missing codes
             best_fit = (stored_codes, (), 0, requested_rooms)
             no_break = False
             break
-
+        # no single code found
         else:
             if len(requested_rooms) == 1:
                 # no exact matches found
@@ -108,17 +113,39 @@ def find_codes(requested_rooms, room_access_codes):
                     no_break = False
                     break
             else:
-                print("not normal")
+                print(
+                    "Multiple rooms requested and no match - need to check combinations for matches."
+                )
         # code may be a combination of codes, go to section b
 
         # proess to follow if there is multiple access codes available
-        print("section b, multiple access codes available")
+        print("section b, check if multiple access codes available")
+        print(room_access_codes)
         filtered_codes = reduce_results(room_access_codes, requested_rooms)
         # for loop code combos
         filtered_codes.sort(reverse=True, key=asc_length)
         print("special sorting test: ", filtered_codes)
-        best_fit = (None, None, len(requested_rooms), None)
+        difference = len(requested_rooms)
+        best_fit = (None, requested_rooms, difference, None)
 
+        # if filtered_codes length is 1 then assign as key and request access code for other rooms
+        if len(filtered_codes) == 1:
+            missing_rooms = list(requested_rooms).copy()
+            print("missing rooms", missing_rooms)
+            print(filtered_codes[0]["value"][0])
+            missing_rooms.remove(filtered_codes[0]["value"][0])
+            difference = len(missing_rooms)
+            resultant_codes = filtered_codes[0]["id"]
+            best_fit = (
+                filtered_codes,
+                tuple(missing_rooms),
+                difference,
+                {resultant_codes: filtered_codes[0]["value"]},
+            )
+
+            # request access code to be created
+
+        # otherwise search through list
         for i, filtered_code in enumerate(filtered_codes):
             if outer_for_break:
                 break
@@ -247,7 +274,7 @@ def find_codes(requested_rooms, room_access_codes):
             print("Stored codes: ", stored_codes)
             print("Resultant codes: ", resultant_codes)
 
-            stored_codes = stored_codes + resultant_codes
+            stored_codes = stored_codes + tuple([resultant_codes])
             outer_for_break = True
         loop_limit -= 1
 
@@ -255,13 +282,14 @@ def find_codes(requested_rooms, room_access_codes):
         requested_spaces = list(best_fit[3])
         access_codes = list(best_fit[0])
     else:
-        requested_spaces = [0]
+        requested_spaces = list(best_fit[3])
+        access_codes = list(best_fit[0])
         # query each code in the list to get the building number, space_owner, space_id, and access_code -
         # change it so the access_code_id is listed and and space_number_id becomes
         # part of a space_numbe_id list.
         # instead of query, extract first couple letters from room-request
 
-    results = {"requested_spaces": requested_spaces, "access_codes": []}
+    results = {"requested_spaces": requested_spaces, "access_codes": access_codes}
     return results
 
 
@@ -270,36 +298,36 @@ def find_codes(requested_rooms, room_access_codes):
 # print("Last best fit: ", best_fit)
 # print("Final results: ", stored_codes)
 
-requested_rooms = ("r1", "r3", "r4")
-requested_rooms = ("r5", "r3", "r6", "r2")
-requested_rooms = ("r1", "r2", "r3", "r5", "r6")
-requested_rooms = ("r1", "r2", "r3", "r5", "r4")
-requested_rooms = ("r1",)
-requested_rooms = ("r1", "r2")
-requested_rooms = ("r1", "r4")
-requested_rooms = ("r1", "r4", "r7")
-requested_rooms = ("r1", "r4", "r3", "r5", "r6")
-requested_rooms = ("r1", "r2", "r3", "r4", "r5", "r6")
-requested_rooms = ("r22",)
+# requested_rooms = ("r1", "r3", "r4")
+# requested_rooms = ("r5", "r3", "r6", "r2")
+# requested_rooms = ("r1", "r2", "r3", "r5", "r6")
+# requested_rooms = ("r1", "r2", "r3", "r5", "r4")
+# requested_rooms = ("r1",)
+# requested_rooms = ("r1", "r2")
+# requested_rooms = ("r1", "r4")
+# requested_rooms = ("r1", "r4", "r7")
+# requested_rooms = ("r1", "r4", "r3", "r5", "r6")
+# requested_rooms = ("r1", "r2", "r3", "r4", "r5", "r6")
+# requested_rooms = ("r22",)
 
 
-room_access_codes = [
-    {"id": 1, "value": ("r1",), "count": 1},
-    {"id": 2, "value": ("r2",), "count": 1},
-    {"id": 3, "value": ("r3",), "count": 1},
-    {"id": 4, "value": ("r4",), "count": 1},
-    {"id": 5, "value": ("r5",), "count": 1},
-    {"id": 6, "value": ("r6",), "count": 1},
-    {"id": 7, "value": ("r1", "r2"), "count": 2},
-    {"id": 8, "value": ("r3", "r5"), "count": 2},
-    {"id": 9, "value": ("r3", "r4", "r5"), "count": 3},
-    {"id": 10, "value": ("r1", "r2", "r3"), "count": 3},
-    {"id": 11, "value": ("r5", "r6"), "count": 2},
-    {"id": 12, "value": ("r1", "r2", "r3", "r5", "r6"), "count": 5},
-    {"id": 13, "value": ("r1", "r2", "r3", "r5", "r6", "r7"), "count": 6},
-]
+# room_access_codes = [
+#     {"id": 1, "value": ("r1",), "count": 1},
+#     {"id": 2, "value": ("r2",), "count": 1},
+#     {"id": 3, "value": ("r3",), "count": 1},
+#     {"id": 4, "value": ("r4",), "count": 1},
+#     {"id": 5, "value": ("r5",), "count": 1},
+#     {"id": 6, "value": ("r6",), "count": 1},
+#     {"id": 7, "value": ("r1", "r2"), "count": 2},
+#     {"id": 8, "value": ("r3", "r5"), "count": 2},
+#     {"id": 9, "value": ("r3", "r4", "r5"), "count": 3},
+#     {"id": 10, "value": ("r1", "r2", "r3"), "count": 3},
+#     {"id": 11, "value": ("r5", "r6"), "count": 2},
+#     {"id": 12, "value": ("r1", "r2", "r3", "r5", "r6"), "count": 5},
+#     {"id": 13, "value": ("r1", "r2", "r3", "r5", "r6", "r7"), "count": 6},
+# ]
 
-find_codes(requested_rooms, room_access_codes)
+# find_codes(requested_rooms, room_access_codes)
 
 
 # string_item = 'R10200122'

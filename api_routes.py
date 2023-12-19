@@ -591,7 +591,6 @@ def keyshop_table():
 
     return jsonify(data)
 
-
 # testing new api
 
 

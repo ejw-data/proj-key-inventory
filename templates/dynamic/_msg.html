@@ -1,3 +1,9 @@
-{% for msg in session['msgs'] %}
-<p> {{ msg }} </p>
-{% endfor %}
+{% if 'msgs' in session %}
+    {% for msg in session['msgs'] %}
+    <div class="alert alert-primary" role="alert">   
+        {{ msg }}
+    </div>
+    {% endfor %}
+{% else %}
+    <div></div>
+{% endif %}

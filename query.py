@@ -79,12 +79,26 @@ def get_access_code(room_list):
     # make this function return only a integer and if more than one integer 
     # is returned then create error handling logic
     # I can simplify this to not include the list comprehension
-    print(results)
-    data = [int(i[0]) for i in results]
-    if len(data[0]) == 0:
+    print('Query results: ', results)
+
+    # temporary code for case when result list is empty
+    if len(results) == 0:
         output = 0
-    else:
-        output = data[0]
+
+    # new code 
+    for result in results:
+        if result[0] == 0:
+            output = 0
+        else:
+            output = result[0]
+            break
+    # print(output)
+
+    # data = [int(i[0]) for i in results]
+    # if len(data[0]) == 0:
+    #     output = 0
+    # else:
+    #     output = data[0]
 
     return output
 
