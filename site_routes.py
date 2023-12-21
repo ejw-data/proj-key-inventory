@@ -675,7 +675,7 @@ def submit_basket():
     room_list = [i["space_id"] for i in order_entries]
     unique_rooms_list = tuple(set(room_list))
 
-    print("Route room check: ", unique_rooms_list)
+    # print("Route room check: ", unique_rooms_list)
 
     # use combos.py function to get access code
     # it returns a list of access codes
@@ -702,9 +702,7 @@ def submit_basket():
         entry = {"id": record, "value": rooms}
         new_data.append(entry)
 
-    # df = pd.DataFrame(data)
-
-    print(new_data)
+    # print(new_data)
 
     # pivot_table = pd.crosstab(df["Access Code"], df.space_id)
 
@@ -719,24 +717,33 @@ def submit_basket():
     # need to make return be (access codes found), (missing codes), (total missing), (remaining missing), (dict of found with rms), (dict of missing with rms)
     codes = find_codes(unique_rooms_list, new_data)
 
-    print("Route test for codes: ", codes)
-    print("New test: ", order_entries)
+    print("Access codes produced: ", codes)
+    # print("New test: ", order_entries)
 
+    #  need fixed then the rest will be fine
     for record in order_entries:
-        if record["space_id"] == codes["requested_spaces"][0]:
-            record["access_code"] = codes["access_codes"][0]
+        for i, code in enumerate(codes["access_codes"]):
+            print("test", record)
+            if code != 0:
+                for room in codes["requested_spaces"][i][code]:
+                    if record["space_id"] == room:
+                        record["access_code"] = code
+            else:
+                if record['access_code'] == "TBD": 
+                    record["access_code"] = "Key Code Requested"
 
+    print(order_entries)
     # logic for storing sessions
     session.modified = True
     session["order"] = order_entries
 
-    if int(codes['access_codes'][0]) != 0:
+    if int(codes["access_codes"][0]) != 0:
         msg = "Exact Match Found"
     else:
         msg = "Match Not Found"
 
-    session['msgs'] = []
-    session['msgs'].append(msg)
+    session["msgs"] = []
+    session["msgs"].append(msg)
 
     # print("updated orders: ", order_entries)
 
@@ -803,7 +810,7 @@ def clear_session():
     # html = render_template("dynamic/_orders.html")
     # remove session variables
     print("Clearing Session Variable")
-    for session_variable in ['order', 'msgs']:
+    for session_variable in ["order", "msgs"]:
         try:
             # logic for storing sessions
             session.modified = True

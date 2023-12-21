@@ -16,6 +16,9 @@ function changeButton(){
     // hide/reveal submit button
     let basketSubmitButton = d3.select("#order-submit");
     basketSubmitButton.classed("d-none", !basketSubmitButton.classed("d-none"))
+    // hide/reveal clear button
+    let basketClearButton = d3.select("#order-clear");
+    basketClearButton.classed("d-none", !basketClearButton.classed("d-none"))
     // hide/reveal close button
     let basketCloseButton = d3.select("#order-close");
     basketCloseButton.classed("d-none", !basketCloseButton.classed("d-none"))
@@ -60,7 +63,10 @@ addKeyButton.on('click', i => {
 // form data sent to route which adds data to session variable
 // add-key-submit only adds keys to local browser session variables
 let submitKey = d3.select('#add-key-submit')
-submitKey.on('click', i => updateTable())
+submitKey.on('click', i => {
+    updateTable();
+    activateSubmit();
+})
 
 // event runs when basket is submitted
 let submitBasket = d3.select('#order-submit')
@@ -68,6 +74,13 @@ submitBasket.on('click', i => {
     addMsg();
     changeButton();
     updateTable();
+})
+
+// event runs when basket clear button is clicked
+let clearBasket = d3.select('#order-clear')
+clearBasket.on('click', i => {
+    clearTable();
+    activateSubmit();
 })
 
 // event runs when bottom of form modal close button is pressed
@@ -80,4 +93,18 @@ basketCloseButton.on('click', i => {
     // location.reload();
 })
 
-updateTable()
+
+function activateSubmit(){
+     setTimeout(function (){
+        console.log('on-change')
+        let dataRow = d3.select('#key-table');
+        let submitBasket = d3.select('#order-submit')
+        if (dataRow.classed('empty')){
+            submitBasket.classed("disabled", true)
+        }
+        else {
+            submitBasket.classed("disabled", false)}
+    }, 2000)
+}
+
+updateTable();

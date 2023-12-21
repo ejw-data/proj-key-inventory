@@ -80,7 +80,7 @@ def find_codes(requested_rooms, room_access_codes):
     while (loop_limit > 0) and no_break:
         # allow outer for loop break to execute
         outer_for_break = False
-        print("\n", "Loop number: ", loop_limit, "\n")
+        # print("\n", "Loop number: ", loop_limit, "\n")
 
         # need to fix so if filtered_codes is only one record; j loop does not run
 
@@ -92,13 +92,16 @@ def find_codes(requested_rooms, room_access_codes):
 
         resultant_codes = get_access_code(requested_rooms)
 
-        print("Zero indicates one code does not exist: ", resultant_codes)
+        print(
+            "Zero indicates multiple codes needed and/or code needs created: ",
+            resultant_codes,
+        )
 
         # single access code found for all requested rooms
         if resultant_codes != 0:
             stored_codes = stored_codes + tuple([resultant_codes])
-            # best fit has tuple of codes, missing codes, and total missing codes
-            best_fit = (stored_codes, (), 0, requested_rooms)
+            # best fit:  codes found, rooms not found, number of rooms not found, dict of code/rooms found
+            best_fit = (stored_codes, (), 0, [{stored_codes[0]: list(requested_rooms)}])
             no_break = False
             break
         # no single code found
@@ -109,7 +112,19 @@ def find_codes(requested_rooms, room_access_codes):
                     print("Code not found - ")
                     # request key and notify person
                     stored_codes = stored_codes + tuple([resultant_codes])
-                    best_fit = (stored_codes, requested_rooms, 1, requested_rooms)
+
+                    if best_fit:
+                        current_status = best_fit[3] + [{"Request in Progress": requested_rooms[0]}]
+                    else:
+                        current_status = [{"Request in Progress": requested_rooms[0]}]
+
+                    # best fit:  codes found, rooms not found, number of rooms not found, dict of code/rooms found
+                    best_fit = (
+                        stored_codes,
+                        requested_rooms,
+                        1,
+                        current_status
+                    )
                     no_break = False
                     break
             else:
@@ -120,27 +135,34 @@ def find_codes(requested_rooms, room_access_codes):
 
         # proess to follow if there is multiple access codes available
         print("section b, check if multiple access codes available")
-        print(room_access_codes)
+        # print(room_access_codes)
         filtered_codes = reduce_results(room_access_codes, requested_rooms)
         # for loop code combos
         filtered_codes.sort(reverse=True, key=asc_length)
-        print("special sorting test: ", filtered_codes)
+        # print("special sorting test: ", filtered_codes)
         difference = len(requested_rooms)
-        best_fit = (None, requested_rooms, difference, None)
+        # best fit needs dictionary of rooms per access code
+        best_fit = (
+            None,
+            requested_rooms,
+            difference,
+            [{"Request in Progress": requested_rooms[0]}],
+        )
 
         # if filtered_codes length is 1 then assign as key and request access code for other rooms
         if len(filtered_codes) == 1:
             missing_rooms = list(requested_rooms).copy()
-            print("missing rooms", missing_rooms)
-            print(filtered_codes[0]["value"][0])
+            # print("missing rooms", missing_rooms)
+            # print(filtered_codes[0]["value"][0])
             missing_rooms.remove(filtered_codes[0]["value"][0])
             difference = len(missing_rooms)
             resultant_codes = filtered_codes[0]["id"]
+            # best fit:  codes found, rooms not found, number of rooms not found, dict of code/rooms found
             best_fit = (
                 filtered_codes,
                 tuple(missing_rooms),
                 difference,
-                {resultant_codes: filtered_codes[0]["value"]},
+                [{resultant_codes: list(filtered_codes[0]["value"])}],
             )
 
             # request access code to be created
@@ -150,9 +172,9 @@ def find_codes(requested_rooms, room_access_codes):
             if outer_for_break:
                 break
             for j in range(i):
-                print(
-                    "for loop check: ", filtered_codes[i]["id"], filtered_codes[j]["id"]
-                )
+                # print(
+                #     "for loop check: ", filtered_codes[i]["id"], filtered_codes[j]["id"]
+                # )
                 room_combination = (
                     filtered_codes[i]["value"] + filtered_codes[j]["value"]
                 )
@@ -164,11 +186,11 @@ def find_codes(requested_rooms, room_access_codes):
                 # check if pair is matched
                 if sorted(room_combination) == sorted(requested_rooms):
                     print("section b, multiple access codes, exact match found")
-                    print(
-                        "lists match",
-                        filtered_codes[i]["id"],
-                        filtered_codes[j]["id"],
-                    )
+                    # print(
+                    #     "lists match",
+                    #     filtered_codes[i]["id"],
+                    #     filtered_codes[j]["id"],
+                    # )
                     resultant_codes = (
                         filtered_codes[i]["id"],
                         filtered_codes[j]["id"],
@@ -179,13 +201,13 @@ def find_codes(requested_rooms, room_access_codes):
                             filter(lambda x: x["id"] == code, room_access_codes)
                         )
                         new_dict.append({code: code_dict[0]["value"]})
-                    missing_codes = tuple()
+                    missing_rooms = tuple()
                     difference = 0
+                    # best fit:  codes found, rooms not found, number of rooms not found, dict of code/rooms found
                     best_fit = (
                         resultant_codes,
-                        missing_codes,
+                        missing_rooms,
                         difference,
-                        requested_rooms,
                         new_dict,
                     )
                     stored_codes = stored_codes + resultant_codes
@@ -220,15 +242,14 @@ def find_codes(requested_rooms, room_access_codes):
                     difference = len(missing_codes)
 
                     if difference <= best_fit[2]:
-                        # print("New Dict: ", new_dict)
-                        print("Updated room requests: ", requested_rooms_lst)
-                        print("Updated missing codes: ", missing_codes)
-                        print(
-                            "Updated id combo",
-                            filtered_codes[i]["id"],
-                            filtered_codes[j]["id"],
-                            difference,
-                        )
+                        # print("Updated room requests: ", requested_rooms_lst)
+                        # print("Updated missing codes: ", missing_codes)
+                        # print(
+                        #     "Updated id combo",
+                        #     filtered_codes[i]["id"],
+                        #     filtered_codes[j]["id"],
+                        #     difference,
+                        # )
                         resultant_codes = (
                             filtered_codes[i]["id"],
                             filtered_codes[j]["id"],
@@ -239,11 +260,11 @@ def find_codes(requested_rooms, room_access_codes):
                                 filter(lambda x: x["id"] == code, room_access_codes)
                             )
                             new_dict.append({code: code_dict[0]["value"]})
+                        # best fit:  codes found, rooms not found, number of rooms not found, dict of code/rooms found
                         best_fit = (
                             resultant_codes,
                             missing_codes,
                             difference,
-                            room_combination,
                             new_dict,
                         )
                         # stored_codes = stored_codes + resultant_codes
@@ -259,7 +280,7 @@ def find_codes(requested_rooms, room_access_codes):
             print(f"The access codes need are: {stored_codes}")
             print(f"The missing codes are:  {missing_codes}")
             print("Best Fit: ", best_fit)
-            # stored_codes = stored_codes + resultant_codes
+
             no_break = False
 
             # request access code creation for missing codes
@@ -271,8 +292,8 @@ def find_codes(requested_rooms, room_access_codes):
                 "section c, start next while loop with requested rooms",
                 requested_rooms,
             )
-            print("Stored codes: ", stored_codes)
-            print("Resultant codes: ", resultant_codes)
+            # print("Stored codes: ", stored_codes)
+            # print("Resultant codes: ", resultant_codes)
 
             stored_codes = stored_codes + tuple([resultant_codes])
             outer_for_break = True
@@ -281,6 +302,8 @@ def find_codes(requested_rooms, room_access_codes):
     if best_fit[2] == 0:
         requested_spaces = list(best_fit[3])
         access_codes = list(best_fit[0])
+        # add message
+
     else:
         requested_spaces = list(best_fit[3])
         access_codes = list(best_fit[0])
@@ -289,7 +312,12 @@ def find_codes(requested_rooms, room_access_codes):
         # part of a space_numbe_id list.
         # instead of query, extract first couple letters from room-request
 
-    results = {"requested_spaces": requested_spaces, "access_codes": access_codes}
+    # maybe add message to dictionary
+    results = {
+        "requested_spaces": list(best_fit[3]),
+        "access_codes": list(best_fit[0]),
+        "missing": list(best_fit[1]),
+    }
     return results
 
 

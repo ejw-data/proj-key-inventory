@@ -16,7 +16,7 @@
         {% if 'order' in session %}
         <!-- disply orders -->
             {% for record in session['order'] %}
-            <tr>
+            <tr id="key-table" class="entries">
                 <td>{{ record['space_id'] }}</td>
                 <td>{{ record['building_number'] }}</td>
                 <td>{{ record['wing_number'] }}</td>
@@ -29,7 +29,7 @@
             {% endfor %}
 
         {% else %}
-            <tr>
+            <tr id="key-table" class="empty">
                 <td>No Keys Added Yet</td>
                 <td></td>
                 <td></td>
