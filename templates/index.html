@@ -15,7 +15,7 @@
         <div class="container d-flex justify-content-center align-items-center">
         
             <div class="card">
-                <div class="upper object-fit-fill h-25">
+                <div class="upper">
                     <img src="{{ url_for('static', filename='images/profile-backdrop.jpg') }}" class="img-fluid">
                 </div>
                 <div class="user text-center">
@@ -23,25 +23,25 @@
                         <img src="{{ url_for('static', filename='images/person/me.jpg') }}" class="rounded-circle" width="80">
                     </div>
                 </div>
-                <div class="text-center">
-                    <h4 class="mb-0">{{ profile.first_name }} {{ profile.last_name }}</h4>
-                    <span class="text-muted d-block mb-2">{{ profile.email }}</span>
-                    <span class="text-muted d-block mb-2">{{ profile.title }}</span>
-                    <div class="d-flex justify-content-between align-items-center mt-4 px-4">
-                        <div class="stats m-3">
-                            <h6 class="mb-0">Role</h6>
-                            <span>{{ profile.role }}</span>
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <h4 class="mb-0">{{ profile.first_name }} {{ profile.last_name }}</h4>
+                        <span class="text-muted d-block mb-2">{{ profile.email }}</span>
+                        <span class="text-muted d-block mb-2">{{ profile.title }}</span>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="text-muted d-block mb-2">
+                            <h6>Role: {{ profile.role }}</h6>
                         </div>
-                        <div class="stats m-3">
-                            <h6 class="mb-0">Current Keys</h6>
-                            <span>{{ profile.assigned_keys }}</span>
+                        <div class="text-muted d-block mb-2">
+                            <h6>Keys Received: {{ profile.assigned_keys }}</h6>
                         </div>
-                        <div class="stats m-3">
-                            <h6 class="mb-0">Pending Keys</h6>
-                            <span>{{  profile.pending_keys  }}</span>
+                        <div class="text-muted d-block mb-2">
+                            <h6>Keys Pending: {{ profile.pending_keys }}</h6>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
