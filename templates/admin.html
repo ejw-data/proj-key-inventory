@@ -116,12 +116,12 @@
                             {{ space_form.room_building_number(class="form-control") }}
                         </div>
                         <div class="mb-3">
-                            {{ space_form.floor_number.label(class="col-form-label") }}
-                            {{ space_form.floor_number(class="form-control") }}
-                        </div>
-                        <div class="mb-3">
                             {{ space_form.wing_number.label(class="col-form-label") }}
                             {{ space_form.wing_number(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ space_form.floor_number.label(class="col-form-label") }}
+                            {{ space_form.floor_number(class="form-control") }}
                         </div>
                         <div class="mb-3">
                             {{ space_form.room_number.label(class="col-form-label") }}
@@ -250,6 +250,10 @@
                         <div class="mb-3">
                             {{ user_form.email.label(class="col-form-label") }}
                             {{ user_form.email(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ user_form.sponsor_id.label(class="col-form-label") }}
+                            {{ user_form.sponsor_id(class="form-control") }}
                         </div>
                         <div class="modal-footer">
                             {{ user_form.submit(class="btn btn-secondary", id="user_add_submit") }}

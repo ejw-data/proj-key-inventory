@@ -17,19 +17,20 @@
             <div class="card">
                 <div class="upper">
                     <img src="{{ url_for('static', filename='images/profile-backdrop.jpg') }}" class="img-fluid">
-                </div>
-                <div class="user text-center">
-                    <div class="profile">
-                        <img src="{{ url_for('static', filename='images/person/me.jpg') }}" class="rounded-circle" width="80">
+                    <div class="user text-center">
+                        <div class="profile">
+                            <img src="{{ url_for('static', filename='images/person/me.jpg') }}" class="rounded-circle" width="80">
+                        </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6 col-sm-12">
+                    <div class="col-md-4 col-sm-12">
                         <h4 class="mb-0">{{ profile.first_name }} {{ profile.last_name }}</h4>
                         <span class="text-muted d-block mb-2">{{ profile.email }}</span>
                         <span class="text-muted d-block mb-2">{{ profile.title }}</span>
                     </div>
-                    <div class="col-md-6 col-sm-12">
+                    <div class="col-md-4 col-sm-12"></div>
+                    <div class="col-md-4 col-sm-12">
                         <div class="text-muted d-block mb-2">
                             <h6>Role: {{ profile.role }}</h6>
                         </div>

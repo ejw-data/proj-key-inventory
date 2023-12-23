@@ -104,6 +104,7 @@ def order_status_group():
     data = []
     for record in records:
         # data.append({name: getattr(record, name) for name in column_names})
+        # column_names = Requests.__table__.columns.keys()
 
         data.append(
             {
@@ -591,12 +592,16 @@ def keyshop_table():
 
     return jsonify(data)
 
+
 # testing new api
 
 
 @api.route("/new", methods=["GET"])
 @include_login_form
 def new():
+    """
+    Used to test request logic for route 'site/post/basket/add'
+    """
     results = AccessPairs.query.all()
     data = []
     for result in results:
@@ -616,14 +621,59 @@ def new():
         rooms = list(included_rooms.index)
         total_rooms = len(rooms)
 
-        dict = {
-            'id': access_code,
-            'value': tuple(rooms),
-            'count': total_rooms
-        }
+        dict = {"id": access_code, "value": tuple(rooms), "count": total_rooms}
 
         results.append(dict)
 
     print(results)
 
     return jsonify(results)
+
+
+@api.route("/building/info/<building>", methods=["GET"])
+@include_login_form
+def menu_filter(building):
+    """
+    Used to retrieve data to update dropdown menus
+    as seen in formFieldUpdate.js
+    """
+    records = Rooms.query.filter(Rooms.building_number == building)
+
+    column_names = Rooms.__table__.columns.keys()
+    data = []
+    for record in records:
+        data.append({name: getattr(record, name) for name in column_names})
+
+    wings = set()
+    floors = set()
+    rooms = set()
+    structure = dict()
+    for i in data:
+        if i["wing_number"] not in wings:
+            wings.add(i["wing_number"])
+            floors.add(i["floor_number"])
+            rooms.add(i["room_number"])
+            structure["wing"] = {
+                str(i["wing_number"]): {"floor": {str(i["floor_number"]): [i["room_number"]]}}
+            }
+        else:
+            if i["floor_number"] not in floors:
+                floors.add(i["floor_number"])
+                rooms.add(i["room_number"])
+                structure["wing"][str(i["wing_number"])]["floor"][str(i["floor_number"])] = [
+                    i["room_number"]
+                ]
+            else:
+                if i["room_number"] not in rooms:
+                    rooms.add(i["room_number"])
+                    structure["wing"][str(i["wing_number"])]["floor"][
+                        str(i["floor_number"])
+                    ].append(i["room_number"])
+                else:
+                    continue
+
+    structure["wings"] = list(wings)
+    structure["wing"][str(i["wing_number"])]["floors"] = list(floors)
+
+    print(structure)
+    return jsonify(structure)

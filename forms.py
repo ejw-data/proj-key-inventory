@@ -467,11 +467,11 @@ class CreateUserForm(FlaskForm):
     User Form fields
     """
 
-    first_name = StringField("Input your First Name", validators=[DataRequired()])
-    last_name = StringField("Input your Last Name", validators=[DataRequired()])
+    first_name = StringField("First Name", validators=[DataRequired()])
+    last_name = StringField("Last Name", validators=[DataRequired()])
     title_fk = SelectField("Select Title", coerce=int, validators=[InputRequired()])
     role = SelectField("Select Role", coerce=int, validators=[InputRequired()])
-    email = EmailField("Input your Email", validators=[DataRequired()])
+    email = EmailField("Email", validators=[DataRequired()])
     sponsor_id = SelectField("Select PI or Supervisor", coerce=int, validators=[InputRequired()])
     submit = SubmitField("Submit") 
 
