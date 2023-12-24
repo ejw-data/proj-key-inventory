@@ -8,34 +8,34 @@
         <h1 class="h2">Administrator</h1>
     </div>
 
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalbuilding" data-bs-dismiss="modal">Add
+    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalbuilding" data-bs-dismiss="modal">Add
         Building</a>
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalroom" data-bs-dismiss="modal">Add
+    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalroom" data-bs-dismiss="modal">Add
         Room</a>
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalclass" data-bs-dismiss="modal">Add
+    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalclass" data-bs-dismiss="modal">Add
         Room Classification</a>
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalamenities" data-bs-dismiss="modal">Add
+    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalamenities" data-bs-dismiss="modal">Add
         Room Amenities</a>
 
     <div id = "room-table"></div>
 
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalusers" data-bs-dismiss="modal">Add
+    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalusers" data-bs-dismiss="modal">Add
         User</a>
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModaltitle" data-bs-dismiss="modal">Add
+    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModaltitle" data-bs-dismiss="modal">Add
         Title</a>
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalroles" data-bs-dismiss="modal">Add
+    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalroles" data-bs-dismiss="modal">Add
         User Role</a>
 
     <div id = "user-table"></div>
 
 
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalapprovers" data-bs-dismiss="modal">Add
+    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalapprovers" data-bs-dismiss="modal">Add
         Approver</a>
 
     <div id = "approver-table"></div>
 
 
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalzones" data-bs-dismiss="modal">Add
+    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalzones" data-bs-dismiss="modal">Add
         Approver Space</a>
 
     <div id = "zones-table"></div>
@@ -43,15 +43,15 @@
     <h4>Other System Inputs</h4>
     <hr>
 
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalreqstat" data-bs-dismiss="modal">Add
+    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalreqstat" data-bs-dismiss="modal">Add
         Request Status</a>
 
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalordstat" data-bs-dismiss="modal">Add
+    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalordstat" data-bs-dismiss="modal">Add
         Order Status</a>
 
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalkeystat" data-bs-dismiss="modal">Add
+    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalkeystat" data-bs-dismiss="modal">Add
         Key Status</a>
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalfabstat" data-bs-dismiss="modal">Add
+    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalfabstat" data-bs-dismiss="modal">Add
         Fabrication Status</a>
 
     
@@ -107,10 +107,6 @@
                     <form name="space_form" action="/post/room/add" method="POST" class="col-md-12">
                         <!-- {{ space_form.hidden_tag() }} -->
                         {{ space_form.csrf_token(id = "space_form_add_id") }}
-                        <div class="mb-3">
-                            {{ space_form.space_number_id.label(class="col-form-label") }}
-                            {{ space_form.space_number_id(class="form-control") }}
-                        </div>
                         <div class="mb-3">
                             {{ space_form.room_building_number.label(class="col-form-label") }}
                             {{ space_form.room_building_number(class="form-control") }}

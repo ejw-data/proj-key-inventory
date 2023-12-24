@@ -19,7 +19,7 @@ from models import (
     Approvers,
     Users,
     AccessCodes,
-    OrderStatus
+    OrderStatus,
 )
 
 
@@ -125,14 +125,28 @@ def access_pair_instance(form_request=None):
 
     access_form = CreateAccessPairsForm(form_request)
 
-    space_id = (
-        Rooms.query.with_entities(Rooms.space_number_id)
+    # found in other places
+    space_results = (
+        Rooms.query.with_entities(
+            Rooms.space_number_id,
+            Buildings.building_name,
+            Rooms.floor_number,
+            Rooms.room_number,
+            Rooms.building_number,
+        )
         .order_by(Rooms.space_number_id.asc())
+        .join(Buildings, Buildings.building_number == Rooms.building_number)
         .all()
     )
+
     space_list = [("void", "Select space")] + [
-        (i.space_number_id, i.space_number_id) for i in space_id
+        (
+            i.space_number_id,
+            f"{i.building_name} {i.floor_number}{str(i.room_number).zfill(2)} ({i.space_number_id})",
+        )
+        for i in space_results
     ]
+
     access_form.space_number_id_fk.choices = space_list
 
     access_id = (
@@ -413,7 +427,7 @@ class CreateRoomForm(FlaskForm):
     Room Form fields
     """
 
-    space_number_id = StringField("Input the space id", validators=[DataRequired()])
+    # space_number_id = StringField("Input the space id", validators=[DataRequired()])
     room_building_number = SelectField(
         "Provide building name", coerce=int, validators=[DataRequired()]
     )
@@ -472,8 +486,10 @@ class CreateUserForm(FlaskForm):
     title_fk = SelectField("Select Title", coerce=int, validators=[InputRequired()])
     role = SelectField("Select Role", coerce=int, validators=[InputRequired()])
     email = EmailField("Email", validators=[DataRequired()])
-    sponsor_id = SelectField("Select PI or Supervisor", coerce=int, validators=[InputRequired()])
-    submit = SubmitField("Submit") 
+    sponsor_id = SelectField(
+        "Select PI or Supervisor", coerce=int, validators=[InputRequired()]
+    )
+    submit = SubmitField("Submit")
 
 
 def userform_instance(form_request=None):
@@ -493,7 +509,7 @@ def userform_instance(form_request=None):
             Users.first_name, Users.last_name, Users.user_id, Users.email
         )
         .order_by(Users.last_name.asc())
-        .filter(Users.role_id in [4,5,6])
+        .filter(Users.role_id in [4, 5, 6])
         .all()
     )
 
@@ -710,15 +726,10 @@ def update_order_status_form_instance(form_request=None):
     """
     order_status_form = CreateUpdateOrderStatusForm(form_request)
 
-    status_options = (
-        OrderStatus.query
-        .order_by(OrderStatus.order_status_id.asc())
-        .all()
-    )
+    status_options = OrderStatus.query.order_by(OrderStatus.order_status_id.asc()).all()
 
     order_status_list = [(-1, "Select order status")] + [
-        (i.order_status_id, i.order_status.title())
-        for i in status_options
+        (i.order_status_id, i.order_status.title()) for i in status_options
     ]
 
     order_status_form.order_status_id.choices = order_status_list

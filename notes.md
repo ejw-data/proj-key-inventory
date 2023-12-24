@@ -1,12 +1,25 @@
 ### Tasks
 1.  Improve interface
-    *  Make sure form options are all formatted the same on input
-    *  Add requests to appropriate table to complete workflow
-    *  Admin.html => fix form using /post/approver/add route so that admin approver is not part of form and it uses current_id
-    *  Admin.html/forms => remove 'input the space id from the Add Room form.  Calculate this value.  Also apply form update javascript to the Add room form on this page so it matches the index.html page.  Need to decide how to add a PI and Building approver to each space!!!!
-    *  Admin.html/forms => should Room classification form have a select dropdown?  What should the dropdown be?
-    * Admin.html/forms => make more room selections to look like the Add Room Amenities form. ie access.html/form Add Room Access
+    *  ! Make sure form options are all formatted the same on input
+    *  ! Add requests to appropriate table to complete workflow
+    *  ! Admin.html => fix form using /post/approver/add route so that admin approver is not part of form and it uses current_id
+    *  ! Admin.html/forms => remove 'input the space id from the Add Room form.  Calculate this value.  Also apply form update javascript to the Add room form on this page so it matches the index.html page.  Need to decide how to add a PI and Building approver to each space!!!!
+    *  ! Admin.html/forms => make more room selections to look like the Add Room Amenities form. ie access.html/form Add Room Access
     * Fix menu hamburger menu when page is minimized.
+
+    *  Keys page inputs all correctly formatted to uppercase in db
+    *  Access page needs room access form to show more text describing the room
+    *  ! Add form logical validation  
+        *  Add Building:  existing building number or name can not be submitted
+        *  Add Room:  technical building name can not be submitted
+        *  Add Room:  Make both inputs be unique in the db
+        *  Add User:  verify that Email address is unique in db
+
+    * Design Choice - all status messages are all caps and all descriptive columns are lower case in db
+    * Keys.html needs the orders in progess table resized for small screens.  Maybe just make table responsive with a scroll bar.
+    
+
+
 
 
 

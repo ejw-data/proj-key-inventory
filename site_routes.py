@@ -241,7 +241,7 @@ def add_user():
                 last_name=user_form.last_name.data,
                 title_id=user_form.title_fk.data,
                 role_id=user_form.role.data,
-                email=user_form.email.data,
+                email=user_form.email.data.lower(),
                 sponsor_id=user_form.sponsor_id,
             )
             db.session.add(user)
@@ -638,8 +638,6 @@ def add_request():
         wing_number = user_form.wing.data
         room_number = user_form.room.data
         building_number = user_form.building_number.data
-        # room_list = ["B24010101"]
-        # code = get_access_code(room_list)[0]
         space_id = f"B{str(building_number).zfill(2)}{str(floor_number).zfill(2)}{str(wing_number).zfill(2)}{str(room_number).zfill(2)}"
 
         new_key = {
