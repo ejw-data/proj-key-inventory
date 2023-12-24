@@ -43,7 +43,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Key Status Form</h3>
                     <form name="keystatus_form" action="/post/key/status/add" method="POST" class="col-md-12">
                         {{ key_status_form.csrf_token(id = "keystatus_form_add_id") }}
                         <div class="mb-3">
@@ -69,7 +68,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Fabrication Status Form</h3>
                     <form name="fabrication_form" action="/post/fabrication/status/add" method="POST" class="col-md-12">
                         {{ fabrication_form.csrf_token(id = "fabrication_form_add_id") }}
                         <div class="mb-3">
@@ -94,7 +92,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Order Status Form</h3>
                     <form name="request_status_form" action="/post/order/status/add" method="POST" class="col-md-12">
                         {{ order_status_form.csrf_token(id = "order_status_form_add_id") }}
                         <div class="mb-3">

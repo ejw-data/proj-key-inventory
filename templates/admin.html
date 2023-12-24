@@ -44,7 +44,7 @@
     <hr>
 
     <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalreqstat" data-bs-dismiss="modal">Add
-        Request Status</a>
+        Key Request Status</a>
 
     <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalordstat" data-bs-dismiss="modal">Add
         Order Status</a>
@@ -67,8 +67,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-
-                    <h3>Building Form</h3>
                     <form name="building_form" action="/post/building/add" method="POST" class="col-md-12">
                         <!-- {{ building_form.hidden_tag() }} -->
                         {{ building_form.csrf_token(id = "building_form_add_id") }}
@@ -103,7 +101,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Room Form</h3>
                     <form name="space_form" action="/post/room/add" method="POST" class="col-md-12">
                         <!-- {{ space_form.hidden_tag() }} -->
                         {{ space_form.csrf_token(id = "space_form_add_id") }}
@@ -146,7 +143,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Room Amenities Form</h3>
                     <form name="amenities_form" action="/post/amenities/add" method="POST" class="col-md-12">
                         <!-- {{ space_form.hidden_tag() }} -->
                         {{ amenities_form.csrf_token(id = "amenities_form_add_id") }}
@@ -181,7 +177,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Room Classification Form</h3>
                     <form name="room_type_form" action="/post/room/type/add" method="POST" class="col-md-12">
                         <!-- {{ space_form.hidden_tag() }} -->
                         {{ room_type_form.csrf_token(id = "room_type_form_add_id") }}
@@ -221,8 +216,6 @@
                     </div>
     
                     {% endfor %}
-    
-                    <h3>Add User</h3>
     
                     <form name="user_form" action="/post/user/add" method="POST" class="col-md-12">
                         <!-- {{ user_form.hidden_tag() }} -->
@@ -266,11 +259,10 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <i class="ion-android-alert mr-1" aria-hidden="true"></i>
-                    <h5 class="modal-title" id="adminModaltitleLabel">Add Title<h5>
+                    <h5 class="modal-title" id="adminModaltitleLabel">Add User Title<h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Title Form</h3>
                     <form name="title_form" action="/post/title/add" method="POST" class="col-md-12">
                         <!-- {{ space_form.hidden_tag() }} -->
                         {{ title_form.csrf_token(id = "title_form_add_id") }}
@@ -297,7 +289,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Roles Form</h3>
                     <form name="role_form" action="/post/role/add" method="POST" class="col-md-12">
                         {{ role_form.csrf_token(id = "role_form_add_id") }}
                         <div class="mb-3">
@@ -324,7 +315,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Approver Zone Form</h3>
                     <form name="approver_zone_form" action="/post/zones/add" method="POST" class="col-md-12">
                         {{ zone_form.csrf_token(id = "zone_form_add_id") }}
                         <div class="mb-3">
@@ -353,7 +343,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Approvers Form</h3>
                     <form name="approver_form" action="/post/approver/add" method="POST" class="col-md-12">
                         {{ approver_form.csrf_token(id = "approver_form_add_id") }}
                         <div class="mb-3">
@@ -380,11 +369,10 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <i class="ion-android-alert mr-1" aria-hidden="true"></i>
-                    <h5 class="modal-title" id="adminModalreqstatLabel">Add Approver Status<h5>
+                    <h5 class="modal-title" id="adminModalreqstatLabel">Add Key Request Status<h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Request Status Form</h3>
                     <form name="request_status_form" action="/post/request/status/add" method="POST" class="col-md-12">
                         {{ request_status_form.csrf_token(id = "request_status_form_add_id") }}
                         <div class="mb-3">
@@ -409,7 +397,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Order Status Form</h3>
                     <form name="request_status_form" action="/post/order/status/add" method="POST" class="col-md-12">
                         {{ order_status_form.csrf_token(id = "order_status_form_add_id") }}
                         <div class="mb-3">
@@ -434,7 +421,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Key Status Form</h3>
                     <form name="roles_form" action="/post/key/status/add" method="POST" class="col-md-12">
                         {{ key_status_form.csrf_token(id = "key_status_form_add_id") }}
                         <div class="mb-3">
@@ -459,7 +445,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Key Fabrication Status Form</h3>
                     <form name="roles_form" action="/post/fabrication/status/add" method="POST" class="col-md-12">
                         {{ fab_status_form.csrf_token(id = "fab_status_form_add_id") }}
                         <div class="mb-3">

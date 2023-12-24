@@ -28,7 +28,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Access Pair Form</h3>
                     <form name="access_pair_form" action="/post/access/add" method="POST" class="col-md-12">
                         {{ access_pair_form.csrf_token(id = "access_pair_form_add_id") }}
                         <div class="mb-3">
@@ -57,7 +56,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Access Code Form</h3>
                     <form name="access_code_form" action="/post/code/add" method="POST" class="col-md-12">
                         {{ access_code_form.csrf_token(id = "access_code_form_add_id") }}
                         <div class="mb-3">
