@@ -87,6 +87,7 @@ function createTable(data, id, buttons=[], hyperlinks=[], nullmessage="No result
                     .attr('data-bs-toggle', 'modal')
                     .attr('data-bs-target', '#tableButtonModal')
                     .attr('data-bs-dismiss', 'modal')
+                    .style("min-width", "130px")
                     .text(button.name)
                     .on('click', d => tableModalHTML(button.url, d[button.column], button.message, button.options))
                     
