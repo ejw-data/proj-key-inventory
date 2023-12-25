@@ -23,7 +23,7 @@ function createTable(data, id, buttons=[], hyperlinks=[], nullmessage="No result
         // create table 
         let table_loc = d3.select(id);
         let table = table_loc.append('table');
-        table.attr('class','styled-table');
+        table.attr('class','table styled-table');
         
         // add header row
         let table_head = table.append('thead').append('tr')

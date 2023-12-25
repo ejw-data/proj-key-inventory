@@ -2,35 +2,36 @@
 {% set active_page = "index" %}
 
 {% block body %}
-<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+<main class="col-sm-12 col-md-9 col-lg-10 ms-sm-auto px-md-4">
 
     <div
         class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Dashboard</h1>
     </div>
 
-    
+
     <!-- card -->
-    <div class = top-section>
+    <div class="m-md-4">
         <div class="container d-flex justify-content-center align-items-center">
-        
+
             <div class="card">
                 <div class="upper">
                     <img src="{{ url_for('static', filename='images/profile-backdrop.jpg') }}" class="img-fluid">
                     <div class="user text-center">
-                        <div class="profile">
-                            <img src="{{ url_for('static', filename='images/person/me.jpg') }}" class="rounded-circle" width="80">
+                        <div class="profile d-none d-md-flex">
+                            <img src="{{ url_for('static', filename='images/person/me.jpg') }}" class="rounded-circle"
+                                width="80">
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-4 col-sm-12">
+                <div class="row d-flex">
+                    <div class="col-5 col-md-4">
                         <h4 class="mb-0">{{ profile.first_name }} {{ profile.last_name }}</h4>
                         <span class="text-muted d-block mb-2">{{ profile.email }}</span>
                         <span class="text-muted d-block mb-2">{{ profile.title }}</span>
                     </div>
-                    <div class="col-md-4 col-sm-12"></div>
-                    <div class="col-md-4 col-sm-12">
+                    <div class="col-2 col-md-4"> </div>
+                    <div class="col-5 col-md-4">
                         <div class="text-muted d-block mb-2">
                             <h6>Role: {{ profile.role }}</h6>
                         </div>
@@ -46,36 +47,40 @@
             </div>
         </div>
     </div>
-    <div class="top-section">
+    <div class="m-md-4">
         <div class="container d-flex justify-content-center align-items-center">
-    
+
             <div class="card">
-                <h3>Welcome</h3> <p>to the key scheduling system portal.  The purpose of this site is to provide you with up-to-date information 
-                about your key requests, received keys, and obligations to the key tracking system.  By receiving a key you are responsible to 
-                maintain a high level of security that the locks were intended to provide.  If at any time if your ability to uphold this 
-                responsibility is compromised then the key shop has the obligation to request for all keys to be returned and alterations to 
-                existing locks be made at expense to the authorizer's department.  </p>
+                <h3>Welcome</h3>
+                <p>to the key scheduling system portal. The purpose of this site is to provide you with up-to-date
+                    information
+                    about your key requests, received keys, and obligations to the key tracking system. By receiving a
+                    key you are responsible to
+                    maintain a high level of security that the locks were intended to provide. If at any time if your
+                    ability to uphold this
+                    responsibility is compromised then the key shop has the obligation to request for all keys to be
+                    returned and alterations to
+                    existing locks be made at expense to the authorizer's department. </p>
             </div>
         </div>
     </div>
-    <div class="top-section">
-        <div class="container d-flex justify-content-center align-items-center">
-    
+    <div class="m-md-4">
+        <div class="container d-flex mb-1">
             <div class="w80">
-
                 <h3 class="d-inline">Pending Access</h3>
-                    <a class="btn btn-secondary mb-1 float-end d-inline" data-bs-toggle="modal" data-bs-target="#dashboardModalbasket"
-                        data-bs-dismiss="modal">Request Access</a>
-                <div id="request-table"></div>
+                <a class="btn btn-secondary float-end d-inline" data-bs-toggle="modal" data-bs-target="#dashboardModalbasket"
+                    data-bs-dismiss="modal">Request Access</a>
             </div>
         </div>
+        <div class="container justify-content-center align-items-center">
+            <div id="request-table" class="table-responsive"></div>
+        </div>
     </div>
-
-    <div class="top-section">
+    <div class="m-md-4">
         <div class="container d-flex justify-content-center align-items-center">
-    
+
             <div class="w80">
-    
+
                 <h3 class="d-inline">Current Keys</h3>
                 <div id="keys-table"></div>
                 <div id="tableModal"></div>
@@ -87,8 +92,8 @@
     <!-- modal development -->
 
 
-    <div class="modal fade" id="tableButtonModal" tabindex="-1" aria-labelledby="tableButtonModalLabel" aria-hidden="true"
-        data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal fade" id="tableButtonModal" tabindex="-1" aria-labelledby="tableButtonModalLabel"
+        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
 
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -101,7 +106,8 @@
                     <p id="button-message"></p>
                 </div>
                 <div class="modal-footer">
-                    <a id="button-link" href="placeholder" class="btn btn-secondary" data-dismiss="modal" onclick="refreshPage()">Confirmed</a>
+                    <a id="button-link" href="placeholder" class="btn btn-secondary" data-dismiss="modal"
+                        onclick="refreshPage()">Confirmed</a>
                     <a class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancel</a>
                 </div>
             </div>
@@ -135,7 +141,7 @@
                         </div>
         
                         {% endfor %} -->
-        
+
                         <form name="basket_form" action="/post/request/add" method="POST" class="col-md-12">
                             {{ basket_form.csrf_token(id = "basket_form_add_id") }}
 
@@ -143,7 +149,8 @@
                                 <div class="col-6">
                                     <div class="mb-2">
                                         {{ basket_form.building_number.label(class="col-form-label") }}
-                                        {{ basket_form.building_number(class="form-control w-50", id="building_number") }}
+                                        {{ basket_form.building_number(class="form-control w-50", id="building_number")
+                                        }}
                                     </div>
                                     <div class="mb-2">
                                         {{ basket_form.wing.label(class="col-form-label") }}
@@ -172,7 +179,8 @@
                     </div>
                     <div id="msg-section"></div>
                     <div id="basket-section"></div>
-                    <a href="/post/basket/add" id="order-submit" class="btn btn-secondary m-1 float-end d-inline disabled">Submit Basket</a>
+                    <a href="/post/basket/add" id="order-submit"
+                        class="btn btn-secondary m-1 float-end d-inline disabled">Submit Basket</a>
                     <a id="order-clear" class="btn btn-secondary m-1 float-end d-inline">Empty Basket</a>
                     <a id="order-close" class="btn btn-secondary m-1 float-end d-inline d-none" data-bs-dismiss="modal"
                         aria-label="Close">Close</a>

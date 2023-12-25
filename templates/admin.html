@@ -2,57 +2,114 @@
 {% set active_page = "admin" %}
 
 {% block body %}
-<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+<main class="col-sm-12 col-md-9 col-lg-10 ms-sm-auto px-md-4">
 
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Administrator</h1>
     </div>
 
-    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalbuilding" data-bs-dismiss="modal">Add
-        Building</a>
-    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalroom" data-bs-dismiss="modal">Add
-        Room</a>
-    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalclass" data-bs-dismiss="modal">Add
-        Room Classification</a>
-    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalamenities" data-bs-dismiss="modal">Add
-        Room Amenities</a>
+    <!-- <div class="m-md-4">
+        <div class="container d-flex justify-content-center align-items-center">
+            <div class="card">
+                <span>add content</span>
+            </div>
+        </div>
+    </div> -->
+    <div class="m-md-4">
+        <div class="container d-flex mb-1">
+            <div class="w80">
+                <h3 class="d-inline">Room Table</h3>
+                <div class="float-end mb-1">
+                    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalbuilding"
+                        data-bs-dismiss="modal">Add
+                        Building</a>
+                    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalroom" data-bs-dismiss="modal">Add
+                        Room</a>
+                    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalclass" data-bs-dismiss="modal">Add
+                        Room Classification</a>
+                    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalamenities"
+                        data-bs-dismiss="modal">Add
+                        Room Amenities</a>
+                </div>
+            </div>
+        </div>
+        <div class="container justify-content-center align-items-center">
+            <div id="room-table" class="table-responsive"></div>
+        </div>
+    </div>
 
-    <div id = "room-table"></div>
+    <div class="m-md-4">
+        <div class="container d-flex mb-1">
+            <div class="w80">
+                <h3 class="d-inline">User Table</h3>
+                <div class="float-end mb-1">
+                    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalusers" data-bs-dismiss="modal">Add
+                        User</a>
+                    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModaltitle" data-bs-dismiss="modal">Add
+                        Title</a>
+                    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalroles" data-bs-dismiss="modal">Add
+                        User Role</a>
+                </div>
+            </div>
+        </div>
+        <div class="container justify-content-center align-items-center">
+            <div id="user-table" class="table-responsive"></div>
+        </div>
+    </div>
 
-    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalusers" data-bs-dismiss="modal">Add
-        User</a>
-    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModaltitle" data-bs-dismiss="modal">Add
-        Title</a>
-    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalroles" data-bs-dismiss="modal">Add
-        User Role</a>
+    
+    <div class="m-md-4">
+        <div class="container d-flex mb-1">
+            <div class="w80">
+                <h3 class="d-inline">Approver Table</h3>
+                <div class="float-end mb-1">
+                    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalapprovers"
+                        data-bs-dismiss="modal">Add
+                        Approver</a>
+                </div>
+            </div>
+        </div>
+        <div class="container justify-content-center align-items-center">
+            <div id="approver-table" class="table-responsive"></div>
+        </div>
+    </div>
 
-    <div id = "user-table"></div>
+    <div class="m-md-4">
+        <div class="container d-flex mb-1">
+            <div class="w80">
+                <h3 class="d-inline">Building Manager Table</h3>
+                <div class="float-end mb-1">
+                    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalzones" data-bs-dismiss="modal">Add
+                        Approver Space</a>
+                </div>
+            </div>
+        </div>
+        <div class="container justify-content-center align-items-center">
+            <div id="zones-table" class="table-responsive"></div>
+        </div>
+    </div>
+    
+    <div class="m-md-4">
+        <div class="container d-flex mb-1">
+            <div class="w80">
+                <h4>Other System Inputs</h4>
+                <hr>
+                <div class="mb-5">
+                    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalreqstat" data-bs-dismiss="modal">Add
+                        Key Request Status</a>
+                    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalordstat" data-bs-dismiss="modal">Add
+                        Order Status</a>
+                    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalkeystat" data-bs-dismiss="modal">Add
+                        Key Status</a>
+                    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalfabstat" data-bs-dismiss="modal">Add
+                        Fabrication Status</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
-    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalapprovers" data-bs-dismiss="modal">Add
-        Approver</a>
 
-    <div id = "approver-table"></div>
-
-
-    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalzones" data-bs-dismiss="modal">Add
-        Approver Space</a>
-
-    <div id = "zones-table"></div>
-
-    <h4>Other System Inputs</h4>
-    <hr>
-
-    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalreqstat" data-bs-dismiss="modal">Add
-        Key Request Status</a>
-
-    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalordstat" data-bs-dismiss="modal">Add
-        Order Status</a>
-
-    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalkeystat" data-bs-dismiss="modal">Add
-        Key Status</a>
-    <a class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#adminModalfabstat" data-bs-dismiss="modal">Add
-        Fabrication Status</a>
 
     
 
