@@ -1,4 +1,15 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
+import pandas as pd
+
+from flask import (
+    Blueprint,
+    render_template,
+    request,
+    flash,
+    redirect,
+    url_for,
+    jsonify,
+    session,
+)
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import (
@@ -25,6 +36,7 @@ from models import (
     Users,
 )
 from query import get_access_code, get_profile
+from access_codes import find_codes
 from sqlalchemy import null, func
 
 # from flask_sqlalchemy import SQLAlchemy
@@ -100,8 +112,20 @@ def index():
     profile = get_profile()
 
     request_form = request_form_instance()
+    basket_form = request_form_instance()
 
-    return render_template("index.html", request_form=request_form, profile=profile)
+    return render_template(
+        "index.html",
+        request_form=request_form,
+        profile=profile,
+        basket_form=basket_form,
+    )
+
+
+@site.route("/order-content")
+@include_login_form
+def ordercontent():
+    return render_template("dynamic/_orders.html")
 
 
 @site.route("/users")
@@ -217,7 +241,8 @@ def add_user():
                 last_name=user_form.last_name.data,
                 title_id=user_form.title_fk.data,
                 role_id=user_form.role.data,
-                email=user_form.email.data,
+                email=user_form.email.data.lower(),
+                sponsor_id=user_form.sponsor_id,
             )
             db.session.add(user)
             db.session.commit()
@@ -226,6 +251,8 @@ def add_user():
             user_form.last_name.data = ""
             user_form.title_fk.data = ""
             user_form.role.data = ""
+            user_form.email = ""
+            user_form.sponsor_id = ""
             flash("User Added Successfully")
         elif user_login_exists is not None:
             flash("User already has login and password.")
@@ -594,37 +621,203 @@ def add_code():
 @include_login_form
 def add_request():
     """
-    Route used to add buildings to database, applied on admin.html
+    Route used to make an order basket that uses session storage
     """
     user_form = request_form_instance(request.form)
 
-    floor_number = user_form.floor.data
-    wing_number = user_form.wing.data
-    room_number = user_form.room.data
-    building_number = user_form.building_number.data
-    room_list = ["B24010101"]
-    code = get_access_code(room_list)[0]
-    space_id = f"B{str(building_number).zfill(2)}{str(floor_number).zfill(2)}{str(wing_number).zfill(2)}{str(room_number).zfill(2)}"
+    # logic for storing sessions
+    session.modified = True
+
+    if session.get("order"):
+        pass
+    else:
+        session["order"] = []
 
     if user_form.validate_on_submit():
-        key_request = Requests(
-            user_id=current_user.get_id(),
-            building_number=building_number,
-            space_number_id=space_id,
-            approver_id=user_form.approver_id.data,
-            access_code_id=code,
-        )
-        db.session.add(key_request)
-        db.session.commit()
+        floor_number = user_form.floor.data
+        wing_number = user_form.wing.data
+        room_number = user_form.room.data
+        building_number = user_form.building_number.data
+        space_id = f"B{str(building_number).zfill(2)}{str(floor_number).zfill(2)}{str(wing_number).zfill(2)}{str(room_number).zfill(2)}"
+
+        new_key = {
+            "space_id": space_id,
+            "building_number": building_number,
+            "wing_number": wing_number,
+            "floor_number": floor_number,
+            "room_number": room_number,
+            "space_owner": "Ted",
+            "building_approver": "Joe",
+            "access_code": "TBD",
+        }
+
+        session["order"].append(new_key)
 
         user_form.building_number.data = ""
-        user_form.floor.data = ""
         user_form.wing.data = ""
+        user_form.floor.data = ""
         user_form.room.data = ""
         user_form.approver_id.data = ""
-        flash("Room Added Successfully")
+        flash("Key Added Successfully")
 
-    return redirect(request.referrer)
+    return ("", 204)
+
+
+@site.route("/post/basket/add", methods=["GET", "POST"])
+@include_login_form
+def submit_basket():
+    """
+    Route used to find access codes and update local variables and add data to database
+    """
+    order_entries = session["order"]
+    room_list = [i["space_id"] for i in order_entries]
+    unique_rooms_list = tuple(set(room_list))
+
+    # print("Route room check: ", unique_rooms_list)
+
+    # use combos.py function to get access code
+    # it returns a list of access codes
+    # each requested key should be updated with an access code
+    # the requests should be just of the unique codes but a column should store the rooms
+    # so the user understands how many keys are needed
+    # a message should also be provided.
+
+    # use /table/matrix/ as a template for getting the input to the find_codes function
+    # filter by building
+    results = AccessPairs.query.all()
+    data = []
+    for result in results:
+        data.append(
+            {"access_code": result.access_code_id, "space_id": result.space_number_id}
+        )
+
+    code_id = set([i["access_code"] for i in data])
+
+    new_data = []
+    for record in code_id:
+        filtered_ids = filter(lambda x: x["access_code"] == record, data)
+        rooms = tuple([i["space_id"] for i in filtered_ids])
+        entry = {"id": record, "value": rooms}
+        new_data.append(entry)
+
+    # print(new_data)
+
+    # pivot_table = pd.crosstab(df["Access Code"], df.space_id)
+
+    # print("Pivot table: ", pivot_table)
+
+    # perform basic filters on this df then input into find_codes - filter by building
+
+    # maybe create a list of buildings and then use 'in' to filter df
+
+    # access_codes = pivot_table.reset_index().to_dict(orient="records")
+
+    # need to make return be (access codes found), (missing codes), (total missing), (remaining missing), (dict of found with rms), (dict of missing with rms)
+    codes = find_codes(unique_rooms_list, new_data)
+
+    print("Access codes produced: ", codes)
+    # print("New test: ", order_entries)
+
+    #  need fixed then the rest will be fine
+    for record in order_entries:
+        for i, code in enumerate(codes["access_codes"]):
+            print("test", record)
+            if code != 0:
+                for room in codes["requested_spaces"][i][code]:
+                    if record["space_id"] == room:
+                        record["access_code"] = code
+            else:
+                if record['access_code'] == "TBD": 
+                    record["access_code"] = "Key Code Requested"
+
+    print(order_entries)
+    # logic for storing sessions
+    session.modified = True
+    session["order"] = order_entries
+
+    if int(codes["access_codes"][0]) != 0:
+        msg = "Exact Match Found"
+    else:
+        msg = "Match Not Found"
+
+    session["msgs"] = []
+    session["msgs"].append(msg)
+
+    # print("updated orders: ", order_entries)
+
+    # update stored variable and also make requests
+    # a zero code should result in a key code creation
+
+    #     new_key = Requests(
+    #             user_id="from current_user()",
+    #             space_number_id=space_id,
+    #             building_number=building_number,
+    #             space_owner="needs added to db",
+    #             approver_id="from existing form",
+    #             access_code_id=code,
+    #         )
+    #     db.session.add(new_key)
+    #     db.session.commit()
+    # else:
+    #     msg = "There is no perfect match\n"
+    # for space in unique_rooms_list:
+    #     code = get_access_code([space])
+    #     msg += f"Key #{code}\n"
+    # execute function that looks for all results
+
+    # the request table probably only needs the following columns:
+    # access_code, space_owner, building_approver, list of space_id; the other info is built into the space_id
+    # new_key = Requests(
+    #     user_id="from current_user()",
+    #     space_number_id=space_id,
+    #     building_number=building_number,
+    #     space_owner="needs added to db",
+    #     approver_id="from existing form",
+    #     access_code_id=code,
+    # )
+    # db.session.add(new_key)
+    # db.session.commit()
+
+    # return redirect(url_for('site.ordercontent'))
+    return ("", 204)
+
+    # return redirect("dynamic/_orders.html")
+
+
+@site.route("/post/basket/msg", methods=["GET", "POST"])
+@include_login_form
+def basket_msg():
+    # print(msg)
+    # logic for storing sessions
+    # session.modified = True
+    # if session.get("msgs"):
+    #     pass
+    # else:
+    #     session["msgs"] = []
+
+    # session["msgs"].append(msg)
+
+    return render_template("dynamic/_msg.html")
+
+
+# clear session data
+@site.route("/post/basket/clear", methods=["GET"])
+@include_login_form
+def clear_session():
+    # update webpage with variables
+    # html = render_template("dynamic/_orders.html")
+    # remove session variables
+    print("Clearing Session Variable")
+    for session_variable in ["order", "msgs"]:
+        try:
+            # logic for storing sessions
+            session.modified = True
+            session.pop(session_variable)
+        except KeyError:
+            print("Session Order does not exist or other error.")
+
+    # return html
+    return render_template("dynamic/_orders.html")
 
 
 # -------------------------- SITE ACCESS -------------------------------------

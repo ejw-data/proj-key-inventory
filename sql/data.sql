@@ -18,11 +18,11 @@ VALUES (1,'requester'),
 		(4,'analyst');
 
 INSERT INTO users (user_id, first_name, last_name, title_id, role_id, email)
-VALUES (1,'erin', 'wills', 1, 1, 'ew@mysite.com'),
-		(2,'will', 'wright', 1, 1, 'ww@mysite.com'),
-		(3,'andrew', 'ng', 1, 1, 'an@mysite.com'),
-		(4,'bob', 'turtle', 5, 3, 'bt@mysite.com'),
-		(5,'jake', 'powers', 9, 3, 'jp@mysite.com');
+VALUES (1,'erin', 'wills', 1, 1, 'ew@mysite.com', 1),
+		(2,'will', 'wright', 1, 1, 'ww@mysite.com', 1),
+		(3,'andrew', 'ng', 1, 1, 'an@mysite.com', 1),
+		(4,'bob', 'turtle', 5, 3, 'bt@mysite.com', 1),
+		(5,'jake', 'powers', 9, 3, 'jp@mysite.com', 1);
 
 INSERT INTO approvers (approver_id,user_id, role_approved_by)
 VALUES (1,4, 5);

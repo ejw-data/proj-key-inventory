@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, Response, redirect, flash
+from flask import Blueprint, request, jsonify, Response, redirect, flash, session
 import json
 from models import (
     db,
@@ -19,8 +19,7 @@ from models import (
     OrderStatus,
     KeysCreated,
     FabricationStatus,
-    KeyStatus
-    
+    KeyStatus,
 )
 from forms import update_order_status_form_instance
 
@@ -77,11 +76,9 @@ def key_status_update(lost_id=None, return_id=None):
 @api.route("/orders/status/<request_id>", methods=["POST"])
 @include_login_form
 def order_status_update(request_id=None):
-    
     update_order_form = update_order_status_form_instance(request.form)
 
     if update_order_form.validate_on_submit():
-   
         update_record = KeyOrders.query.get(int(request_id))
         update_record.order_status_id = update_order_form.order_status_id.data
         db.session.commit()
@@ -95,20 +92,19 @@ def order_status_update(request_id=None):
 @api.route("/orders/status/group", methods=["GET"])
 @include_login_form
 def order_status_group():
-
     records = (
         KeyInventory.query.with_entities(
-            KeyStatus.key_status,
-            func.count(KeyInventory.key_status_id)
+            KeyStatus.key_status, func.count(KeyInventory.key_status_id)
         )
         .join(KeyStatus, KeyStatus.key_status_id == KeyInventory.key_status_id)
         .group_by(KeyStatus.key_status)
         .all()
     )
-    
+
     data = []
     for record in records:
         # data.append({name: getattr(record, name) for name in column_names})
+        # column_names = Requests.__table__.columns.keys()
 
         data.append(
             {
@@ -118,7 +114,6 @@ def order_status_group():
         )
 
     return jsonify(data)
-
 
 
 # API table routes
@@ -596,3 +591,89 @@ def keyshop_table():
         )
 
     return jsonify(data)
+
+
+# testing new api
+
+
+@api.route("/new", methods=["GET"])
+@include_login_form
+def new():
+    """
+    Used to test request logic for route 'site/post/basket/add'
+    """
+    results = AccessPairs.query.all()
+    data = []
+    for result in results:
+        data.append(
+            {"Access Code": result.access_code_id, "space_id": result.space_number_id}
+        )
+
+    df = pd.DataFrame(data)
+
+    pivot_table = pd.crosstab(df["Access Code"], df.space_id)
+
+    results = []
+    for row in pivot_table.iterrows():
+        access_code = row[0]
+        s = row[1]
+        included_rooms = s[s > 0]
+        rooms = list(included_rooms.index)
+        total_rooms = len(rooms)
+
+        dict = {"id": access_code, "value": tuple(rooms), "count": total_rooms}
+
+        results.append(dict)
+
+    print(results)
+
+    return jsonify(results)
+
+
+@api.route("/building/info/<building>", methods=["GET"])
+@include_login_form
+def menu_filter(building):
+    """
+    Used to retrieve data to update dropdown menus
+    as seen in formFieldUpdate.js
+    """
+    records = Rooms.query.filter(Rooms.building_number == building)
+
+    column_names = Rooms.__table__.columns.keys()
+    data = []
+    for record in records:
+        data.append({name: getattr(record, name) for name in column_names})
+
+    wings = set()
+    floors = set()
+    rooms = set()
+    structure = dict()
+    for i in data:
+        if i["wing_number"] not in wings:
+            wings.add(i["wing_number"])
+            floors.add(i["floor_number"])
+            rooms.add(i["room_number"])
+            structure["wing"] = {
+                str(i["wing_number"]): {"floor": {str(i["floor_number"]): [i["room_number"]]}}
+            }
+        else:
+            if i["floor_number"] not in floors:
+                floors.add(i["floor_number"])
+                rooms.add(i["room_number"])
+                structure["wing"][str(i["wing_number"])]["floor"][str(i["floor_number"])] = [
+                    i["room_number"]
+                ]
+            else:
+                if i["room_number"] not in rooms:
+                    rooms.add(i["room_number"])
+                    structure["wing"][str(i["wing_number"])]["floor"][
+                        str(i["floor_number"])
+                    ].append(i["room_number"])
+                else:
+                    continue
+
+    structure["wings"] = list(wings)
+    structure["wing"][str(i["wing_number"])]["floors"] = list(floors)
+
+    print(structure)
+    return jsonify(structure)

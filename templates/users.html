@@ -2,19 +2,37 @@
 {% set active_page = "users" %}
 
 {% block body %}
-<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+<main class="col-sm-12 col-md-9 col-lg-10 ms-sm-auto px-md-4">
 
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 m-mb-4 border-bottom">
         <h1 class="h2">User Accessibility</h1>
     </div>
+    <div class="m-md-4">
+        <div class="container d-flex justify-content-center align-items-center">
+            <div class="card">
+                <h3>Things to add:</h3>
+                <ul>
+                    <li>Be able to search users by room or by faculty </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
-    <ul>Things to add:
-        <li>Be able to search users by room or by faculty </li>
-    </ul>
-    
-    <div id="user-group-table"></div>
-
-    <div id="building-access"></div>
-
+    <div class="m-md-4">
+        <div class="container d-flex justify-content-center align-items-center">
+            <div class="w-100">
+                <h3 class="d-inline">User Table</h3>
+                <div id="user-group-table"></div>
+            </div>
+        </div>
+    </div>
+    <div class="m-md-4">
+        <div class="container d-flex justify-content-center align-items-center">
+            <div class="w-100">
+                <h3 class="d-inline">Room Table</h3>
+                <div id="building-access"></div>
+            </div>
+        </div>
+    </div>
 </main>
 {% endblock %}

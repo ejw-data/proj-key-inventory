@@ -2,7 +2,7 @@ function createTable(data, id, buttons=[], hyperlinks=[], nullmessage="No result
     d3.json(data).then(data => {
 
         let include_buttons = true
-        console.log(data)
+        // console.log(data)
         // check to see if no data exists
         if (data.length === 0){
             data = [{"Status": nullmessage}]
@@ -23,7 +23,7 @@ function createTable(data, id, buttons=[], hyperlinks=[], nullmessage="No result
         // create table 
         let table_loc = d3.select(id);
         let table = table_loc.append('table');
-        table.attr('class','styled-table');
+        table.attr('class','table styled-table');
         
         // add header row
         let table_head = table.append('thead').append('tr')
@@ -87,6 +87,7 @@ function createTable(data, id, buttons=[], hyperlinks=[], nullmessage="No result
                     .attr('data-bs-toggle', 'modal')
                     .attr('data-bs-target', '#tableButtonModal')
                     .attr('data-bs-dismiss', 'modal')
+                    .style("min-width", "130px")
                     .text(button.name)
                     .on('click', d => tableModalHTML(button.url, d[button.column], button.message, button.options))
                     

@@ -1,0 +1,49 @@
+<table id="basket-table" class="table">
+    <thead>
+        <tr>
+            <th>Space ID</th>
+            <th>Building</th>
+            <th>Wing</th>
+            <th>Floor</th>
+            <th>Room</th>
+            <th>Space Owner</th>
+            <th>Building Approver</th>
+            <th>Access Code</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        {% if 'order' in session %}
+        <!-- disply orders -->
+            {% for record in session['order'] %}
+            <tr id="key-table" class="entries">
+                <td>{{ record['space_id'] }}</td>
+                <td>{{ record['building_number'] }}</td>
+                <td>{{ record['wing_number'] }}</td>
+                <td>{{ record['floor_number'] }}</td>
+                <td>{{ record['room_number'] }}</td>
+                <td>{{ record['space_owner'] }}</td>
+                <td>{{ record['building_approver'] }}</td>
+                <td>{{ record['access_code'] }}</td>
+            </tr>
+            {% endfor %}
+
+        {% else %}
+            <tr id="key-table" class="empty">
+                <td>No Keys Added Yet</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        {% endif %}
+        
+    </tbody>
+    <tfoot>
+        <!-- footer content -->
+    </tfoot>
+</table>
+

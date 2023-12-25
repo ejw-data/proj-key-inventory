@@ -2,22 +2,40 @@
 {% set active_page = "access" %}
 
 {% block body %}
-<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+<main class="col-sm-12 col-md-9 col-lg-10 ms-sm-auto px-md-4">
 
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Access Settings</h1>
     </div>
 
-    <ul>Things to Add:
-        <li>Maybe add approvers link to existing table</li>
-        
-    </ul>
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalaccess" data-bs-dismiss="modal">Add
-        Room Access</a>
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalcode" data-bs-dismiss="modal">Add
-        Access Code</a>
-        
-    <div id="access-matrix"></div>
+    <div class="m-md-4">
+        <div class="container d-flex justify-content-center align-items-center">
+            <div class="card">
+                <h3>Things to Add:</h3>
+                <ul>
+                    <li>Maybe add approvers link to existing table</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="m-md-4">
+        <div class="container d-flex mb-1">
+            <div class="w-100">
+                <h3 class="d-inline">Access Table</h3>
+                <div class="float-end">
+                    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalaccess" data-bs-dismiss="modal">Add
+                        Room Access</a>
+                    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalcode" data-bs-dismiss="modal">Add
+                        Access Code</a>
+                </div>
+            </div>
+        </div>
+        <div class="container justify-content-center align-items-center">
+            <div id="access-matrix" class="table-responsive"></div>
+        </div>    
+    </div>
+
+    <!-- modal -->
     
     <div class="modal fade" id="adminModalaccess" aria-hidden="true" aria-labelledby="adminModalaccess" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -28,7 +46,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Access Pair Form</h3>
                     <form name="access_pair_form" action="/post/access/add" method="POST" class="col-md-12">
                         {{ access_pair_form.csrf_token(id = "access_pair_form_add_id") }}
                         <div class="mb-3">
@@ -57,7 +74,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Access Code Form</h3>
                     <form name="access_code_form" action="/post/code/add" method="POST" class="col-md-12">
                         {{ access_code_form.csrf_token(id = "access_code_form_add_id") }}
                         <div class="mb-3">

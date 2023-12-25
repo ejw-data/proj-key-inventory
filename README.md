@@ -14,5 +14,7 @@ Cloud application that will manage an entire space access system
 * `pip install flask_login`
 * `pip install pandas`
 
+* may need the `pip install ipykernel` - this is really only needed for interactive window in VSCode 
+
 ### Activate Environment
 * `. venv/Scripts/activate`

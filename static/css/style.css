@@ -237,10 +237,6 @@ i {
 
 /* Profile Info on index.html and dashboard route */
 
-.top-section {
-    margin: 3em
-}
-
 .container {
     height:auto;
     margin-bottom: 3em;
@@ -275,7 +271,7 @@ i {
 
 .user {
     position: relative;
-    max-height: 150px
+    max-height: 20px
 }
 
 .profile img {

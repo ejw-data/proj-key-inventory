@@ -2,36 +2,71 @@
 {% set active_page = "keys" %}
 
 {% block body %}
-<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+<main class="col-sm-12 col-md-9 col-lg-10 ms-sm-auto px-md-4">
 
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 m-mb-4 border-bottom">
         <h1 class="h2">Keys</h1>
     </div>
 
-    <ul>Things to add:  
-  
-        <li>Add keys by status table (groupby status) and add key status button above table - api done</li>
-        <li>X - Show stats - weekly pickup totals, pickups by day</li>
-        <li>Make dashboard very key shop friendly - add key status update - setup table with buttons for key handoff</li>
-    </ul>
+    <div class="m-md-4">
+        <div class="container d-flex justify-content-center align-items-center">
+            <div class="card">
+                <h3>Things to add:</h3>
+                <ul>
+                    <li>Add keys by status table (groupby status) and add key status button above table - api done</li>
+                    <li>X - Show stats - weekly pickup totals, pickups by day</li>
+                    <li>Make dashboard very key shop friendly - add key status update - setup table with buttons for key handoff</li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
-    <h3 class="d-inline">Orders in Progress</h3>
-    <a class="btn btn-secondary mb-1 mx-1 float-end d-inline" data-bs-toggle="modal" data-bs-target="#adminModalordstat" 
-        data-bs-dismiss="modal">Add Order Status</a>
-    <div id="orders"></div>  
-
-    <h3 class="d-inline">Key Shop Activity</h3>
-    <a class="btn btn-secondary mb-1 float-end d-inline" data-bs-toggle="modal" data-bs-target="#keysModalkeyfabrication"
-        data-bs-dismiss="modal">Add
-        Key Fabrication Status</a>
-    <div id="key-shop"></div>
-
-    <h3 class="d-inline">Current Key Inventory</h3>
-    <a class="btn btn-secondary mb-1 float-end d-inline" data-bs-toggle="modal" data-bs-target="#keysModalkeystatus"
-        data-bs-dismiss="modal">Add
-        Inventory Status</a>
-    <div id="key-inventory"></div>
-
+    <div class="m-md-4">
+        <div class="container d-flex mb-1">
+            <div class="w-100">
+                <h3 class="d-inline">Orders in Progress</h3>
+                <div class="float-end">
+                    <a class="btn btn-secondary float-end d-inline" data-bs-toggle="modal" data-bs-target="#adminModalordstat"
+                        data-bs-dismiss="modal">Add Order Status</a>
+                </div>
+            </div>
+        </div>
+        <div class="container justify-content-center align-items-center">
+            <div id="orders" class="table-responsive"></div>
+        </div>
+    </div>    
+    <div class="m-md-4">
+        <div class="container d-flex mb-1">
+            <div class="w-100">
+                <h3 class="d-inline">Key Shop Activity</h3>
+                <div class="float-end">
+                    <a class="btn btn-secondary d-inline" data-bs-toggle="modal" data-bs-target="#keysModalkeyfabrication"
+                    data-bs-dismiss="modal">Add
+                    Key Fabrication Status</a>
+                </div>
+            </div>
+        </div>
+        <div class="container justify-content-center align-items-center">
+            <div id="key-shop" class="table-responsive"></div>
+        </div>
+    </div>
+    <div class="m-md-4">
+        <div class="container d-flex mb-1">
+            <div class="w-100">
+                <h3 class="d-inline">Current Key Inventory</h3>
+                <div class="float-end">
+                    <a class="btn btn-secondary float-end d-inline" data-bs-toggle="modal" data-bs-target="#keysModalkeystatus"
+                        data-bs-dismiss="modal">Add
+                        Inventory Status</a>
+                </div>
+            </div>
+        </div>
+        <div class="container justify-content-center align-items-center">
+            <div id="key-inventory" class="table-responsive"></div>
+        </div>
+    </div>
+        
+    
     <!-- Modals -->
     
     <div class="modal fade" id="keysModalkeystatus" aria-hidden="true" aria-labelledby="keysModalkeystatus" tabindex="-1">
@@ -43,7 +78,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Key Status Form</h3>
                     <form name="keystatus_form" action="/post/key/status/add" method="POST" class="col-md-12">
                         {{ key_status_form.csrf_token(id = "keystatus_form_add_id") }}
                         <div class="mb-3">
@@ -69,7 +103,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Fabrication Status Form</h3>
                     <form name="fabrication_form" action="/post/fabrication/status/add" method="POST" class="col-md-12">
                         {{ fabrication_form.csrf_token(id = "fabrication_form_add_id") }}
                         <div class="mb-3">
@@ -94,7 +127,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Order Status Form</h3>
                     <form name="request_status_form" action="/post/order/status/add" method="POST" class="col-md-12">
                         {{ order_status_form.csrf_token(id = "order_status_form_add_id") }}
                         <div class="mb-3">
