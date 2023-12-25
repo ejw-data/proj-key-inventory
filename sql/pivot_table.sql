@@ -38,6 +38,7 @@ SELECT access_code_id::text, space_number_id, 1 as Truth
 FROM access_pairs 
 order by 1,2;
 
+
 -- view table
 Select * FROM temp_matrix;
 
@@ -56,6 +57,9 @@ begin
     execute dynsql2;
 end;
 $$;
+
+-- activate extenstion that includes crosstab
+ create extension tablefunc;
 
 -- execute the function
 DO $$

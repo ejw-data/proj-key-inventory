@@ -43,7 +43,7 @@ CREATE TABLE users (
 CREATE TABLE approvers (
 	approver_id SERIAL PRIMARY KEY,
 	user_id INT REFERENCES users (user_id),
-	role_approved_by VARCHAR NOT NULL,
+	role_approved_by INT NOT NULL,
 	date_approved TIMESTAMP NOT NULL DEFAULT NOW(),
 	date_removed TIMESTAMP
 );
@@ -79,10 +79,10 @@ CREATE TABLE room_classification (
 CREATE TABLE rooms (
 	space_number_id VARCHAR PRIMARY KEY,
 	building_number INT REFERENCES buildings (building_number),
-	wing_number INT,  
+	wing_number VARCHAR,  
 	floor_number INT,
 	room_number INT,
-	room_type INT REFERENCES room_classification (room_type_id)
+	room_type_id INT REFERENCES room_classification (room_type_id)
 );
 
 CREATE TABLE room_amenities (
@@ -143,8 +143,8 @@ CREATE TABLE key_orders (
 	order_status_id INT REFERENCES order_status (order_status_id),
 	date_key_received DATE,
 	date_key_handoff DATE,
-	key_admin_user INT,
-	key_pickup_user INT,
+	key_admin_user_id INT,
+	key_pickup_user_id INT,
 	hold_on_conditions BOOL
 );
 -- maybe add a comments field or a separate table where all comments can be stored

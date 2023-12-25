@@ -7,11 +7,156 @@
     <div
         class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Dashboard</h1>
-
-        <!-- Add HTML -->
     </div>
 
-    <h2>Section title</h2>
+    
+    <!-- card -->
+    <div class = top-section>
+        <div class="container d-flex justify-content-center align-items-center">
+        
+            <div class="card">
+                <div class="upper">
+                    <img src="{{ url_for('static', filename='images/profile-backdrop.jpg') }}" class="img-fluid">
+                </div>
+                <div class="user text-center">
+                    <div class="profile">
+                        <img src="{{ url_for('static', filename='images/person/me.jpg') }}" class="rounded-circle" width="80">
+                    </div>
+                </div>
+                <div class="text-center">
+                    <h4 class="mb-0">{{ profile.first_name }} {{ profile.last_name }}</h4>
+                    <span class="text-muted d-block mb-2">{{ profile.email }}</span>
+                    <span class="text-muted d-block mb-2">{{ profile.title }}</span>
+                    <div class="d-flex justify-content-between align-items-center mt-4 px-4">
+                        <div class="stats m-3">
+                            <h6 class="mb-0">Role</h6>
+                            <span>{{ profile.role }}</span>
+                        </div>
+                        <div class="stats m-3">
+                            <h6 class="mb-0">Current Keys</h6>
+                            <span>{{ profile.assigned_keys }}</span>
+                        </div>
+                        <div class="stats m-3">
+                            <h6 class="mb-0">Pending Keys</h6>
+                            <span>{{  profile.pending_keys  }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="top-section">
+        <div class="container d-flex justify-content-center align-items-center">
+    
+            <div class="card">
+                <h3>Welcome</h3> <p>to the key scheduling system portal.  The purpose of this site is to provide you with up-to-date information 
+                about your key requests, received keys, and obligations to the key tracking system.  By receiving a key you are responsible to 
+                maintain a high level of security that the locks were intended to provide.  If at any time if your ability to uphold this 
+                responsibility is compromised then the key shop has the obligation to request for all keys to be returned and alterations to 
+                existing locks be made at expense to the authorizer's department.  </p>
+            </div>
+        </div>
+    </div>
+    <div class="top-section">
+        <div class="container d-flex justify-content-center align-items-center">
+    
+            <div class="w80">
+
+                <h3 class="d-inline">Pending Access</h3>
+                <a class="btn btn-secondary mb-1 float-end d-inline" data-bs-toggle="modal" data-bs-target="#dashboardModalrequest" data-bs-dismiss="modal">Request
+                    Access</a>
+                <div id="request-table"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="top-section">
+        <div class="container d-flex justify-content-center align-items-center">
+    
+            <div class="w80">
+    
+                <h3 class="d-inline">Current Keys</h3>
+                <div id="keys-table"></div>
+                <div id="tableModal"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- modal development -->
+
+    <div class="modal fade" id="dashboardModalrequest" aria-hidden="true" aria-labelledby="dashboardModalrequest" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <i class="ion-android-alert mr-1" aria-hidden="true"></i>
+                    <h5 class="modal-title" id="dashboardModalrequestLabel">Request Key for Room<h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div
+                        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Request Access</h1>
+                    </div>
+    
+                    {% for message in get_flashed_messages() %}
+                    <div class="alert alert-warning alert-dismissible fade show col-md-4" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+    
+                    {% endfor %}
+    
+                    <form name="request_form" action="/post/request/add" method="POST" class="col-md-12">
+                        {{ request_form.csrf_token(id = "request_form_add_id") }}
+                        <div class="mb-3">
+                            {{ request_form.building_number.label(class="col-form-label") }}
+                            {{ request_form.building_number(class="form-control", id="building_number") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ request_form.wing.label(class="col-form-label") }}
+                            {{ request_form.wing(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ request_form.floor.label(class="col-form-label") }}
+                            {{ request_form.floor(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ request_form.room.label(class="col-form-label") }}
+                            {{ request_form.room(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ request_form.approver_id.label(class="col-form-label") }}
+                            {{ request_form.approver_id(class="form-control") }}
+                        </div>
+                        <div class="modal-footer">
+                            {{ request_form.submit(class="btn btn-secondary", id="request_submit") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="tableButtonModal" tabindex="-1" aria-labelledby="tableButtonModalLabel" aria-hidden="true"
+        data-bs-backdrop="static" data-bs-keyboard="false">
+
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <i class="ion-android-alert mr-1" aria-hidden="true"></i>
+                    <h5 class="modal-title" id="tableButtonModalLabel">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="button-message"></p>
+                </div>
+                <div class="modal-footer">
+                    <a id="button-link" href="placeholder" class="btn btn-secondary" data-dismiss="modal" onclick="refreshPage()">Confirmed</a>
+                    <a class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </main>
 {% endblock %}

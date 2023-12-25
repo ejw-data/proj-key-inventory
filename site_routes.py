@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import (
@@ -6,7 +6,7 @@ from models import (
     Approvers,
     AccessCodes,
     AccessPairs,
-    ApprovalStatus,
+    RequestStatus,
     Zones,
     Authentication,
     Buildings,
@@ -24,7 +24,7 @@ from models import (
     Titles,
     Users,
 )
-from query import get_access_code
+from query import get_access_code, get_profile
 from sqlalchemy import null, func
 
 # from flask_sqlalchemy import SQLAlchemy
@@ -44,10 +44,11 @@ from forms import (
     CreateFabricationStatusForm,
     zones_instance,
     access_pair_instance,
-    CreateApprovalStatusForm,
+    CreateRequestStatusForm,
     approver_instance,
     access_code_form_instance,
-    CreateOrderStatusForm
+    CreateOrderStatusForm,
+    update_order_status_form_instance,
 )
 
 
@@ -56,6 +57,8 @@ site = Blueprint("site", __name__)
 
 
 # ---------- WIDELY USED PAGE PARAMETERS ----------------------------
+def logged_in_user():
+    return current_user.get_id()
 
 
 # views to include additional_parameters()
@@ -93,7 +96,12 @@ def index():
     """
     Summary page for all users
     """
-    return render_template("index.html")
+
+    profile = get_profile()
+
+    request_form = request_form_instance()
+
+    return render_template("index.html", request_form=request_form, profile=profile)
 
 
 @site.route("/users")
@@ -103,9 +111,7 @@ def users():
     User information page, currently holds add users form
     """
 
-    user_form = request_form_instance()
-
-    return render_template("users.html", user_form=user_form)
+    return render_template("users.html")
 
 
 @site.route("/keys")
@@ -114,20 +120,19 @@ def keys():
     """
     User information page, currently holds add users form
     """
-
-    user_form = userform_instance()
-    key_form = keys_form_instance()
     key_status_form = CreateKeyStatusForm()
     fabrication_form = CreateFabricationStatusForm()
+    order_status_form = CreateOrderStatusForm()
+    update_order_status_form = update_order_status_form_instance()
 
     # Table KeyOrders and KeyInventory should be filled via triggers
 
     return render_template(
         "keys.html",
-        user_form=user_form,
-        key_form=key_form,
         key_status_form=key_status_form,
         fabrication_form=fabrication_form,
+        order_status_form=order_status_form,
+        update_order_status_form=update_order_status_form,
     )
 
 
@@ -138,9 +143,14 @@ def access():
     User information page, currently holds add users form
     """
 
-    user_form = userform_instance()
+    access_pair_form = access_pair_instance()
+    access_code_form = access_code_form_instance()
 
-    return render_template("access.html", user_form=user_form)
+    return render_template(
+        "access.html",
+        access_pair_form=access_pair_form,
+        access_code_form=access_code_form,
+    )
 
 
 @site.route("/admin")
@@ -158,9 +168,10 @@ def admin():
     role_form = CreateRolesForm()
     zone_form = zones_instance()
     approver_form = approver_instance()
-    approval_status_form = CreateApprovalStatusForm()
-    access_pair_form = access_pair_instance()
-    access_code_form = access_code_form_instance()
+    request_status_form = CreateRequestStatusForm()
+    order_status_form = CreateOrderStatusForm()
+    key_status_form = CreateKeyStatusForm()
+    fab_status_form = CreateFabricationStatusForm()
 
     return render_template(
         "admin.html",
@@ -173,9 +184,10 @@ def admin():
         role_form=role_form,
         zone_form=zone_form,
         approver_form=approver_form,
-        approval_status_form=approval_status_form,
-        access_pair_form=access_pair_form,
-        access_code_form=access_code_form,
+        request_status_form=request_status_form,
+        order_status_form=order_status_form,
+        key_status_form=key_status_form,
+        fab_status_form=fab_status_form,
         # order_status not added yet
     )
 
@@ -203,7 +215,7 @@ def add_user():
             user = Users(
                 first_name=user_form.first_name.data,
                 last_name=user_form.last_name.data,
-                title_id=user_form.title.data,
+                title_id=user_form.title_fk.data,
                 role_id=user_form.role.data,
                 email=user_form.email.data,
             )
@@ -212,7 +224,7 @@ def add_user():
 
             user_form.first_name.data = ""
             user_form.last_name.data = ""
-            user_form.title.data = ""
+            user_form.title_fk.data = ""
             user_form.role.data = ""
             flash("User Added Successfully")
         elif user_login_exists is not None:
@@ -257,14 +269,14 @@ def add_room():
     """
     Route used to add buildings to database, applied on admin.html
     """
-    user_form = spaceform_instance()
+    user_form = spaceform_instance(request.form)
 
     if user_form.validate_on_submit():
         room = Rooms(
             space_number_id=user_form.space_number_id.data,
             building_number=user_form.room_building_number.data,
-            floor_number=user_form.floor_number.data,
             wing_number=user_form.wing_number.data,
+            floor_number=user_form.floor_number.data,
             room_number=user_form.room_number.data,
             room_type=user_form.room_type.data,
         )
@@ -307,23 +319,23 @@ def add_amenities():
     return redirect(request.referrer)
 
 
-@site.route("/post/roomtype/add", methods=["POST"])
+@site.route("/post/room/type/add", methods=["POST"])
 @include_login_form
 def add_room_type():
     """
     Route used to add room classifications to database, applied on admin.html
     """
-    user_form = CreateRoomClassificationForm()
+    user_form = CreateRoomClassificationForm(request.form)
 
     if user_form.validate_on_submit():
         room_type = RoomClassification(
-            room_type_id=user_form.room_type_id.data,
+            room_type_id=user_form.room_type_id_fk.data,
             room_type=user_form.room_type_name.data.lower(),
         )
         db.session.add(room_type)
         db.session.commit()
 
-        user_form.room_type_id.data = ""
+        user_form.room_type_id_fk.data = ""
         user_form.room_type_name.data = ""
         flash("Room Type Added Successfully")
 
@@ -372,7 +384,8 @@ def add_role():
     return redirect(request.referrer)
 
 
-@site.route("/post/orderstatus/add", methods=["POST"])
+# no form yet
+@site.route("/post/order/status/add", methods=["POST"])
 @include_login_form
 def add_orderstatus():
     """
@@ -393,7 +406,7 @@ def add_orderstatus():
     return redirect(request.referrer)
 
 
-@site.route("/post/keys/add", methods=["POST"])
+@site.route("/post/key/add", methods=["POST"])
 @include_login_form
 def add_keys():
     """
@@ -420,7 +433,7 @@ def add_keys():
     return redirect(request.referrer)
 
 
-@site.route("/post/keystatus/add", methods=["POST"])
+@site.route("/post/key/status/add", methods=["POST"])
 @include_login_form
 def add_keystatus():
     """
@@ -441,7 +454,7 @@ def add_keystatus():
     return redirect(request.referrer)
 
 
-@site.route("/post/fabricationstatus/add", methods=["POST"])
+@site.route("/post/fabrication/status/add", methods=["POST"])
 @include_login_form
 def add_fabricationstatus():
     """
@@ -462,16 +475,16 @@ def add_fabricationstatus():
     return redirect(request.referrer)
 
 
-@site.route("/post/approvalstatus/add", methods=["POST"])
+@site.route("/post/request/status/add", methods=["POST"])
 @include_login_form
-def add_approvalstatus():
+def add_requeststatus():
     """
     Route used to add approval status to database, applied on admin.html
     """
-    user_form = CreateApprovalStatusForm()
+    user_form = CreateRequestStatusForm()
 
     if user_form.validate_on_submit():
-        approval_status = ApprovalStatus(
+        approval_status = RequestStatus(
             status_code_name=user_form.status_code_name.data.upper(),
         )
         db.session.add(approval_status)
@@ -493,20 +506,20 @@ def add_spaceapprover():
 
     if user_form.validate_on_submit():
         approver = Zones(
-            building_number=user_form.building_number.data,
-            approver_id=user_form.approver_id.data,
+            building_number=user_form.building_number_fk.data,
+            approver_id=user_form.approver_id_fk.data,
         )
         db.session.add(approver)
         db.session.commit()
 
-        user_form.building_number.data = ""
-        user_form.approver_id.data = ""
+        user_form.building_number_fk.data = ""
+        user_form.approver_id_fk.data = ""
         flash("Space Approver Added Successfully")
 
     return redirect(request.referrer)
 
 
-@site.route("/post/roomaccess/add", methods=["POST"])
+@site.route("/post/access/add", methods=["POST"])
 @include_login_form
 def add_accesspair():
     """
@@ -517,13 +530,13 @@ def add_accesspair():
     if user_form.validate_on_submit():
         pairs = AccessPairs(
             access_code_id=user_form.access_code_id.data,
-            space_number_id=user_form.space_number_id.data,
+            space_number_id=user_form.space_number_id_fk.data,
         )
         db.session.add(pairs)
         db.session.commit()
 
         user_form.access_code_id.data = ""
-        user_form.space_number_id.data = ""
+        user_form.space_number_id_fk.data = ""
         flash("Space Assignment Added Successfully")
 
     return redirect(request.referrer)
@@ -590,7 +603,7 @@ def add_request():
     room_number = user_form.room.data
     building_number = user_form.building_number.data
     room_list = ["B24010101"]
-    code = get_access_code(room_list)
+    code = get_access_code(room_list)[0]
     space_id = f"B{str(building_number).zfill(2)}{str(floor_number).zfill(2)}{str(wing_number).zfill(2)}{str(room_number).zfill(2)}"
 
     if user_form.validate_on_submit():

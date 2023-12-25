@@ -8,6 +8,18 @@ from flask_login import UserMixin
 
 db = SQLAlchemy()
 
+# # create view
+# class AccessGridView(db.Model):
+#     """
+#     A PostgreSQL view that shows all the rooms available in each access code
+#     """
+#     __bind_key__ = "key_inventory"
+#     __tablename__ = 'temp_matrix'
+#     access_code_id = db.Column(db.String(10))
+#     b24010101 = db.Column(db.Integer)
+#     b24020101 = db.Column(db.Integer)
+#     b24020102 = db.Column(db.Integer)
+
 
 class Approvers(db.Model):
     """
@@ -18,7 +30,7 @@ class Approvers(db.Model):
     __tablename__ = "approvers"
     approver_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
-    role_approved_by = db.Column(db.String(128))
+    role_approved_by = db.Column(db.Integer)
     date_approved = db.Column(db.Date, server_default=func.now())
     date_removed = db.Column(db.Date)
 
@@ -49,15 +61,15 @@ class AccessPairs(db.Model):
     space_number_id = db.Column(db.Integer, primary_key=True)
 
 
-class ApprovalStatus(db.Model):
+class RequestStatus(db.Model):
     """
     Status of key request from request to handoff
     """
 
     __bind_key__ = "key_inventory"
-    __tablename__ = "approval_status"
-    status_code = db.Column(db.Integer, primary_key=True)
-    status_code_name = db.Column(db.String(128))
+    __tablename__ = "request_status"
+    request_status_id = db.Column(db.Integer, primary_key=True)
+    request_status_name = db.Column(db.String(128))
 
 
 class Zones(db.Model):
@@ -189,9 +201,11 @@ class KeysCreated(db.Model):
     key_copy = db.Column(db.Integer)
     access_code_id = db.Column(db.Integer)
     fabrication_status_id = db.Column(db.Integer)
-    key_maker_id = db.Column(db.Integer)
+    key_maker_user_id = db.Column(db.Integer)
     date_created = db.Column(db.Date)
 
+
+# change approved to Integer where it can be "Request Approved", "Waiting Approval", "Request Rejected"
 class Requests(db.Model):
     """
     Key Requests
@@ -205,7 +219,7 @@ class Requests(db.Model):
     building_number = db.Column(db.Integer)
     approver_id = db.Column(db.Integer)
     access_code_id = db.Column(db.Integer)
-    status_code = db.Column(db.Integer)
+    request_status_id = db.Column(db.Integer)
     request_date = db.Column(db.DateTime, server_default=func.now())
     approved_date = db.Column(db.Date)
     approved = db.Column(db.Boolean)
@@ -256,10 +270,10 @@ class Rooms(db.Model):
     __tablename__ = "rooms"
     space_number_id = db.Column(db.String(128), primary_key=True)
     building_number = db.Column(db.Integer)
+    wing_number = db.Column(db.String(20))
     floor_number = db.Column(db.Integer)
-    wing_number = db.Column(db.Integer)
     room_number = db.Column(db.Integer)
-    room_type = db.Column(db.Integer)
+    room_type_id = db.Column(db.Integer)
 
 
 class Titles(db.Model):

@@ -190,3 +190,118 @@ body {
 i {
     text-align: center;
 }
+
+/*  Table Styles */
+
+.styled-table {
+    border-collapse: collapse;
+    margin: 5px 0 25px 0;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    min-width: 400px;
+    width:100%;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.styled-table thead tr {
+    background-color: #009879;
+    color: #ffffff;
+    text-align: left;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 12px 15px;
+}
+
+.styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid #009879;
+}
+
+.styled-table tbody tr.active-row {
+    font-weight: bold;
+    color: #009879;
+}
+
+.w80 {
+    width:80vw;
+}
+
+/* Profile Info on index.html and dashboard route */
+
+.top-section {
+    margin: 3em
+}
+
+.container {
+    height:auto;
+    margin-bottom: 3em;
+}
+
+.card {
+
+    width: 80vw;
+    max-width:1300px;
+    height: 100%;
+    border: none;
+    border-radius: 15px;
+    padding: 8px;
+    background-color: white;
+    position: relative;
+
+}
+
+.upper {
+
+    height: 100%;
+
+}
+
+.upper img {
+
+    width: 100%;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+
+}
+
+.user {
+    position: relative;
+    max-height: 150px
+}
+
+.profile img {
+    height: 9.9vw;
+    width: 9.9vw;
+    margin-top: 4px;
+}
+
+.profile {
+    position: relative;
+    top: -5vw;
+    left: 41.75%;
+    height: 10vw;
+    width: 10vw;
+    border: 3px solid #fff;
+    border-radius: 50%;
+}
+
+.follow {
+    border-radius: 15px;
+    padding-left: 20px;
+    padding-right: 20px;
+    height: 35px;
+}
+
+.stats span {
+
+    font-size: 29px;
+}

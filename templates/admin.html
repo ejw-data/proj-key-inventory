@@ -8,65 +8,55 @@
         <h1 class="h2">Administrator</h1>
     </div>
 
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalusers" data-bs-dismiss="modal">Add
-        User</a>
-    
-    <div class="modal fade" id="adminModalusers" aria-hidden="true" aria-labelledby="adminModalusers" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <i class="ion-android-alert mr-1" aria-hidden="true"></i>
-                    <h5 class="modal-title" id="adminModaluserLabel">Add User<h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-
-                    {% for message in get_flashed_messages() %}
-                        <div class="alert alert-warning alert-dismissible fade show col-md-12" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    
-                    {% endfor %}
-
-                    <h3>Add User</h3>
-
-                    <form name="user_form" action="/post/user/add" method="POST" class="col-md-12">
-                        <!-- {{ user_form.hidden_tag() }} -->
-                        {{ user_form.csrf_token(id = "user_form_add_id") }}
-                        <div class="mb-3">
-                            {{ user_form.first_name.label(class="col-form-label") }}
-                            {{ user_form.first_name(class="form-control") }}
-                        </div>
-                        <div class="mb-3">
-                            {{ user_form.last_name.label(class="col-form-label") }}
-                            {{ user_form.last_name(class="form-control") }}
-                        </div>
-                        <div class="mb-3">
-                            {{ user_form.title.label(class="col-form-label") }}
-                            {{ user_form.title(class="form-control") }}
-                        </div>
-                        <div class="mb-3">
-                            {{ user_form.role.label(class="col-form-label") }}
-                            {{ user_form.role(class="form-control") }}
-                        </div>
-                        <div class="mb-3">
-                            {{ user_form.email.label(class="col-form-label") }}
-                            {{ user_form.email(class="form-control") }}
-                        </div>
-                        <div class="modal-footer">
-                            {{ user_form.submit(class="btn btn-secondary", id="user_add_submit") }}
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
     <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalbuilding" data-bs-dismiss="modal">Add
         Building</a>
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalroom" data-bs-dismiss="modal">Add
+        Room</a>
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalclass" data-bs-dismiss="modal">Add
+        Room Classification</a>
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalamenities" data-bs-dismiss="modal">Add
+        Room Amenities</a>
+
+    <div id = "room-table"></div>
+
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalusers" data-bs-dismiss="modal">Add
+        User</a>
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModaltitle" data-bs-dismiss="modal">Add
+        Title</a>
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalroles" data-bs-dismiss="modal">Add
+        User Role</a>
+
+    <div id = "user-table"></div>
+
+
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalapprovers" data-bs-dismiss="modal">Add
+        Approver</a>
+
+    <div id = "approver-table"></div>
+
+
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalzones" data-bs-dismiss="modal">Add
+        Approver Space</a>
+
+    <div id = "zones-table"></div>
+
+    <h4>Other System Inputs</h4>
+    <hr>
+
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalreqstat" data-bs-dismiss="modal">Add
+        Request Status</a>
+
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalordstat" data-bs-dismiss="modal">Add
+        Order Status</a>
+
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalkeystat" data-bs-dismiss="modal">Add
+        Key Status</a>
+    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalfabstat" data-bs-dismiss="modal">Add
+        Fabrication Status</a>
+
+    
+
+<!-- ####################################################################################################################### -->
     
     <div class="modal fade" id="adminModalbuilding" aria-hidden="true" aria-labelledby="adminModalbuilding" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -103,11 +93,6 @@
         </div>
     </div>
 
-
-
-
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalroom" data-bs-dismiss="modal">Add
-        Room</a>
     
     <div class="modal fade" id="adminModalroom" aria-hidden="true" aria-labelledby="adminModalroom" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -143,8 +128,8 @@
                             {{ space_form.room_number(class="form-control") }}
                         </div>
                         <div class="mb-3">
-                            {{ space_form.room_type.label(class="col-form-label") }}
-                            {{ space_form.room_type(class="form-control") }}
+                            {{ space_form.room_type_id_fk.label(class="col-form-label") }}
+                            {{ space_form.room_type_id_fk(class="form-control") }}
                         </div>
                         <div class="modal-footer">
                             {{ space_form.submit(class="btn btn-secondary", id="room_add_submit") }}
@@ -155,10 +140,6 @@
         </div>
     </div>
 
-
-
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalamenities" data-bs-dismiss="modal">Add
-        Room Amenities</a>
     
     <div class="modal fade" id="adminModalamenities" aria-hidden="true" aria-labelledby="adminModalamenities" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -194,9 +175,6 @@
         </div>
     </div>
 
-
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalclass" data-bs-dismiss="modal">Add
-        Room Classification</a>
     
     <div class="modal fade" id="adminModalclass" aria-hidden="true" aria-labelledby="adminModalclass" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -208,7 +186,7 @@
                 </div>
                 <div class="modal-body">
                     <h3>Room Classification Form</h3>
-                    <form name="room_type_form" action="/post/roomtype/add" method="POST" class="col-md-12">
+                    <form name="room_type_form" action="/post/room/type/add" method="POST" class="col-md-12">
                         <!-- {{ space_form.hidden_tag() }} -->
                         {{ room_type_form.csrf_token(id = "room_type_form_add_id") }}
                         <div class="mb-3">
@@ -228,9 +206,61 @@
         </div>
     </div>
 
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModaltitle" data-bs-dismiss="modal">Add
-        Title</a>
+    <!-- ############################################################################################################ -->
     
+    <div class="modal fade" id="adminModalusers" aria-hidden="true" aria-labelledby="adminModalusers" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <i class="ion-android-alert mr-1" aria-hidden="true"></i>
+                    <h5 class="modal-title" id="adminModaluserLabel">Add User<h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+    
+                    {% for message in get_flashed_messages() %}
+                    <div class="alert alert-warning alert-dismissible fade show col-md-12" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+    
+                    {% endfor %}
+    
+                    <h3>Add User</h3>
+    
+                    <form name="user_form" action="/post/user/add" method="POST" class="col-md-12">
+                        <!-- {{ user_form.hidden_tag() }} -->
+                        {{ user_form.csrf_token(id = "user_form_add_id") }}
+                        <div class="mb-3">
+                            {{ user_form.first_name.label(class="col-form-label") }}
+                            {{ user_form.first_name(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ user_form.last_name.label(class="col-form-label") }}
+                            {{ user_form.last_name(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ user_form.title_fk.label(class="col-form-label") }}
+                            {{ user_form.title_fk(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ user_form.role.label(class="col-form-label") }}
+                            {{ user_form.role(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ user_form.email.label(class="col-form-label") }}
+                            {{ user_form.email(class="form-control") }}
+                        </div>
+                        <div class="modal-footer">
+                            {{ user_form.submit(class="btn btn-secondary", id="user_add_submit") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="modal fade" id="adminModaltitle" aria-hidden="true" aria-labelledby="adminModaltitle" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -257,9 +287,6 @@
         </div>
     </div>
 
-
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalroles" data-bs-dismiss="modal">Add
-        User Role</a>
     
     <div class="modal fade" id="adminModalroles" aria-hidden="true" aria-labelledby="adminModalroles" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -286,9 +313,7 @@
         </div>
     </div>
 
-
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalzones" data-bs-dismiss="modal">Add
-        Approver Space</a>
+<!-- ############################################################################################### -->
     
     <div class="modal fade" id="adminModalzones" aria-hidden="true" aria-labelledby="adminModalzones" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -303,12 +328,12 @@
                     <form name="approver_zone_form" action="/post/zones/add" method="POST" class="col-md-12">
                         {{ zone_form.csrf_token(id = "zone_form_add_id") }}
                         <div class="mb-3">
-                            {{ zone_form.building_number.label(class="col-form-label") }}
-                            {{ zone_form.building_number(class="form-control") }}
+                            {{ zone_form.building_number_fk.label(class="col-form-label") }}
+                            {{ zone_form.building_number_fk(class="form-control") }}
                         </div>
                         <div class="mb-3">
-                            {{ zone_form.approver_id.label(class="col-form-label") }}
-                            {{ zone_form.approver_id(class="form-control") }}
+                            {{ zone_form.approver_id_fk.label(class="col-form-label") }}
+                            {{ zone_form.approver_id_fk(class="form-control") }}
                         </div>
                         <div class="modal-footer">
                             {{ zone_form.submit(class="btn btn-secondary", id="zone_add_submit") }}
@@ -318,10 +343,6 @@
             </div>
         </div>
     </div>
-
-
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalapprovers" data-bs-dismiss="modal">Add
-        Approver</a>
     
     <div class="modal fade" id="adminModalapprovers" aria-hidden="true" aria-labelledby="adminModalapprovers" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -352,8 +373,7 @@
         </div>
     </div>
 
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalreqstat" data-bs-dismiss="modal">Add
-        Approver Status</a>
+    <!-- ########################################################################## -->
     
     <div class="modal fade" id="adminModalreqstat" aria-hidden="true" aria-labelledby="adminModalreqstat" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -364,15 +384,15 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Approval Status Form</h3>
-                    <form name="approval_status_form" action="/post/approvalstatus/add" method="POST" class="col-md-12">
-                        {{ approval_status_form.csrf_token(id = "approval_status_form_add_id") }}
+                    <h3>Request Status Form</h3>
+                    <form name="request_status_form" action="/post/request/status/add" method="POST" class="col-md-12">
+                        {{ request_status_form.csrf_token(id = "request_status_form_add_id") }}
                         <div class="mb-3">
-                            {{ approval_status_form.status_code_name.label(class="col-form-label") }}
-                            {{ approval_status_form.status_code_name(class="form-control") }}
+                            {{ request_status_form.request_status_name.label(class="col-form-label") }}
+                            {{ request_status_form.request_status_name(class="form-control") }}
                         </div>
                         <div class="modal-footer">
-                            {{ approval_status_form.submit(class="btn btn-secondary", id="approval_status_add_submit") }}
+                            {{ request_status_form.submit(class="btn btn-secondary", id="request_status_add_submit") }}
                         </div>
                     </form>
                 </div>
@@ -380,31 +400,24 @@
         </div>
     </div>
 
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalaccess" data-bs-dismiss="modal">Add
-        Room Access</a>
-    
-    <div class="modal fade" id="adminModalaccess" aria-hidden="true" aria-labelledby="adminModalaccess" tabindex="-1">
+    <div class="modal fade" id="adminModalordstat" aria-hidden="true" aria-labelledby="adminModalordstat" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <i class="ion-android-alert mr-1" aria-hidden="true"></i>
-                    <h5 class="modal-title" id="adminModalaccessLabel">Add Room Access<h5>
+                    <h5 class="modal-title" id="adminModalordstatLabel">Add Order Status<h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Access Pair Form</h3>
-                    <form name="access_pair_form" action="/post/roomaccess/add" method="POST" class="col-md-12">
-                        {{ access_pair_form.csrf_token(id = "access_pair_form_add_id") }}
+                    <h3>Order Status Form</h3>
+                    <form name="request_status_form" action="/post/order/status/add" method="POST" class="col-md-12">
+                        {{ order_status_form.csrf_token(id = "order_status_form_add_id") }}
                         <div class="mb-3">
-                            {{ access_pair_form.access_code_id.label(class="col-form-label") }}
-                            {{ access_pair_form.access_code_id(class="form-control") }}
-                        </div>
-                        <div class="mb-3">
-                            {{ access_pair_form.space_number_id.label(class="col-form-label") }}
-                            {{ access_pair_form.space_number_id(class="form-control") }}
+                            {{ order_status_form.order_status.label(class="col-form-label") }}
+                            {{ order_status_form.order_status(class="form-control") }}
                         </div>
                         <div class="modal-footer">
-                            {{ access_pair_form.submit(class="btn btn-secondary", id="access_pair_add_submit") }}
+                            {{ order_status_form.submit(class="btn btn-secondary", id="order_status_add_submit") }}
                         </div>
                     </form>
                 </div>
@@ -412,38 +425,55 @@
         </div>
     </div>
 
-
-    <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModalcode" data-bs-dismiss="modal">Add
-        Access Code</a>
-    
-    <div class="modal fade" id="adminModalcode" aria-hidden="true" aria-labelledby="adminModalcode" tabindex="-1">
+    <div class="modal fade" id="adminModalkeystat" aria-hidden="true" aria-labelledby="adminModalkeystat" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <i class="ion-android-alert mr-1" aria-hidden="true"></i>
-                    <h5 class="modal-title" id="adminModalcodeLabel">Add Access Code<h5>
+                    <h5 class="modal-title" id="adminModalrolesLabel">Add Key Status<h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h3>Access Code Form</h3>
-                    <form name="access_code_form" action="/post/code/add" method="POST" class="col-md-12">
-                        {{ access_code_form.csrf_token(id = "access_code_form_add_id") }}
+                    <h3>Key Status Form</h3>
+                    <form name="roles_form" action="/post/key/status/add" method="POST" class="col-md-12">
+                        {{ key_status_form.csrf_token(id = "key_status_form_add_id") }}
                         <div class="mb-3">
-                            {{ access_code_form.access_description.label(class="col-form-label") }}
-                            {{ access_code_form.access_description(class="form-control") }}
-                        </div>
-                        <div class="mb-3">
-                            {{ access_code_form.authorized_by.label(class="col-form-label") }}
-                            {{ access_code_form.authorized_by(class="form-control") }}
+                            {{ key_status_form.key_status.label(class="col-form-label") }}
+                            {{ key_status_form.key_status(class="form-control") }}
                         </div>
                         <div class="modal-footer">
-                            {{ access_code_form.submit(class="btn btn-secondary", id="access_code_add_submit") }}
+                            {{ key_status_form.submit(class="btn btn-secondary", id="key_status_add_submit") }}
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    
+
+    <div class="modal fade" id="adminModalfabstat" aria-hidden="true" aria-labelledby="adminModalfabstat" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <i class="ion-android-alert mr-1" aria-hidden="true"></i>
+                    <h5 class="modal-title" id="adminModalrolesLabel">Add Key Fabrication Status<h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h3>Key Fabrication Status Form</h3>
+                    <form name="roles_form" action="/post/fabrication/status/add" method="POST" class="col-md-12">
+                        {{ fab_status_form.csrf_token(id = "fab_status_form_add_id") }}
+                        <div class="mb-3">
+                            {{ fab_status_form.fabrication_status.label(class="col-form-label") }}
+                            {{ fab_status_form.fabrication_status(class="form-control") }}
+                        </div>
+                        <div class="modal-footer">
+                            {{ fab_status_form.submit(class="btn btn-secondary", id="fab_status_add_submit") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </main>
 {% endblock %}

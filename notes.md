@@ -1,3 +1,39 @@
+### Tasks
+1.  ! Improve interface
+1.  Add space owner, add student relationship on profile - reports to or sponsored
+    *  Also include role so that special rules can be added based on this association
+    *  Maybe have utilities vary based on this metric - checks for if student has left.
+1.  Create order basket for requests that utilize past and current information.  
+1.  ! Create restrictions on who can see what menu
+1.  ! Restrict who can access which routes
+1.  ! Move common html to template parts in flask
+1.  ! Allow to upload picture as profile image
+1.  ! Create messaging system that stores all messages per request
+1.  ! Create popup that displays the stats of a request and all messages
+    *  Request ID Title 
+    *  Start date - ready date - pickup date
+    *  Total days elapsed
+    *  Building Approver - Room Approver
+        *  Access Code (key) - Room(s)
+    *  Messages (listed as Date, Sender Group, Sender, Message) - Sender Group can also be 'Requester', 'PI'
+1.  !/- Separate routes into different files
+    * site_routes.py - pages loading (render_templates)
+    * api_routes.py - graphics/data
+    * form_routes.py - forms posting data
+    * table_routes.py - tables getting data
+    * workflow_routes.py - updates to the database that often trigger db procedures
+1.  ! Create Reports - these could be used in periodic emails request for checks for accuracy
+    * Space Owner - people access by Room per PI - each report could be emailed to PI
+    * Building Approver - All access under their building
+    * Recently removed by affiliation
+    * Recently added by affiliation
+    * Keyshop response time, keys issued, door maintenance, trends per week and weekday
+
+### key request form
+* Create new table that will hold the requests in a modal and the modal brings up another model for adding items
+* Each time the for has a new item added the page refreshes.  
+* Use separate button to contents of teh 
+
 
 
 ### Features
@@ -27,7 +63,7 @@
 
 ### Pages
 * Login
-* Register (request goes to approver)
+* Register (admin must first add the persons email)
 * Dashboard
     * General Dashboard:  System Notices, Keys and Spaces Allowed, Profile
     * Key Shop Dashboard:  Key Fab Requests, Repair Requests, Lock Changes
@@ -36,7 +72,15 @@
     * Administrator Dashboard:  Can mimic anyones account, full view
     * Site Owner: only person allowed to add Administors.  Stats of each role.  
 
+* Table Views
+    * Requests - shows full summary of users all, active, and inactive requests.  Can report key lost or returned and request new keys.
+    * Space Updates - shows Space info and includes an option to add: building, room, amenities
+    * Access Updates - includes access matrix, add new codes, and add new code pairs.
+    * Users - add approvers, key shop, analyst, and general users.  Shows table of all users with filters by role, recently left, recently new,
+    * Key shop - (include access updates) add new keys, add status codes, orders status, stats
+    * Admin - see stats of users, approvers
 
+    - collect data of when people login and where they click.
 
 ### Case Studies  
 
@@ -80,3 +124,7 @@ Requestors:
 * note the variables assigned to the forms need to be unique becasue these become the input id's.
 * an id could be assigned in the jinja that could overwrite it but then there would be extra assignments and mismatches in the code.  This is probably not that important but for now I will keep the names unique until I determine if there are any other issues related to this.
 * WTF Forms has nice functionality but as I use it there are some less apparent issues with how the standard template generates ids.  This is only apparent if multiple forms are put on the same page or if forms have similar inputs.  My forms are introduced as popups so the form for adding a room and the form for making a room selection use the same variable name (until my last change where I removed these duplications.)
+
+
+### Tables
+* Use datatables.js for large tables 
