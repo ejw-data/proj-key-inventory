@@ -673,6 +673,8 @@ def submit_basket():
     room_list = [i["space_id"] for i in order_entries]
     unique_rooms_list = tuple(set(room_list))
 
+    # need to finish this route
+
     # print("Route room check: ", unique_rooms_list)
 
     # use combos.py function to get access code
