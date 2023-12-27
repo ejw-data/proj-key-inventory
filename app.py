@@ -6,13 +6,20 @@ from api_routes import api
 from setup import create_app
 from models import db, Authentication
 from db_paths import path
+from jinja import foundin, notfoundin
 
 
 # create app
 app = create_app()
+
+# create custom routes
 app.register_blueprint(api)
 app.register_blueprint(site)
 app.app_context().push()
+
+# add custom function from jinja.py
+app.jinja_env.filters["foundin"] = foundin
+app.jinja_env.filters["notfoundin"] = notfoundin
 
 # connect to schema
 db.init_app(app)

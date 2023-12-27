@@ -15,6 +15,9 @@
         *  Add Room:  Make both inputs be unique in the db
         *  Add User:  verify that Email address is unique in db
     *  Prevent all users from access the different side menu options.  Only admin should have access to each section.
+    *  Create method that allows upload of image or better yet of id that extracts id and photo
+    *  Create method that allows scanner qr code to add rooms to key request
+    *  Update route flash messaging - incorporate categories to filter messages
 
     * Design Choice - all status messages are all caps and all descriptive columns are lower case in db
     * Keys.html needs the orders in progess table resized for small screens.  Maybe just make table responsive with a scroll bar.

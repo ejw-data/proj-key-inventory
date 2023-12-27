@@ -69,8 +69,33 @@ site = Blueprint("site", __name__)
 
 
 # ---------- WIDELY USED PAGE PARAMETERS ----------------------------
-def logged_in_user():
-    return current_user.get_id()
+# # probably not needed
+# def logged_in_user():
+#     return current_user.get_id()
+
+import functools
+
+
+def roles_required(*role_names):
+    def roles_wrapper(view_func):
+        @functools.wraps(view_func)
+        def decorator(*args, **kwargs):
+            role_title = (
+                Users.query.with_entities(
+                    Users.email, Users.role_id, Roles.role_id, Roles.user_role
+                )
+                .join(Roles, Roles.role_id == Users.role_id)
+                .filter(Users.user_id == current_user.get_id())
+                .first()
+            )
+
+            if role_title.user_role not in role_names:
+                return ("", 401)
+            return view_func(*args, **kwargs)
+
+        return decorator
+
+    return roles_wrapper
 
 
 # views to include additional_parameters()
@@ -93,9 +118,35 @@ def additional_parameters():
     user_record = Users.query.filter_by(user_id=login_user_id).first()
     first_name = user_record.first_name.title()
     last_name = user_record.last_name.title()
+
     form = LoginForm()
 
     return {"first_name": first_name, "last_name": last_name, "form": form}
+
+
+# ---------- TEMPLATE ROUTES ----------------------------
+
+
+@site.route("/order-content")
+@include_login_form
+def ordercontent():
+    return render_template("dynamic/_orders.html")
+
+
+@site.route("/post/basket/msg", methods=["GET", "POST"])
+@include_login_form
+def basket_msg():
+    # print(msg)
+    # logic for storing sessions
+    # session.modified = True
+    # if session.get("msgs"):
+    #     pass
+    # else:
+    #     session["msgs"] = []
+
+    # session["msgs"].append(msg)
+
+    return render_template("dynamic/_msg.html")
 
 
 # ---------- PAGE ROUTES ----------------------------
@@ -122,14 +173,9 @@ def index():
     )
 
 
-@site.route("/order-content")
-@include_login_form
-def ordercontent():
-    return render_template("dynamic/_orders.html")
-
-
 @site.route("/users")
 @include_login_form
+@roles_required("administrator", "approver", "analyst")
 def users():
     """
     User information page, currently holds add users form
@@ -140,6 +186,7 @@ def users():
 
 @site.route("/keys")
 @include_login_form
+@roles_required("administrator", "approver")
 def keys():
     """
     User information page, currently holds add users form
@@ -162,6 +209,7 @@ def keys():
 
 @site.route("/access")
 @include_login_form
+@roles_required("administrator", "approver")
 def access():
     """
     User information page, currently holds add users form
@@ -179,6 +227,7 @@ def access():
 
 @site.route("/admin")
 @include_login_form
+@roles_required("administrator")
 def admin():
     """
     User information page, currently holds add users form
@@ -727,7 +776,7 @@ def submit_basket():
                     if record["space_id"] == room:
                         record["access_code"] = code
             else:
-                if record['access_code'] == "TBD": 
+                if record["access_code"] == "TBD":
                     record["access_code"] = "Key Code Requested"
 
     print(order_entries)
@@ -784,22 +833,6 @@ def submit_basket():
     # return redirect("dynamic/_orders.html")
 
 
-@site.route("/post/basket/msg", methods=["GET", "POST"])
-@include_login_form
-def basket_msg():
-    # print(msg)
-    # logic for storing sessions
-    # session.modified = True
-    # if session.get("msgs"):
-    #     pass
-    # else:
-    #     session["msgs"] = []
-
-    # session["msgs"].append(msg)
-
-    return render_template("dynamic/_msg.html")
-
-
 # clear session data
 @site.route("/post/basket/clear", methods=["GET"])
 @include_login_form
@@ -854,6 +887,24 @@ def login():
             if passed_verification:
                 login_user(find_username)
                 flash("Login Successful")
+
+                # set role
+                role_title = (
+                    Users.query.with_entities(
+                        Users.email, Users.role_id, Roles.role_id, Roles.user_role
+                    )
+                    .join(Roles, Roles.role_id == Users.role_id)
+                    .filter(Users.email == username)
+                    .first()
+                )
+
+                # logic for storing sessions
+                session.modified = True
+                if session.get("roles"):
+                    session["roles"].append(role_title.user_role)
+                else:
+                    session["roles"] = [role_title.user_role]
+
                 return redirect(url_for("site.index"))
             flash("Wrong Password - Try Again")
         else:
@@ -901,7 +952,7 @@ def register():
     return render_template("register.html", form=form)
 
 
-@site.route("/logout", methods=["GET", "POST"])
+@site.route("/logout")
 @include_login_form
 @login_required
 def logout():
@@ -909,5 +960,10 @@ def logout():
     Logout function
     """
     logout_user()
+
+    # necessary to remove session info
+    # probably only problematic if multiple people use the same browser
+    session.clear()
+
     flash("You are now logged out")
     return redirect(url_for("site.login"))
