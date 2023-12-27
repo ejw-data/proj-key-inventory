@@ -1,5 +1,5 @@
 import pandas as pd
-
+import functools
 from flask import (
     Blueprint,
     render_template,
@@ -73,10 +73,15 @@ site = Blueprint("site", __name__)
 # def logged_in_user():
 #     return current_user.get_id()
 
-import functools
+# ---------- DECORATORS ----------------------------
 
 
+# requires functools
 def roles_required(*role_names):
+    """
+    Decorator that takes in user roles that restricts the route to 
+    only run for users with those user roles.
+    """
     def roles_wrapper(view_func):
         @functools.wraps(view_func)
         def decorator(*args, **kwargs):
@@ -88,7 +93,6 @@ def roles_required(*role_names):
                 .filter(Users.user_id == current_user.get_id())
                 .first()
             )
-
             if role_title.user_role not in role_names:
                 return ("", 401)
             return view_func(*args, **kwargs)
