@@ -90,8 +90,8 @@ basketCloseButton.on('click', i => {
     changeButton();
     addMsg();
     showForm();
-    // location.reload();
-})
+    location.reload(true);
+});
 
 
 function activateSubmit(){

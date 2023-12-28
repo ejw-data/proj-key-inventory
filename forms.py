@@ -20,6 +20,7 @@ from models import (
     Users,
     AccessCodes,
     OrderStatus,
+    RoomAssignment,
 )
 
 
@@ -592,6 +593,9 @@ class CreateRequestsForm(FlaskForm):
     # Calc remaining options for wing for user to select
     # calc space_number_id in the background
     # calc available access approver for user to select
+    assignment_id = SelectField(
+        "Select PI/Manager of space", coerce=int, validators=[DataRequired()]
+    )
     approver_id = SelectField(
         "Select approver", coerce=int, validators=[DataRequired()]
     )
@@ -673,11 +677,26 @@ def request_form_instance(form_request=None):
         .all()
     )
 
-    approvers_list = [(-1, "Select approver")] + [
+    approvers_list = [(-1, "Select building approver")] + [
         (i.approver_id, f"{i.first_name.title()} {i.last_name.title()}")
         for i in approvers
     ]
     request_form.approver_id.choices = approvers_list
+
+    # Add space owner query to autofill in the form
+    space_assignments = (
+        RoomAssignment.query.with_entities(Users.first_name, Users.last_name, Users.email, RoomAssignment.assignment_id)
+        .distinct(Users.first_name, Users.last_name)
+        .join(Rooms, Rooms.space_number_id == RoomAssignment.space_number_id)
+        .join(Users, Users.user_id == RoomAssignment.user_id)
+    )
+
+    assignment_list = [(-1, "Select space authorizer")] + [
+        (i.assignment_id, f"{i.first_name.title()} {i.last_name.title()} - ({i.email})")
+        for i in space_assignments
+    ]
+
+    request_form.assignment_id.choices = assignment_list
 
     # I think this is the subquery that is needed get approver names
     # this should replace the approvers variable above

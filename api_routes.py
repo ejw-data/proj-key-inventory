@@ -9,6 +9,7 @@ from models import (
     Rooms,
     RoomClassification,
     RoomAmenities,
+    RoomAssignment,
     Titles,
     Roles,
     AccessPairs,
@@ -632,7 +633,7 @@ def new():
 
 @api.route("/building/info/<building>", methods=["GET"])
 @include_login_form
-def menu_filter(building):
+def request_room_filter(building):
     """
     Used to retrieve data to update dropdown menus
     as seen in formFieldUpdate.js
@@ -654,15 +655,17 @@ def menu_filter(building):
             floors.add(i["floor_number"])
             rooms.add(i["room_number"])
             structure["wing"] = {
-                str(i["wing_number"]): {"floor": {str(i["floor_number"]): [i["room_number"]]}}
+                str(i["wing_number"]): {
+                    "floor": {str(i["floor_number"]): [i["room_number"]]}
+                }
             }
         else:
             if i["floor_number"] not in floors:
                 floors.add(i["floor_number"])
                 rooms.add(i["room_number"])
-                structure["wing"][str(i["wing_number"])]["floor"][str(i["floor_number"])] = [
-                    i["room_number"]
-                ]
+                structure["wing"][str(i["wing_number"])]["floor"][
+                    str(i["floor_number"])
+                ] = [i["room_number"]]
             else:
                 if i["room_number"] not in rooms:
                     rooms.add(i["room_number"])
@@ -677,3 +680,57 @@ def menu_filter(building):
 
     print(structure)
     return jsonify(structure)
+
+
+@api.route("/approver/info/<building_number>", methods=["GET"])
+@include_login_form
+def request_approver_filter(building_number):
+    """
+    Used to retrieve data to update dropdown menus
+    as seen in formFieldUpdate.js
+    """
+    building_approver = (
+        Zones.query.with_entities(
+            Zones.approver_id, Users.first_name, Users.last_name, Users.email
+        )
+        .distinct()
+        .join(Approvers, Approvers.approver_id == Zones.approver_id)
+        .join(Users, Users.user_id == Approvers.user_id)
+        .filter(Zones.building_number == building_number)
+    )
+
+    approver_list = [
+        {
+            "approver_id": i.approver_id,
+            "name": f"{i.first_name.title()} {i.last_name.title()} - ({i.email})",
+        }
+        for i in building_approver
+    ]
+
+    return jsonify(approver_list)
+
+
+@api.route("/assignment/info/<space_number>", methods=["GET"])
+@include_login_form
+def request_assignee_filter(space_number):
+    """
+    Used to retrieve data to update dropdown menus
+    as seen in formFieldUpdate.js
+    """
+    space_assignee = (
+        RoomAssignment.query.with_entities(
+            RoomAssignment.user_id, Users.first_name, Users.last_name, Users.email
+        )
+        .join(Users, Users.user_id == RoomAssignment.user_id)
+        .filter(RoomAssignment.space_number_id == space_number)
+    )
+
+    assignee_list = [
+        {
+            "user_id": i.user_id,
+            "name": f"{i.first_name.title()} {i.last_name.title()} - ({i.email})",
+        }
+        for i in space_assignee
+    ]
+
+    return jsonify(assignee_list)

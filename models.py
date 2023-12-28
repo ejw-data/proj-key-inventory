@@ -217,6 +217,7 @@ class Requests(db.Model):
     user_id = db.Column(db.Integer)
     space_number_id = db.Column(db.String(128))
     building_number = db.Column(db.Integer)
+    space_owner_id = db.Column(db.Integer)
     approver_id = db.Column(db.Integer)
     access_code_id = db.Column(db.Integer)
     request_status_id = db.Column(db.Integer)
@@ -260,7 +261,16 @@ class RoomClassification(db.Model):
     room_type_id = db.Column(db.Integer, primary_key=True)
     room_type = db.Column(db.String(128))
 
-
+class RoomAssignment(db.Model):
+    """
+    
+    """
+    __bind_key__ = 'key_inventory'
+    __tablename__ = 'room_assignment'
+    assignment_id = db.Column(db.Integer, primary_key=True)
+    space_number_id = db.Column(db.String(128))
+    user_id = db.Column(db.Integer)
+    
 class Rooms(db.Model):
     """
     Room Info

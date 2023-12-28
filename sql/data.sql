@@ -48,6 +48,11 @@ VALUES ('B24010101', 24, 01, 01, 01, 210),
 		('B24020101', 24, 02, 01, 01, 201),
 		('B24020102', 24, 02, 01, 02, 220);
 
+INSERT INTO room_assignment (space_number_id, user_id)
+VALUES ('B24010101', 1),
+		('B24020101', 2),
+		('B24020102', 2);
+
 INSERT INTO room_amenities (space_number_id, room_projector, room_seating)
 VALUES ('B24010101', TRUE, 50),
 		('B24020101', FALSE, 1),

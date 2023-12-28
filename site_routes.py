@@ -638,17 +638,37 @@ def add_request():
         wing_number = user_form.wing.data
         room_number = user_form.room.data
         building_number = user_form.building_number.data
+        approver_id = user_form.approver_id.data
+        assignment_id = user_form.assignment_id.data
+
         space_id = f"B{str(building_number).zfill(2)}{str(floor_number).zfill(2)}{str(wing_number).zfill(2)}{str(room_number).zfill(2)}"
 
+        # query for space owner name
+        pi_name = (
+            Users.query.with_entities(Users.first_name, Users.last_name)
+            .filter(Users.user_id == assignment_id)
+            .first()
+        )
+        # query for buiding approver
+        approver_name = (
+            Users.query.with_entities(Users.first_name, Users.last_name)
+            .join(Approvers, Users.user_id == Approvers.user_id)
+            .filter(Approvers.approver_id == approver_id)
+            .first()
+        )
+
+        print(pi_name)
         new_key = {
             "space_id": space_id,
             "building_number": building_number,
             "wing_number": wing_number,
             "floor_number": floor_number,
             "room_number": room_number,
-            "space_owner": "Ted",
-            "building_approver": "Joe",
+            "space_owner": f"{pi_name.first_name.title()} {pi_name.last_name.title()}",
+            "building_approver": f"{approver_name.first_name.title()} {approver_name.last_name.title()}",
             "access_code": "TBD",
+            "space_owner_id": assignment_id,
+            "building_approver_id": approver_id,
         }
 
         session["order"].append(new_key)
@@ -658,6 +678,7 @@ def add_request():
         user_form.floor.data = ""
         user_form.room.data = ""
         user_form.approver_id.data = ""
+        user_form.assignment_id.data = ""
         flash("Key Added Successfully")
 
     return ("", 204)
@@ -702,19 +723,7 @@ def submit_basket():
         entry = {"id": record, "value": rooms}
         new_data.append(entry)
 
-    # print(new_data)
-
-    # pivot_table = pd.crosstab(df["Access Code"], df.space_id)
-
-    # print("Pivot table: ", pivot_table)
-
-    # perform basic filters on this df then input into find_codes - filter by building
-
-    # maybe create a list of buildings and then use 'in' to filter df
-
-    # access_codes = pivot_table.reset_index().to_dict(orient="records")
-
-    # need to make return be (access codes found), (missing codes), (total missing), (remaining missing), (dict of found with rms), (dict of missing with rms)
+    # returns dictionary of access codes and rooms found, list of access codes, and rooms without codes
     codes = find_codes(unique_rooms_list, new_data)
 
     print("Access codes produced: ", codes)
@@ -729,7 +738,7 @@ def submit_basket():
                     if record["space_id"] == room:
                         record["access_code"] = code
             else:
-                if record['access_code'] == "TBD": 
+                if record["access_code"] == "TBD":
                     record["access_code"] = "Key Code Requested"
 
     print(order_entries)
@@ -745,21 +754,33 @@ def submit_basket():
     session["msgs"] = []
     session["msgs"].append(msg)
 
-    # print("updated orders: ", order_entries)
+    print("ttt: ", codes["requested_spaces"])
 
-    # update stored variable and also make requests
-    # a zero code should result in a key code creation
+    for obj in codes["requested_spaces"]:
+        for k, v in obj.items():
+            filter_record = [
+                (i["space_owner_id"], i["building_approver_id"])
+                for i in order_entries
+                if i["space_id"] == v[0]
+            ]
+            # print("building number: ", v[0][1:3])
+            # print("space owner: ", filter_record[0][0])
+            # print("building approver: ", filter_record[0][1])
+            # print("room key: ", int(k))
+            # print("room code: ", v[0])
+            # print("current id: ", current_user.get_id())
 
-    #     new_key = Requests(
-    #             user_id="from current_user()",
-    #             space_number_id=space_id,
-    #             building_number=building_number,
-    #             space_owner="needs added to db",
-    #             approver_id="from existing form",
-    #             access_code_id=code,
-    #         )
-    #     db.session.add(new_key)
-    #     db.session.commit()
+        new_request = Requests(
+                user_id=current_user.get_id(),
+                space_number_id=v[0],
+                building_number=v[0][1:3],
+                space_owner_id=filter_record[0][0],
+                approver_id=filter_record[0][1],
+                access_code_id=int(k),
+                request_status_id=1,
+            )
+        db.session.add(new_request)
+        db.session.commit()
     # else:
     #     msg = "There is no perfect match\n"
     # for space in unique_rooms_list:
@@ -767,18 +788,6 @@ def submit_basket():
     #     msg += f"Key #{code}\n"
     # execute function that looks for all results
 
-    # the request table probably only needs the following columns:
-    # access_code, space_owner, building_approver, list of space_id; the other info is built into the space_id
-    # new_key = Requests(
-    #     user_id="from current_user()",
-    #     space_number_id=space_id,
-    #     building_number=building_number,
-    #     space_owner="needs added to db",
-    #     approver_id="from existing form",
-    #     access_code_id=code,
-    # )
-    # db.session.add(new_key)
-    # db.session.commit()
 
     # return redirect(url_for('site.ordercontent'))
     return ("", 204)
