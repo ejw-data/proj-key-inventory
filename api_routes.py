@@ -654,18 +654,27 @@ def request_room_filter(building):
             wings.add(i["wing_number"])
             floors.add(i["floor_number"])
             rooms.add(i["room_number"])
-            structure["wing"] = {
-                str(i["wing_number"]): {
+            if "wing" not in structure:
+                structure["wing"] = {
+                    str(i["wing_number"]): {
+                        "floor": {str(i["floor_number"]): [i["room_number"]]}
+                    }
+                }
+            else:
+                structure["wing"][str(i["wing_number"])] = {
                     "floor": {str(i["floor_number"]): [i["room_number"]]}
                 }
-            }
         else:
             if i["floor_number"] not in floors:
                 floors.add(i["floor_number"])
                 rooms.add(i["room_number"])
-                structure["wing"][str(i["wing_number"])]["floor"][
-                    str(i["floor_number"])
-                ] = [i["room_number"]]
+                if "floor" not in structure["wing"][str(i["wing_number"])]:
+                    structure["wing"][str(i["wing_number"])]["floor"] = {
+                        str(i["floor_number"]): [i["room_number"]]}
+                else:
+                    structure["wing"][str(i["wing_number"])]["floor"][
+                        str(i["floor_number"])
+                    ] = [i["room_number"]]
             else:
                 if i["room_number"] not in rooms:
                     rooms.add(i["room_number"])
@@ -674,9 +683,9 @@ def request_room_filter(building):
                     ].append(i["room_number"])
                 else:
                     continue
-
+        structure["wing"][str(i["wing_number"])]["floors"] = list(floors)
     structure["wings"] = list(wings)
-    structure["wing"][str(i["wing_number"])]["floors"] = list(floors)
+    
 
     print(structure)
     return jsonify(structure)

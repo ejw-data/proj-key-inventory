@@ -84,7 +84,6 @@ building_field.on('change', (i) => {
         d3.json(approver_api).then(data2 => {
             console.log(data2)
             let approver_field = d3.select('#approver_id')
-            approver_field.attr("disabled", null);
             approver_field.selectAll('option').remove();
 
             approver_field.append('option')
@@ -184,6 +183,9 @@ building_field.on('change', (i) => {
 
                         option_assignee.text(d =>  d.name)
                             .property('value', d => d.user_id);
+
+                        let approver_field = d3.select('#approver_id')
+                        approver_field.attr("disabled", null);
 
                         
 
