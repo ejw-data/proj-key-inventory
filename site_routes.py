@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from flask import (
@@ -22,7 +23,7 @@ from models import (
     Authentication,
     Buildings,
     FabricationStatus,
-    # KeyInventory,
+    KeyInventory,
     # KeyOrders,
     KeyStatus,
     KeysCreated,
@@ -690,9 +691,11 @@ def submit_basket():
     """
     Route used to find access codes and update local variables and add data to database
     """
+
+    # access data in basket and obtain the requested rooms
     order_entries = session["order"]
     room_list = [i["space_id"] for i in order_entries]
-    unique_rooms_list = tuple(set(room_list))
+    deduped_requested_rooms = list(tuple(set(room_list)))
 
     # need to finish this route
 
@@ -707,6 +710,11 @@ def submit_basket():
 
     # use /table/matrix/ as a template for getting the input to the find_codes function
     # filter by building
+    # replace with:  list(AccessPairs.query.with_entities(AccessPairs.access_code_id, AccessPairs.space_number_id).all())
+
+    ##########################################################################################
+    # Update Table UX
+    ##########################################################################################
     results = AccessPairs.query.all()
     data = []
     for result in results:
@@ -714,8 +722,9 @@ def submit_basket():
             {"access_code": result.access_code_id, "space_id": result.space_number_id}
         )
 
+    # get unique access codes and retrieve all records related to those codes
+    # format is in code:[rooms] format
     code_id = set([i["access_code"] for i in data])
-
     new_data = []
     for record in code_id:
         filtered_ids = filter(lambda x: x["access_code"] == record, data)
@@ -723,25 +732,50 @@ def submit_basket():
         entry = {"id": record, "value": rooms}
         new_data.append(entry)
 
+    # find existing codes that the user has in possession
+    # note:  may want to also find keys in queue but not complete and handle them differently
+    # add filter of approved not equal to false so rejected requests are not part of this list
+    existing_rooms = list(
+        Requests.query.with_entities(Requests.space_number_id)
+        .distinct()
+        .filter(Requests.user_id == current_user.get_id())
+        .filter(Requests.request_status_id == 6)
+    )
+
+    existing_codes = list(
+        Requests.query.with_entities(Requests.access_code_id)
+        .distinct()
+        .filter(Requests.user_id == current_user.get_id())
+        .filter(Requests.request_status_id == 6)
+    )
+
+    print("existing codes: ", existing_codes)
+
+    # new requests and existing requests combined
+    total_rooms = deduped_requested_rooms + existing_rooms
+    unique_rooms_flattened = tuple(
+        set([i if type(i) is str else i[0] for i in total_rooms])
+    )
     # returns dictionary of access codes and rooms found, list of access codes, and rooms without codes
-    codes = find_codes(unique_rooms_list, new_data)
+    codes = find_codes(unique_rooms_flattened, new_data)
 
-    print("Access codes produced: ", codes)
-    # print("New test: ", order_entries)
-
-    #  need fixed then the rest will be fine
+    #  Update session variable that updates order basket
     for record in order_entries:
         for i, code in enumerate(codes["access_codes"]):
             print("test", record)
             if code != 0:
+                # Assigns code to key request entry in the table
+                # This replaces the default value of TBD with the appropriate code
                 for room in codes["requested_spaces"][i][code]:
                     if record["space_id"] == room:
                         record["access_code"] = code
             else:
+                # TBD is the default value in the table and the replacement of this value
+                # indicates the actions being taken since there is no existing code
+                # note:  the if below is probably not needed
                 if record["access_code"] == "TBD":
                     record["access_code"] = "Key Code Requested"
 
-    print(order_entries)
     # logic for storing sessions
     session.modified = True
     session["order"] = order_entries
@@ -754,45 +788,78 @@ def submit_basket():
     session["msgs"] = []
     session["msgs"].append(msg)
 
-    print("ttt: ", codes["requested_spaces"])
+    ##################################################################################
+    # Database Updates
+    ##################################################################################
+    print("latest test: ", codes)
+    # create list of the room codes returned and the existing codes already available to the user
+    # room_codes = np.ravel([list(v.keys()) for v in codes["requested_spaces"]])
 
-    for obj in codes["requested_spaces"]:
-        for k, v in obj.items():
-            filter_record = [
-                (i["space_owner_id"], i["building_approver_id"])
-                for i in order_entries
-                if i["space_id"] == v[0]
-            ]
-            # print("building number: ", v[0][1:3])
-            # print("space owner: ", filter_record[0][0])
-            # print("building approver: ", filter_record[0][1])
-            # print("room key: ", int(k))
-            # print("room code: ", v[0])
-            # print("current id: ", current_user.get_id())
+    room_codes = []
+    for i in codes["requested_spaces"]:
+        room_codes = room_codes + list(i.keys())
 
-        new_request = Requests(
-                user_id=current_user.get_id(),
-                space_number_id=v[0],
-                building_number=v[0][1:3],
-                space_owner_id=filter_record[0][0],
-                approver_id=filter_record[0][1],
-                access_code_id=int(k),
-                request_status_id=1,
-            )
-        db.session.add(new_request)
-        db.session.commit()
-    # else:
-    #     msg = "There is no perfect match\n"
-    # for space in unique_rooms_list:
-    #     code = get_access_code([space])
-    #     msg += f"Key #{code}\n"
-    # execute function that looks for all results
+    # rooms = [list(i.values())[0] for i in code["requested_spaces"]]
+    # rooms_list = []
+    # for i in rooms:
+    #     rooms_list = rooms_list + i
+    # print(rooms_list)
 
+    print("room codes found: ", room_codes)
+    print("existing rooms: ", existing_rooms)
+    print("key dictionary found: ", codes["requested_spaces"])
 
-    # return redirect(url_for('site.ordercontent'))
+    for code in room_codes:
+        if code is not int:
+            # proceed to next iteration
+            continue
+        elif code in existing_codes:
+            print(f"code {code} already given, no action needed")
+        else:
+            print(f"new space request - {code}, request sent for approval")
+            # add to request table
+            for obj in codes["requested_spaces"]:
+                for k, v in obj.items():
+                    filter_record = [
+                        (i["space_owner_id"], i["building_approver_id"])
+                        for i in order_entries
+                        if i["space_id"] == v[0]
+                    ]
+                    # print("building number: ", v[0][1:3])
+                    # print("space owner: ", filter_record[0][0])
+                    # print("building approver: ", filter_record[0][1])
+                    # print("room key: ", int(k))
+                    # print("room code: ", v[0])
+                    # print("current id: ", current_user.get_id())
+                    print("filter record: ", filter_record)
+
+                new_request = Requests(
+                    user_id=current_user.get_id(),
+                    space_number_id=v[0],
+                    building_number=v[0][1:3],
+                    space_owner_id=filter_record[0][0],
+                    approver_id=filter_record[0][1],
+                    access_code_id=int(k),
+                    request_status_id=1,
+                )
+                db.session.add(new_request)
+                db.session.commit()
+    # when an existing key is not returned in the room_codes to issue then that key should be returned
+    for room in existing_rooms:
+        if room not in room_codes:
+            print(f"request key {code} to be returned, place hold on existing orders")
+            # update the requests status and update the orders table
+
+        else:
+            print(f"code {code} already given, no action needed")
+
+    # loop through missing dictionary
+    # add code to access_pairs
+    for i in codes["missing"]:
+        # create new table for these requests
+        print("new request: ", i)
+
     return ("", 204)
-
-    # return redirect("dynamic/_orders.html")
 
 
 @site.route("/post/basket/msg", methods=["GET", "POST"])

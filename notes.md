@@ -1,5 +1,7 @@
 ### Tasks
 1.  Improve interface
+    *  ! When adding room also add room assignment
+    *  ! When adding building also add building manager
     *  ! Make sure form options are all formatted the same on input
     *  ! Add requests to appropriate table to complete workflow
     *  ! Admin.html => fix form using /post/approver/add route so that admin approver is not part of form and it uses current_id
