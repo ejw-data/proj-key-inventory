@@ -93,6 +93,17 @@ basketCloseButton.on('click', i => {
     location.reload(true);
 });
 
+let requestButton = d3.select("#request-access-button");
+requestButton.on('click', i => {
+    clearTable();
+    d3.select('#building_number').property("value", "-1")
+    d3.select('#wing').property("value", "0")
+    d3.select('#floor').property("value", "0")
+    d3.select('#room').property("value", "0")
+    d3.select('#approver_id').property("value", "0")
+    d3.select('#assignment_id').property("value", "0")
+})
+
 
 function activateSubmit(){
      setTimeout(function (){

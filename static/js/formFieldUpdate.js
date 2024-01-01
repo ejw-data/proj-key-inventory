@@ -64,7 +64,7 @@ d3.select('#assignment_id').attr("disabled", "true");
 
 
 
-// used in admin.html in the Room Add form
+// used in index.html in the Access Request form
 let building_field = d3.select('#building_number')
 building_field.on('change', (i) => {
 
