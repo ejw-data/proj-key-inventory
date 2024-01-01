@@ -739,15 +739,16 @@ def submit_basket():
         Requests.query.with_entities(Requests.space_number_id)
         .distinct()
         .filter(Requests.user_id == current_user.get_id())
-        .filter(Requests.request_status_id == 6)
+        .filter(Requests.request_status_id.not_in((3, 8, 9)))
     )
 
     existing_codes = list(
         Requests.query.with_entities(Requests.access_code_id)
         .distinct()
         .filter(Requests.user_id == current_user.get_id())
-        .filter(Requests.request_status_id == 6)
+        .filter(Requests.request_status_id.not_in((3, 8, 9)))
     )
+    existing_codes = [r for r, in existing_codes]
 
     print("existing codes: ", existing_codes)
 
@@ -807,13 +808,14 @@ def submit_basket():
 
     print("room codes found: ", room_codes)
     print("existing rooms: ", existing_rooms)
+    print("existing codes: ", existing_codes)
     print("key dictionary found: ", codes["requested_spaces"])
 
     for code in room_codes:
-        if code is not int:
+        if code == "Key Code Requested":
             # proceed to next iteration
             continue
-        elif code in existing_codes:
+        elif int(code) in existing_codes:
             print(f"code {code} already given, no action needed")
         else:
             print(f"new space request - {code}, request sent for approval")

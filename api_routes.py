@@ -313,6 +313,8 @@ def users_table():
 def users_grouped_table():
     """
     Route used to get all users access
+    Issue:  if requests table is empty then it returns an error when doing the groupby
+            - a short term fix is to put an if statement around it
     """
 
     records = (
@@ -342,12 +344,17 @@ def users_grouped_table():
 
     df = pd.DataFrame(data)
 
-    users_and_spaces = (
-        df.groupby(["User ID", "First Name", "Last Name", "Email"])["Accessible Spaces"]
-        .apply(lambda x: ", ".join(x))
-        .reset_index()
-    )
-    data = users_and_spaces.to_dict(orient="records")
+    if len(df) == 0:
+        data = [{}]
+    else:
+        users_and_spaces = (
+            df.groupby(["User ID", "First Name", "Last Name", "Email"])[
+                "Accessible Spaces"
+            ]
+            .apply(lambda x: ", ".join(x))
+            .reset_index()
+        )
+        data = users_and_spaces.to_dict(orient="records")
 
     return jsonify(data)
 
@@ -357,6 +364,8 @@ def users_grouped_table():
 def buildings_grouped_table():
     """
     Route used to get all building access
+    Issue:  if requests table is empty then it returns an error when doing the groupby
+            - a short term fix is to put an if statement around it
     """
 
     records = (
@@ -387,12 +396,15 @@ def buildings_grouped_table():
 
     df = pd.DataFrame(data)
 
-    users_and_spaces = (
-        df.groupby(["Room", "Room Type"])["People With Access"]
-        .apply(lambda x: "<br> ".join(x))
-        .reset_index()
-    )
-    data = users_and_spaces.to_dict(orient="records")
+    if len(df) == 0:
+        data = [{}]
+    else:
+        users_and_spaces = (
+            df.groupby(["Room", "Room Type"])["People With Access"]
+            .apply(lambda x: "<br> ".join(x))
+            .reset_index()
+        )
+        data = users_and_spaces.to_dict(orient="records")
 
     return jsonify(data)
 
@@ -670,7 +682,8 @@ def request_room_filter(building):
                 rooms.add(i["room_number"])
                 if "floor" not in structure["wing"][str(i["wing_number"])]:
                     structure["wing"][str(i["wing_number"])]["floor"] = {
-                        str(i["floor_number"]): [i["room_number"]]}
+                        str(i["floor_number"]): [i["room_number"]]
+                    }
                 else:
                     structure["wing"][str(i["wing_number"])]["floor"][
                         str(i["floor_number"])
@@ -685,7 +698,6 @@ def request_room_filter(building):
                     continue
         structure["wing"][str(i["wing_number"])]["floors"] = list(floors)
     structure["wings"] = list(wings)
-    
 
     print(structure)
     return jsonify(structure)
