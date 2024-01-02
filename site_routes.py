@@ -642,7 +642,7 @@ def add_request():
         approver_id = user_form.approver_id.data
         assignment_id = user_form.assignment_id.data
 
-        space_id = f"B{str(building_number).zfill(2)}{str(floor_number).zfill(2)}{str(wing_number).zfill(2)}{str(room_number).zfill(2)}"
+        space_id = f"B{str(building_number).zfill(2)}{str(wing_number).zfill(2)}{str(floor_number).zfill(2)}{str(room_number).zfill(2)}"
 
         # query for space owner name
         pi_name = (
@@ -759,7 +759,7 @@ def submit_basket():
     )
     # returns dictionary of access codes and rooms found, list of access codes, and rooms without codes
     codes = find_codes(unique_rooms_flattened, new_data)
-
+    print("calc codes", codes["access_codes"])
     #  Update session variable that updates order basket
     print("updating session variables and table")
     for record in order_entries:
@@ -776,9 +776,13 @@ def submit_basket():
                 # TBD is the default value in the table and the replacement of this value
                 # indicates the actions being taken since there is no existing code
                 # note:  the if below is probably not needed
-                if record["access_code"] == "TBD":
+                if (record["access_code"] == "TBD") or (
+                    record["access_code"] == "Request in Progress"
+                ):
                     record["access_code"] = "Key Code Requested"
-                    print(f"Requested room not found in access matrix.  Requested new code to be generated.")
+                    print(
+                        f"Requested room not found in access matrix.  Requested new code to be generated."
+                    )
 
     # logic for storing sessions
     # need to improve messaging based on case
@@ -816,7 +820,9 @@ def submit_basket():
     # print("key dictionary found: ", codes["requested_spaces"])
 
     for code in room_codes:
-        if code == "Key Code Requested":
+        if (code == "Key Code Requested") or (
+            code == "Request in Progress"
+        ):
             # proceed to next iteration
             continue
         elif int(code) in existing_codes:
@@ -831,13 +837,6 @@ def submit_basket():
                         for i in order_entries
                         if i["space_id"] == v[0]
                     ]
-                    # print("building number: ", v[0][1:3])
-                    # print("space owner: ", filter_record[0][0])
-                    # print("building approver: ", filter_record[0][1])
-                    # print("room key: ", int(k))
-                    # print("room code: ", v[0])
-                    # print("current id: ", current_user.get_id())
-                    # print("filter record: ", filter_record)
 
                 new_request = Requests(
                     user_id=current_user.get_id(),
@@ -852,13 +851,18 @@ def submit_basket():
                 db.session.commit()
                 print("request added to Requests table")
     # when an existing key is not returned in the room_codes to issue then that key should be returned
-    print("existing rooms: ", existing_codes)
-    print("room codes: ", room_codes)
+
     for held_code in existing_codes:
         if str(held_code) not in room_codes:
             print(f"request key {code} to be returned, place hold on existing orders")
             # update the requests status and update the orders table
+            user_id = current_user.get_id()
+            code_id = held_code
 
+            # update record
+            Requests.query.filter(Requests.user_id == user_id).filter(Requests.access_code_id == code_id).update({
+                'request_status_id': 7
+            }, synchronize_session=False)
         # else:
         #     print(f"code {code} already given, no action needed")
 
@@ -867,7 +871,24 @@ def submit_basket():
     if len(codes["missing"]) > 0:
         for i in codes["missing"]:
             # create new table for these requests
-            print("Request for new code to be generated for thise rooms: ", i)
+            print("Request for new code to be generated for these rooms: ", i)
+
+            filtered_results = [(j["space_owner_id"], j["building_approver_id"]) for j in order_entries if j["space_id"] == i]
+            if len(filtered_results) > 0:
+                
+                new_request = Requests(
+                        user_id=current_user.get_id(),
+                        space_number_id=i,
+                        building_number=i[1:3],
+                        space_owner_id=0,
+                        approver_id=filtered_results[0][1],
+                        access_code_id=0,
+                        request_status_id=10,
+                    )
+                db.session.add(new_request)
+                db.session.commit()
+            else:
+                print("Missing room is already in requests - no action needed")
     else:
         print("No missing codes requested")
 

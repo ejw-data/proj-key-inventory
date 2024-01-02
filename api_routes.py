@@ -165,7 +165,7 @@ def request_table(active):
                 Requests.approved,
                 RequestStatus.request_status_name,
             )
-            .filter(Requests.user_id == login_user_id, Requests.request_status_id < 6)
+            .filter(Requests.user_id == login_user_id, or_(Requests.request_status_id < 6, Requests.request_status_id == 10))
             .join(
                 RequestStatus,
                 RequestStatus.request_status_id == Requests.request_status_id,

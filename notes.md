@@ -1,5 +1,6 @@
 ### Tasks
 1.  Improve interface
+    *  ! Update message that says "Exact Match" after submitting order basket - it should say whether this is an existing request, not found, order sent to approver and/or key needs returned.  Exact Match is only used for intitial troubleshooting.  
     *  ! When adding room also add room assignment
     *  ! When adding building also add building manager
     *  ! Make sure form options are all formatted the same on input

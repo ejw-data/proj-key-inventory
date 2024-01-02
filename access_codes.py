@@ -114,17 +114,14 @@ def find_codes(requested_rooms, room_access_codes):
                     stored_codes = stored_codes + tuple([resultant_codes])
 
                     if best_fit:
-                        current_status = best_fit[3] + [{"Request in Progress": requested_rooms[0]}]
+                        current_status = best_fit[3] + [
+                            {"Request in Progress": requested_rooms[0]}
+                        ]
                     else:
                         current_status = [{"Request in Progress": requested_rooms[0]}]
 
                     # best fit:  codes found, rooms not found, number of rooms not found, dict of code/rooms found
-                    best_fit = (
-                        stored_codes,
-                        requested_rooms,
-                        1,
-                        current_status
-                    )
+                    best_fit = (stored_codes, requested_rooms, 1, current_status)
                     no_break = False
                     break
             else:
@@ -313,9 +310,19 @@ def find_codes(requested_rooms, room_access_codes):
         # instead of query, extract first couple letters from room-request
 
     # maybe add message to dictionary
+    def flatten_list(data):
+        flat_list = []
+        for tuple_or_number in data:
+            if isinstance(tuple_or_number, tuple):
+                for item in tuple_or_number:
+                    flat_list.append(item)
+            else:
+                flat_list.append(tuple_or_number)
+        return flat_list
+
     results = {
         "requested_spaces": list(best_fit[3]),
-        "access_codes": list(best_fit[0]),
+        "access_codes": flatten_list(best_fit[0]),
         "missing": list(best_fit[1]),
     }
     return results
