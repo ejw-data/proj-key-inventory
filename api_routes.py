@@ -145,6 +145,7 @@ def request_table(active):
                 Requests.space_number_id,
                 Requests.approved,
                 RequestStatus.request_status_name,
+                Requests.access_code_id,
             )
             .filter(Requests.user_id == login_user_id)
             .join(
@@ -164,8 +165,12 @@ def request_table(active):
                 Requests.space_number_id,
                 Requests.approved,
                 RequestStatus.request_status_name,
+                Requests.access_code_id,
             )
-            .filter(Requests.user_id == login_user_id, or_(Requests.request_status_id < 6, Requests.request_status_id == 10))
+            .filter(
+                Requests.user_id == login_user_id,
+                or_(Requests.request_status_id < 6, Requests.request_status_id == 10),
+            )
             .join(
                 RequestStatus,
                 RequestStatus.request_status_id == Requests.request_status_id,
@@ -183,6 +188,7 @@ def request_table(active):
                 Requests.space_number_id,
                 Requests.approved,
                 RequestStatus.request_status_name,
+                Requests.access_code_id,
             )
             .filter(
                 Requests.user_id == login_user_id,
@@ -209,7 +215,8 @@ def request_table(active):
                 {
                     "Request ID": record[0],
                     "User Name": f"{record[1].title()} {record[2].title()}",
-                    "Room Code": record[3],
+                    "Room": record[3],
+                    "Room Code": record[6],
                     "Approval Status": "Approved" if bool(record[4]) else "PENDING",
                     "Request Status": record[5],
                 }
@@ -218,7 +225,8 @@ def request_table(active):
             data.append(
                 {
                     "Request ID": record[0],
-                    "Room Code": record[3],
+                    "Room": record[3],
+                    "Room Code": record[6],
                     "Approval Status": "Approved" if bool(record[4]) else "PENDING",
                     "Request Status": record[5],
                 }
