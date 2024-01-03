@@ -739,14 +739,14 @@ def submit_basket():
         Requests.query.with_entities(Requests.space_number_id)
         .distinct()
         .filter(Requests.user_id == current_user.get_id())
-        .filter(Requests.request_status_id.not_in((3, 8, 9)))
+        .filter(Requests.request_status_id.not_in((3, 8, 9, 10)))
     )
 
     existing_codes = list(
         Requests.query.with_entities(Requests.access_code_id)
         .distinct()
         .filter(Requests.user_id == current_user.get_id())
-        .filter(Requests.request_status_id.not_in((3, 8, 9)))
+        .filter(Requests.request_status_id.not_in((3, 8, 9, 10)))
     )
     existing_codes = [r for r, in existing_codes]
 
@@ -820,9 +820,7 @@ def submit_basket():
     # print("key dictionary found: ", codes["requested_spaces"])
 
     for code in room_codes:
-        if (code == "Key Code Requested") or (
-            code == "Request in Progress"
-        ):
+        if (code == "Key Code Requested") or (code == "Request in Progress"):
             # proceed to next iteration
             continue
         elif int(code) in existing_codes:
@@ -854,15 +852,29 @@ def submit_basket():
 
     for held_code in existing_codes:
         if str(held_code) not in room_codes:
-            print(f"request key {code} to be returned, place hold on existing orders")
+            # update key record to be deleted if the request status is 1 (key submitted, but not yet approved (not in queue yet))
+
+            # for request status 2,4, 5 (mid-request process), the request should be set to 8 *Key Returned) and inventory should be updated
+
+
+
+            # update key status to show the key needs returned if the request status is 6 (key assigned)
+            print(
+                f"request key {held_code} to be returned, place hold on existing orders"
+            )
             # update the requests status and update the orders table
             user_id = current_user.get_id()
             code_id = held_code
 
             # update record
-            Requests.query.filter(Requests.user_id == user_id).filter(Requests.access_code_id == code_id).update({
-                'request_status_id': 7
-            }, synchronize_session=False)
+            Requests.query.filter(Requests.user_id == user_id).filter(
+                Requests.access_code_id == code_id
+            ).update({"request_status_id": 7}, synchronize_session=False)
+
+            db.session.commit()
+
+            # no action needed for request status 3, 7, 8, 9, 10
+
         # else:
         #     print(f"code {code} already given, no action needed")
 
@@ -873,18 +885,21 @@ def submit_basket():
             # create new table for these requests
             print("Request for new code to be generated for these rooms: ", i)
 
-            filtered_results = [(j["space_owner_id"], j["building_approver_id"]) for j in order_entries if j["space_id"] == i]
-            if len(filtered_results) > 0:
-                
+            filtered_results = [
+                (j["space_owner_id"], j["building_approver_id"])
+                for j in order_entries
+                if j["space_id"] == i
+            ]
+            if (len(filtered_results) > 0) and (i not in existing_codes):
                 new_request = Requests(
-                        user_id=current_user.get_id(),
-                        space_number_id=i,
-                        building_number=i[1:3],
-                        space_owner_id=0,
-                        approver_id=filtered_results[0][1],
-                        access_code_id=0,
-                        request_status_id=10,
-                    )
+                    user_id=current_user.get_id(),
+                    space_number_id=i,
+                    building_number=i[1:3],
+                    space_owner_id=0,
+                    approver_id=filtered_results[0][1],
+                    access_code_id=0,
+                    request_status_id=10,
+                )
                 db.session.add(new_request)
                 db.session.commit()
             else:
