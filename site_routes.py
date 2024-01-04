@@ -750,16 +750,21 @@ def submit_basket():
     )
     existing_codes = [r for r, in existing_codes]
 
-    existing_rooms2 = list(AccessPairs.query.with_entities(AccessPairs.space_number_id)
-                .filter(AccessPairs.access_code_id.in_(existing_codes)))
-    
+    existing_rooms2 = list(
+        AccessPairs.query.with_entities(AccessPairs.space_number_id).filter(
+            AccessPairs.access_code_id.in_(existing_codes)
+        )
+    )
+
     test = [r for r, in existing_rooms2]
-    
+
     print("existing_rooms: ", existing_rooms)
-    print("existing_rooms2: ",  test)
+    print("existing_rooms2: ", test)
 
     existing_codes2 = list(
-        Requests.query.with_entities(Requests.access_code_id, Requests.request_status_id)
+        Requests.query.with_entities(
+            Requests.access_code_id, Requests.request_status_id
+        )
         .distinct()
         .filter(Requests.user_id == current_user.get_id())
         .filter(Requests.request_status_id.not_in((3, 8, 9, 10)))
@@ -842,6 +847,7 @@ def submit_basket():
             print(f"code {code} previously requested and given, no action needed")
         else:
             print(f"requesting approval for code {code}")
+            print(f"code_requestd_spaces: ", codes["requested_spaces"])
             # add to request table
             for obj in codes["requested_spaces"]:
                 for k, v in obj.items():
@@ -850,48 +856,58 @@ def submit_basket():
                         for i in order_entries
                         if i["space_id"] == v[0]
                     ]
+                    print(v)
 
-                new_request = Requests(
-                    user_id=current_user.get_id(),
-                    spaces_requsted=v[0],
-                    building_number=v[0][1:3],
-                    space_owner_id=filter_record[0][0],
-                    approver_id=filter_record[0][1],
-                    access_code_id=int(k),
-                    request_status_id=1,
-                )
-                db.session.add(new_request)
-                db.session.commit()
-                print("request added to Requests table")
+                    new_request = Requests(
+                        user_id=current_user.get_id(),
+                        spaces_requested=", ".join(v),
+                        building_number=v[0][1:3],
+                        space_owner_id=filter_record[0][0],
+                        approver_id=filter_record[0][1],
+                        access_code_id=int(k),
+                        request_status_id=1,
+                    )
+                    db.session.add(new_request)
+                    db.session.commit()
+                    print("request added to Requests table")
     # when an existing key is not returned in the room_codes to issue then that key should be returned
 
     for held_code in existing_codes2:
-        if str(held_code[0]) not in room_codes:
+        user_id = current_user.get_id()
+        code_id = held_code[0]
+        code_status = held_code[1]
+        if str(code_id) not in room_codes:
             # update key record to be deleted if the request status is 1 (key submitted, but not yet approved (not in queue yet))
+            if code_status == 1:
+                Requests.query.filter(Requests.user_id == user_id).filter(
+                    Requests.access_code_id == code_id
+                ).delete(synchronize_session=False)
+
+                db.session.commit()
 
             # for request status 2,4, 5 (mid-request process), the request should be set to 8 *Key Returned) and inventory should be updated
+            elif code_status in [2, 4, 5]:
+                Requests.query.filter(Requests.user_id == user_id).filter(
+                    Requests.access_code_id == code_id
+                ).update({"request_status_id": 8}, synchronize_session=False)
 
-
+                db.session.commit()
 
             # update key status to show the key needs returned if the request status is 6 (key assigned)
-            print(
-                f"request key {held_code[0]} to be returned, place hold on existing orders"
-            )
-            # update the requests status and update the orders table
-            user_id = current_user.get_id()
-            code_id = held_code[0]
+            elif code_status == 6:
+                print(
+                    f"request key {held_code[0]} to be returned, place hold on existing orders"
+                )
+                # update the requests status and update the orders table
+                Requests.query.filter(Requests.user_id == user_id).filter(
+                    Requests.access_code_id == code_id
+                ).update({"request_status_id": 7}, synchronize_session=False)
 
-            # update record
-            Requests.query.filter(Requests.user_id == user_id).filter(
-                Requests.access_code_id == code_id
-            ).update({"request_status_id": 7}, synchronize_session=False)
-
-            db.session.commit()
+                db.session.commit()
 
             # no action needed for request status 3, 7, 8, 9, 10
-
-        # else:
-        #     print(f"code {code} already given, no action needed")
+            else:
+                print(f"No action needed")
 
     # loop through missing dictionary
     # add code to access_pairs
@@ -905,7 +921,9 @@ def submit_basket():
                 for j in order_entries
                 if j["space_id"] == i
             ]
-            if (len(filtered_results) > 0) and (i not in [j[0] for j in existing_codes2]):
+            if (len(filtered_results) > 0) and (
+                i not in [j[0] for j in existing_codes2]
+            ):
                 new_request = Requests(
                     user_id=current_user.get_id(),
                     spaces_requested=i,
