@@ -755,6 +755,7 @@ def submit_basket():
     
     test = [r for r, in existing_rooms2]
     
+    print("existing_rooms: ", existing_rooms)
     print("existing_rooms2: ",  test)
 
     existing_codes2 = list(
@@ -763,11 +764,11 @@ def submit_basket():
         .filter(Requests.user_id == current_user.get_id())
         .filter(Requests.request_status_id.not_in((3, 8, 9, 10)))
     )
-
+    print("existing codes: ", existing_codes)
     print("existing codes2: ", existing_codes2)
-
+    print("dedup: ", deduped_requested_rooms)
     # new requests and existing requests combined
-    total_rooms = deduped_requested_rooms + existing_rooms
+    total_rooms = deduped_requested_rooms + existing_rooms2
     unique_rooms_flattened = tuple(
         set([i if type(i) is str else i[0] for i in total_rooms])
     )
@@ -837,7 +838,7 @@ def submit_basket():
         if (code == "Key Code Requested") or (code == "Request in Progress"):
             # proceed to next iteration
             continue
-        elif int(code) in existing_codes:
+        elif int(code) in [j[0] for j in existing_codes2]:
             print(f"code {code} previously requested and given, no action needed")
         else:
             print(f"requesting approval for code {code}")
@@ -864,8 +865,8 @@ def submit_basket():
                 print("request added to Requests table")
     # when an existing key is not returned in the room_codes to issue then that key should be returned
 
-    for held_code in existing_codes:
-        if str(held_code) not in room_codes:
+    for held_code in existing_codes2:
+        if str(held_code[0]) not in room_codes:
             # update key record to be deleted if the request status is 1 (key submitted, but not yet approved (not in queue yet))
 
             # for request status 2,4, 5 (mid-request process), the request should be set to 8 *Key Returned) and inventory should be updated
@@ -874,11 +875,11 @@ def submit_basket():
 
             # update key status to show the key needs returned if the request status is 6 (key assigned)
             print(
-                f"request key {held_code} to be returned, place hold on existing orders"
+                f"request key {held_code[0]} to be returned, place hold on existing orders"
             )
             # update the requests status and update the orders table
             user_id = current_user.get_id()
-            code_id = held_code
+            code_id = held_code[0]
 
             # update record
             Requests.query.filter(Requests.user_id == user_id).filter(
@@ -904,7 +905,7 @@ def submit_basket():
                 for j in order_entries
                 if j["space_id"] == i
             ]
-            if (len(filtered_results) > 0) and (i not in existing_codes):
+            if (len(filtered_results) > 0) and (i not in [j[0] for j in existing_codes2]):
                 new_request = Requests(
                     user_id=current_user.get_id(),
                     spaces_requested=i,
