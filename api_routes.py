@@ -25,7 +25,7 @@ from models import (
 from forms import update_order_status_form_instance
 
 from sqlalchemy.orm import aliased
-from sqlalchemy import or_, func
+from sqlalchemy import or_, func, union
 from flask_login import current_user
 import pandas as pd
 
@@ -142,7 +142,7 @@ def request_table(active):
                 Requests.request_id,
                 Users.first_name,
                 Users.last_name,
-                Requests.space_number_id,
+                Requests.spaces_requested,
                 Requests.approved,
                 RequestStatus.request_status_name,
                 Requests.access_code_id,
@@ -162,7 +162,7 @@ def request_table(active):
                 Requests.request_id,
                 Users.first_name,
                 Users.last_name,
-                Requests.space_number_id,
+                Requests.spaces_requested,
                 Requests.approved,
                 RequestStatus.request_status_name,
                 Requests.access_code_id,
@@ -185,7 +185,7 @@ def request_table(active):
                 Requests.request_id,
                 Users.first_name,
                 Users.last_name,
-                Requests.space_number_id,
+                Requests.spaces_requested,
                 Requests.approved,
                 RequestStatus.request_status_name,
                 Requests.access_code_id,
@@ -331,7 +331,7 @@ def users_grouped_table():
             Users.first_name,
             Users.last_name,
             Users.email,
-            Requests.space_number_id,
+            Requests.spaces_requested,
         )
         .join(Requests, Requests.user_id == Users.user_id)
         .order_by(Users.last_name)
@@ -375,23 +375,60 @@ def buildings_grouped_table():
     Issue:  if requests table is empty then it returns an error when doing the groupby
             - a short term fix is to put an if statement around it
     """
+    # BREAKS - will break due to changing data type of Requests.spaces_requested from single room name to a list of room names
+    # records = (
+    #     Users.query.with_entities(
+    #         Users.user_id,
+    #         Users.first_name,
+    #         Users.last_name,
+    #         Users.email,
+    #         Requests.spaces_requested,
+    #         RoomClassification.room_type,
+    #     )
+    #     .join(Requests, Requests.user_id == Users.user_id)
+    #     .join(Rooms, Rooms.space_number_id == Requests.spaces_requested)
+    #     .join(RoomClassification, RoomClassification.room_type_id == Rooms.room_type_id)
+    #     .order_by(Users.last_name)
+    #     .all()
+    # )
 
-    records = (
-        Users.query.with_entities(
-            Users.user_id,
+    spaces_with_codes = (Requests.query.with_entities(
+            Requests.user_id,
             Users.first_name,
             Users.last_name,
             Users.email,
-            Requests.space_number_id,
+            AccessPairs.space_number_id,
             RoomClassification.room_type,
         )
-        .join(Requests, Requests.user_id == Users.user_id)
-        .join(Rooms, Rooms.space_number_id == Requests.space_number_id)
-        .join(RoomClassification, RoomClassification.room_type_id == Rooms.room_type_id)
-        .order_by(Users.last_name)
-        .all()
+        .join(Users, Users.user_id == Requests.user_id)
+        .join(AccessPairs, AccessPairs.access_code_id == Requests.access_code_id)
+        .join(Rooms, Rooms.space_number_id == AccessPairs.space_number_id, isouter=True)
+        .join(
+            RoomClassification,
+            RoomClassification.room_type_id == Rooms.room_type_id,
+            isouter=True,
+        )
+        .where(Requests.request_status_id.not_in((3, 8)))
+    )
+    spaces_without_codes = (Requests.query.with_entities(
+            Requests.user_id,
+            Users.first_name,
+            Users.last_name,
+            Users.email,
+            Requests.spaces_requested,
+            RoomClassification.room_type,
+        )
+        .join(Users, Users.user_id == Requests.user_id)
+        .join(Rooms, Rooms.space_number_id == Requests.spaces_requested)
+        .join(
+            RoomClassification,
+            RoomClassification.room_type_id == Rooms.room_type_id)
+        .where(Requests.access_code_id == 0)
     )
 
+    query = db.union(spaces_with_codes, spaces_without_codes)
+    records = db.session.execute(query)
+ 
     data = []
     for record in records:
         data.append(

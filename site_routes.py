@@ -736,7 +736,7 @@ def submit_basket():
     # note:  may want to also find keys in queue but not complete and handle them differently
     # add filter of approved not equal to false so rejected requests are not part of this list
     existing_rooms = list(
-        Requests.query.with_entities(Requests.space_number_id)
+        Requests.query.with_entities(Requests.spaces_requested)
         .distinct()
         .filter(Requests.user_id == current_user.get_id())
         .filter(Requests.request_status_id.not_in((3, 8, 9, 10)))
@@ -750,7 +750,21 @@ def submit_basket():
     )
     existing_codes = [r for r, in existing_codes]
 
-    # print("existing codes: ", existing_codes)
+    existing_rooms2 = list(AccessPairs.query.with_entities(AccessPairs.space_number_id)
+                .filter(AccessPairs.access_code_id.in_(existing_codes)))
+    
+    test = [r for r, in existing_rooms2]
+    
+    print("existing_rooms2: ",  test)
+
+    existing_codes2 = list(
+        Requests.query.with_entities(Requests.access_code_id, Requests.request_status_id)
+        .distinct()
+        .filter(Requests.user_id == current_user.get_id())
+        .filter(Requests.request_status_id.not_in((3, 8, 9, 10)))
+    )
+
+    print("existing codes2: ", existing_codes2)
 
     # new requests and existing requests combined
     total_rooms = deduped_requested_rooms + existing_rooms
@@ -838,7 +852,7 @@ def submit_basket():
 
                 new_request = Requests(
                     user_id=current_user.get_id(),
-                    space_number_id=v[0],
+                    spaces_requsted=v[0],
                     building_number=v[0][1:3],
                     space_owner_id=filter_record[0][0],
                     approver_id=filter_record[0][1],
@@ -893,7 +907,7 @@ def submit_basket():
             if (len(filtered_results) > 0) and (i not in existing_codes):
                 new_request = Requests(
                     user_id=current_user.get_id(),
-                    space_number_id=i,
+                    spaces_requested=i,
                     building_number=i[1:3],
                     space_owner_id=0,
                     approver_id=filtered_results[0][1],

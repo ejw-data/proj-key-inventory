@@ -110,7 +110,7 @@ VALUES (1,'ISSUED'),
 
 -- This will initiate some of the logic
 -- logic needs built to complete this request via forms  
-INSERT INTO requests (user_id, space_number_id, building_number, approver_id, access_code_id, status_code)
+INSERT INTO requests (user_id, spaces_requested, building_number, approver_id, access_code_id, status_code)
 VALUES (1, 'B24010101', 24, 1, 1, 1),
 		(2, 'B24010101', 24, 1, 2, 1),
 		(3, 'B24010101', 24, 1, 2, 1),

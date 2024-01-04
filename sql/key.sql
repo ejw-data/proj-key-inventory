@@ -121,7 +121,7 @@ CREATE TABLE request_status (
 CREATE TABLE requests (
 	request_id SERIAL PRIMARY KEY,
 	user_id INT,
-	space_number_id VARCHAR,
+	spaces_requested VARCHAR,
 	building_number INT,
 	space_owner_id INT,
 	approver_id INT,

@@ -215,7 +215,7 @@ class Requests(db.Model):
     __tablename__ = "requests"
     request_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
-    space_number_id = db.Column(db.String(128))
+    spaces_requested = db.Column(db.String(128))
     building_number = db.Column(db.Integer)
     space_owner_id = db.Column(db.Integer)
     approver_id = db.Column(db.Integer)
