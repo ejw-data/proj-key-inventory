@@ -750,16 +750,21 @@ def submit_basket():
     )
     existing_codes = [r for r, in existing_codes]
 
+    waiting_for_codes_rooms = list(
+        Requests.query.with_entities(Requests.spaces_requested)
+        .distinct()
+        .filter(Requests.user_id == current_user.get_id())
+        .filter(Requests.request_status_id == 10)
+    )
+
     existing_rooms2 = list(
         AccessPairs.query.with_entities(AccessPairs.space_number_id).filter(
             AccessPairs.access_code_id.in_(existing_codes)
         )
     )
 
-    test = [r for r, in existing_rooms2]
-
     print("existing_rooms: ", existing_rooms)
-    print("existing_rooms2: ", test)
+    print("existing_rooms2: ", existing_rooms2)
 
     existing_codes2 = list(
         Requests.query.with_entities(
@@ -773,7 +778,8 @@ def submit_basket():
     print("existing codes2: ", existing_codes2)
     print("dedup: ", deduped_requested_rooms)
     # new requests and existing requests combined
-    total_rooms = deduped_requested_rooms + existing_rooms2
+    rooms_without_codes = [r for r, in waiting_for_codes_rooms]
+    total_rooms = deduped_requested_rooms + existing_rooms2 + rooms_without_codes
     unique_rooms_flattened = tuple(
         set([i if type(i) is str else i[0] for i in total_rooms])
     )
@@ -823,10 +829,11 @@ def submit_basket():
     # print("latest test: ", codes)
     # create list of the room codes returned and the existing codes already available to the user
     # room_codes = np.ravel([list(v.keys()) for v in codes["requested_spaces"]])
-
+    room_numbers = []
     room_codes = []
     for i in codes["requested_spaces"]:
         room_codes = room_codes + list(i.keys())
+        room_numbers = room_numbers + list(i.values())
 
     # rooms = [list(i.values())[0] for i in code["requested_spaces"]]
     # rooms_list = []
@@ -848,15 +855,17 @@ def submit_basket():
         else:
             print(f"requesting approval for code {code}")
             print(f"code_requestd_spaces: ", codes["requested_spaces"])
+            print(f"order entries: ", order_entries)
             # add to request table
             for obj in codes["requested_spaces"]:
                 for k, v in obj.items():
                     filter_record = [
                         (i["space_owner_id"], i["building_approver_id"])
                         for i in order_entries
-                        if i["space_id"] == v[0]
+                        if i["space_id"] in v
                     ]
                     print(v)
+                    print(filter_record)
 
                     new_request = Requests(
                         user_id=current_user.get_id(),
@@ -875,10 +884,13 @@ def submit_basket():
     for held_code in existing_codes2:
         user_id = current_user.get_id()
         code_id = held_code[0]
+        print('code_id: ', code_id)
+        print('room codes: ', room_codes)
         code_status = held_code[1]
-        if str(code_id) not in room_codes:
+        if code_id not in room_codes:
             # update key record to be deleted if the request status is 1 (key submitted, but not yet approved (not in queue yet))
-            if code_status == 1:
+            if code_status in [1, 10]:
+                print('Delete duplicate request that have not been approved')
                 Requests.query.filter(Requests.user_id == user_id).filter(
                     Requests.access_code_id == code_id
                 ).delete(synchronize_session=False)
@@ -887,6 +899,7 @@ def submit_basket():
 
             # for request status 2,4, 5 (mid-request process), the request should be set to 8 *Key Returned) and inventory should be updated
             elif code_status in [2, 4, 5]:
+                print('Update request for key not yet distributed to be "returned" to stop distribution')
                 Requests.query.filter(Requests.user_id == user_id).filter(
                     Requests.access_code_id == code_id
                 ).update({"request_status_id": 8}, synchronize_session=False)
@@ -896,7 +909,7 @@ def submit_basket():
             # update key status to show the key needs returned if the request status is 6 (key assigned)
             elif code_status == 6:
                 print(
-                    f"request key {held_code[0]} to be returned, place hold on existing orders"
+                    f"Update request to have key {held_code[0]} to be returned, place hold on existing orders"
                 )
                 # update the requests status and update the orders table
                 Requests.query.filter(Requests.user_id == user_id).filter(
@@ -907,7 +920,50 @@ def submit_basket():
 
             # no action needed for request status 3, 7, 8, 9, 10
             else:
-                print(f"No action needed")
+                print(f"No existing records need changed for this request")
+
+    # check if keys requested are being requested again
+    print("Prev room numbers requested without codes: ", rooms_without_codes)
+    print("Prev rooom numbers requested: ", room_numbers)
+    if len(rooms_without_codes) > 1:
+        for room22 in rooms_without_codes:
+            if room22 not in room_numbers[0]:
+                print("Deletion 1 running")
+                user_id = current_user.get_id()
+                (
+                    Requests.query.filter(Requests.user_id == user_id)
+                    .filter(Requests.access_code_id == 10)
+                    .filter(Requests.spaces_requested == room22)
+                    .delete(synchronize_session=False)
+                )
+
+                db.session.commit()
+    elif len(rooms_without_codes) == 1:
+        if room22 not in room_numbers[0]:
+            print("Deletion 2 running")
+            user_id = current_user.get_id()
+            (
+                Requests.query.filter(Requests.user_id == user_id)
+                .filter(Requests.access_code_id == 10)
+                .filter(Requests.spaces_requested == room22)
+                .delete(synchronize_session=False)
+            )
+    else:
+        print("No code requests deletions needed")
+
+        # if len(room_numbers) == 1:
+        #     room33 = rooms_without_codes[0]
+        #     print("inner loop: ", room33)
+        #     user_id = current_user.get_id()
+        #     (
+        #         Requests.query.filter(Requests.user_id == user_id)
+        #         .filter(Requests.access_code_id == 0)
+        #         .filter(Requests.spaces_requested == room33)
+        #         .delete(synchronize_session=False)
+        #     )
+        #     db.session.commit()
+        # else:
+        pass
 
     # loop through missing dictionary
     # add code to access_pairs
