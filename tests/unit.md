@@ -79,7 +79,11 @@ The testing for this part will initially be a bit limited.  Currently, there are
 *  Add Rooms where none have their own individual code but one pair makes a code ie, B24010201, B24020101, B24020101
     * Expected Outcome:  The key waiting for pickup be deleted and two of the spaces being assigned one code and the other waiting for for code assignment
     * Actual Outcome:  No errors but all three rooms are listed as not having codes
-    * Fix Applied:  fixed get_codes() so that a list of values can be processed instead of a single value and a new action was added to the basket route to delete code assignment requests that have not been approved. 
+    * Fix Applied:  fixed get_codes() so that a list of values can be processed instead of a single value and a new action was added to the basket route to delete code assignment requests that have not been approved.  The deletion process required multiple adjustments to correctly delete the prior record(s).  
+*  - Add three rooms that make an access code that replaces an existing two room access code
+
+Note:  More testing needs to be done on the missing codes logic.  It may work fine with the above test but the code functionality is not apparent.
+
 **In the cases below, the user has had requests approved**
 *  Add same key as what has already been received
 *  Add key that is not in access codes
