@@ -892,7 +892,7 @@ def submit_basket():
         print("code_id: ", code_id)
         print("room codes: ", room_codes)
         code_status = held_code[1]
-        if code_id not in room_codes:
+        if str(code_id) not in room_codes:
             # update key record to be deleted if the request status is 1 (key submitted, but not yet approved (not in queue yet))
             if code_status in [1, 10]:
                 print("Delete duplicate request that have not been approved")
