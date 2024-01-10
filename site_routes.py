@@ -785,6 +785,9 @@ def submit_basket():
     )
     # returns dictionary of access codes and rooms found, list of access codes, and rooms without codes
     codes = find_codes(unique_rooms_flattened, new_data)
+
+   
+    
     print("calc codes", codes["access_codes"])
     #  Update session variable that updates order basket
     print("updating session variables and table")
@@ -860,30 +863,31 @@ def submit_basket():
             # [{'space_id': 'B24020101', 'building_number': 24, 'wing_number': 2, 'floor_number': 1, 'room_number': 1, 'space_owner': 'Will Wright', 'building_approver': 'Bob Turtle', 'access_code': 2, 'space_owner_id': 2, 'building_approver_id': 1}]
             # add to request table
 
-            # need to fix this part - rerun using request for 'B24020102'
             for obj in codes["requested_spaces"]:
                 for k, v in obj.items():
-                    filter_record = [
-                        (i["space_owner_id"], i["building_approver_id"])
-                        for i in order_entries
-                        if i["space_id"] in v
-                    ]
-                    print(v)
-                    print(filter_record)
+                    if k != 'Request in Progress':
+                        filter_record = [
+                            (i["space_owner_id"], i["building_approver_id"])
+                            for i in order_entries
+                            if i["space_id"] in v
+                        ]
+                        print(v)
+                        print(filter_record)
 
-                    if len(filter_record) > 0:
-                        new_request = Requests(
-                            user_id=current_user.get_id(),
-                            spaces_requested=", ".join(v),
-                            building_number=v[0][1:3],
-                            space_owner_id=filter_record[0][0],
-                            approver_id=filter_record[0][1],
-                            access_code_id=int(k),
-                            request_status_id=1,
-                        )
-                        db.session.add(new_request)
-                        db.session.commit()
-                        print("request added to Requests table")
+                        if (len(filter_record) > 0):
+                            print(f"Add code {k} to database")
+                            new_request = Requests(
+                                user_id=current_user.get_id(),
+                                spaces_requested=", ".join(v),
+                                building_number=v[0][1:3],
+                                space_owner_id=filter_record[0][0],
+                                approver_id=filter_record[0][1],
+                                access_code_id=int(k),
+                                request_status_id=1,
+                            )
+                            db.session.add(new_request)
+                            db.session.commit()
+                            print("request added to Requests table")
     # when an existing key is not returned in the room_codes to issue then that key should be returned
 
     for held_code in existing_codes2:
@@ -895,7 +899,7 @@ def submit_basket():
         if str(code_id) not in room_codes:
             # update key record to be deleted if the request status is 1 (key submitted, but not yet approved (not in queue yet))
             if code_status in [1, 10]:
-                print("Delete duplicate request that have not been approved")
+                print(f"Delete code {code_id} request that have not been approved")
                 Requests.query.filter(Requests.user_id == user_id).filter(
                     Requests.access_code_id == code_id
                 ).delete(synchronize_session=False)
@@ -905,7 +909,7 @@ def submit_basket():
             # for request status 2,4, 5 (mid-request process), the request should be set to 8 *Key Returned) and inventory should be updated
             elif code_status in [2, 4, 5]:
                 print(
-                    'Update request for key not yet distributed to be "returned" to stop distribution'
+                    'Update code {code_id} request for key not yet distributed to be "returned" to stop distribution'
                 )
                 Requests.query.filter(Requests.user_id == user_id).filter(
                     Requests.access_code_id == code_id
