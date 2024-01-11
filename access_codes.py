@@ -144,7 +144,7 @@ def find_codes(requested_rooms, room_access_codes):
         # best_fit is just used to initialize - the values from this section are typically overwritten
         difference = len(requested_rooms)
         best_fit = (
-            None,
+            (0,),
             requested_rooms,
             difference,
             [{"Request in Progress": requested_rooms[0]}],
@@ -313,6 +313,9 @@ def find_codes(requested_rooms, room_access_codes):
         access_codes = list(best_fit[0])
         # add message
 
+    elif best_fit[0] is None:
+        print("No codes found")
+        pass
     else:
         print("last check: ", best_fit)
         requested_spaces = list(best_fit[3])
@@ -325,12 +328,15 @@ def find_codes(requested_rooms, room_access_codes):
     # maybe add message to dictionary
     def flatten_list(data):
         flat_list = []
-        for tuple_or_number in data:
-            if isinstance(tuple_or_number, tuple):
-                for item in tuple_or_number:
-                    flat_list.append(item)
-            else:
-                flat_list.append(tuple_or_number)
+        if data is None:
+            pass
+        else:
+            for tuple_or_number in data:
+                if isinstance(tuple_or_number, tuple):
+                    for item in tuple_or_number:
+                        flat_list.append(item)
+                else:
+                    flat_list.append(tuple_or_number)
         return flat_list
 
     results = {

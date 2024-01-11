@@ -786,42 +786,46 @@ def submit_basket():
     # returns dictionary of access codes and rooms found, list of access codes, and rooms without codes
     codes = find_codes(unique_rooms_flattened, new_data)
 
-   
-    
     print("calc codes", codes["access_codes"])
     #  Update session variable that updates order basket
     print("updating session variables and table")
     for record in order_entries:
-        for i, code in enumerate(codes["access_codes"]):
-            # print("test", record)
-            if code != 0:
-                # Assigns code to key request entry in the table
-                # This replaces the default value of TBD with the appropriate code
-                for room in codes["requested_spaces"][i][code]:
-                    if record["space_id"] == room:
-                        record["access_code"] = code
-                        print(f"Request for room {room} will be code {code}")
-            else:
-                # TBD is the default value in the table and the replacement of this value
-                # indicates the actions being taken since there is no existing code
-                # note:  the if below is probably not needed
-                if (record["access_code"] == "TBD") or (
-                    record["access_code"] == "Request in Progress"
-                ):
-                    record["access_code"] = "Key Code Requested"
-                    print(
-                        f"Requested room not found in access matrix.  Requested new code to be generated."
-                    )
+        # if no access coes are generated then this doesn't run
+        if len(codes["access_codes"]) != 0:
+            for i, code in enumerate(codes["access_codes"]):
+                # print("test", record)
+                if code != 0:
+                    # Assigns code to key request entry in the table
+                    # This replaces the default value of TBD with the appropriate code
+                    for room in codes["requested_spaces"][i][code]:
+                        if record["space_id"] == room:
+                            record["access_code"] = code
+                            print(f"Request for room {room} will be code {code}")
+                else:
+                    # TBD is the default value in the table and the replacement of this value
+                    # indicates the actions being taken since there is no existing code
+                    # note:  the if below is probably not needed
+                    if (record["access_code"] == "TBD") or (
+                        record["access_code"] == "Request in Progress"
+                    ):
+                        record["access_code"] = "Key Code Requested"
+                        print(
+                            f"Requested room not found in access matrix.  Requested new code to be generated."
+                        )
+
+        else:
+            record["access_code"] = "Key Code Requested2"
 
     # logic for storing sessions
     # need to improve messaging based on case
     session.modified = True
     session["order"] = order_entries
-
-    if int(codes["access_codes"][0]) != 0:
-        msg = "Exact Match Found"
+    if len(codes["access_codes"]) == 0:
+        msg = "No Access Codes Found - Requesting codes to be created."
+    elif int(codes["access_codes"][0]) != 0:
+        msg = "Access Code(s) Found"
     else:
-        msg = "Match Not Found"
+        msg = "Access Code(s) Not Found"
 
     session["msgs"] = []
     session["msgs"].append(msg)
@@ -865,7 +869,7 @@ def submit_basket():
 
             for obj in codes["requested_spaces"]:
                 for k, v in obj.items():
-                    if k != 'Request in Progress':
+                    if k != "Request in Progress":
                         filter_record = [
                             (i["space_owner_id"], i["building_approver_id"])
                             for i in order_entries
@@ -874,7 +878,7 @@ def submit_basket():
                         print(v)
                         print(filter_record)
 
-                        if (len(filter_record) > 0):
+                        if len(filter_record) > 0:
                             print(f"Add code {k} to database")
                             new_request = Requests(
                                 user_id=current_user.get_id(),
@@ -953,7 +957,8 @@ def submit_basket():
                 db.session.commit()
     elif len(rooms_without_codes) == 1:
         room22 = rooms_without_codes[0]
-        if room22 not in room_numbers:
+        # print("Waiting room: ", waiting_for_codes_rooms)
+        if room22 not in [j[0] for j in waiting_for_codes_rooms]:
             print(f"Deleting {room22} from database")
             user_id = current_user.get_id()
             (
