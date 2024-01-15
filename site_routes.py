@@ -937,14 +937,15 @@ def submit_basket():
             else:
                 print(f"No existing records need changed for this request")
 
-    # what happened to B24010201
+ 
     # check if keys requested are being requested again
     print("Prev room numbers requested without codes: ", rooms_without_codes)
     # may need to flatten room_numbers or make room_numbers be the flattened list of rooms that are returned - don't include missing codes
     print("Final rooom numbers requested: ", room_numbers)
     if len(rooms_without_codes) > 1:
         for room22 in rooms_without_codes:
-            if room22 not in room_numbers:
+            if (room22 not in [j[0] for j in waiting_for_codes_rooms]) and (
+                room22 not in room_numbers):
                 print(f"Deleting {room22} request from database")
                 user_id = current_user.get_id()
                 (
@@ -958,7 +959,7 @@ def submit_basket():
     elif len(rooms_without_codes) == 1:
         room22 = rooms_without_codes[0]
         # print("Waiting room: ", waiting_for_codes_rooms)
-        if room22 not in [j[0] for j in waiting_for_codes_rooms]:
+        if (room22 not in [j[0] for j in waiting_for_codes_rooms]) and (room22 not in room_numbers):
             print(f"Deleting {room22} from database")
             user_id = current_user.get_id()
             (

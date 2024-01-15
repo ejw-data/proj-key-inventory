@@ -76,6 +76,9 @@ The testing for this part will initially be a bit limited.  Currently, there are
 *  Add same multi-room request again
 *  Add new request for a single room that already exists in a multi-room request
 *  Add in one basket the same combination of keys twice
+*  !Add request for a room that does not have a code and follow up with another room request that does not exist inthe system.
+*  !Continue the above case by adding a single room that does not have a code.  
+
 **Need to revisit**
 *  Code 3 + B2400201 resulted in incorrectly deleting Code 3 and correctly add code request
 *  Add Rooms where none have their own individual code but one pair makes a code ie, B24010201, B24020101, B24020101
