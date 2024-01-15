@@ -990,29 +990,30 @@ def submit_basket():
     if len(codes["missing"]) > 0:
         for i in codes["missing"]:
             # create new table for these requests
-            print("Request for new code to be generated for these rooms: ", i)
+            if i not in rooms_without_codes: 
+                print("Request for new code to be generated for these rooms: ", i)
 
-            filtered_results = [
-                (j["space_owner_id"], j["building_approver_id"])
-                for j in order_entries
-                if j["space_id"] == i
-            ]
-            if (len(filtered_results) > 0) and (
-                i not in [j[0] for j in existing_codes2]
-            ):
-                new_request = Requests(
-                    user_id=current_user.get_id(),
-                    spaces_requested=i,
-                    building_number=i[1:3],
-                    space_owner_id=0,
-                    approver_id=filtered_results[0][1],
-                    access_code_id=0,
-                    request_status_id=10,
-                )
-                db.session.add(new_request)
-                db.session.commit()
-            else:
-                print("Missing room is already in requests - no action needed")
+                filtered_results = [
+                    (j["space_owner_id"], j["building_approver_id"])
+                    for j in order_entries
+                    if j["space_id"] == i
+                ]
+                if (len(filtered_results) > 0) and (
+                    i not in [j[0] for j in existing_codes2]
+                ):
+                    new_request = Requests(
+                        user_id=current_user.get_id(),
+                        spaces_requested=i,
+                        building_number=i[1:3],
+                        space_owner_id=0,
+                        approver_id=filtered_results[0][1],
+                        access_code_id=0,
+                        request_status_id=10,
+                    )
+                    db.session.add(new_request)
+                    db.session.commit()
+                else:
+                    print("Missing room is already in requests - no action needed")
     else:
         print("No missing codes requested")
 

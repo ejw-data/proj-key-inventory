@@ -70,22 +70,24 @@ The code for this feature is not a single function but multiple interacting piec
 The testing for this part will initially be a bit limited.  Currently, there are a limited number of rooms and access codes configured in the database so the following will be the initial tests until a large sample database is created:  
 
 **In the cases below, the user has not had any requests approved yet**  
-*  Add a single room that has an access code 
-*  Add the same single room again - update messaging on request form to indicate that the request is bypassed due to duplication
-*  Add multiple rooms that also include the initial room - this should delete the original unapproved request and add in the new request showing all the requested rooms in one request
-*  Add same multi-room request again
-*  Add new request for a single room that already exists in a multi-room request
-*  Add in one basket the same combination of keys twice
-*  !Add request for a room that does not have a code and follow up with another room request that does not exist inthe system.
-*  !Continue the above case by adding a single room that does not have a code.  
+*  Add a single room that has an access code  - B24010101
+*  Add the same single room again - update messaging on request form to indicate that the request is bypassed due to duplication  - B24010101
+*  Add multiple rooms that also include the initial room - this should delete the original unapproved request and add in the new request showing all the requested rooms in one request - Code 3 - B24010101, B24020101, B24020102
+*  Add same multi-room request again - Code 3 - B24010101, B24020101, B24020102
+*  Add new request for a single room that already exists in a multi-room request - B24020102
+*  Add in one basket the same combination of keys twice - B24020102,  B24020102
+*  !Add request for a room that does not have a code and follow up with another room request that does not exist in the system - B24010201, B24010201 (need to add new room)
+    * Error - Adds duplicate space add requests - added simple check
+*  Continue the above case by adding a single room that does not have a code - B24010201
 
 **Need to revisit**
-*  Code 3 + B2400201 resulted in incorrectly deleting Code 3 and correctly add code request
-*  Add Rooms where none have their own individual code but one pair makes a code ie, B24010201, B24020101, B24020101
+*  Code 3 + B2400201 resulted in incorrectly deleting Code 3 and correctly add code requestn- fixed
+*  Add Rooms where none have their own individual code but one pair makes a code ie, B24010201, B24020101, B24020102
     * Expected Outcome:  The key waiting for pickup be deleted and two of the spaces being assigned one code and the other waiting for for code assignment
     * Actual Outcome:  No errors but all three rooms are listed as not having codes
     * Fix Applied:  fixed get_codes() so that a list of values can be processed instead of a single value and a new action was added to the basket route to delete code assignment requests that have not been approved.  The deletion process required multiple adjustments to correctly delete the prior record(s).  
-*  - Add three rooms that make an access code that replaces an existing two room access code
+*  - Add three rooms that make an access code that replaces an existing two room access code - add Code 3 - B24010101, B24020101, B24020102
+* - Add a code but don't fill in all the form parts - ie PI/Manager - should just reset form
 
 Note:  More testing needs to be done on the missing codes logic.  It may work fine with the above test but the code functionality is not apparent.
 
