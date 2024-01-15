@@ -702,6 +702,7 @@ def request_room_filter(building):
     for record in records:
         data.append({name: getattr(record, name) for name in column_names})
 
+    print(data)
     wings = set()
     floors = set()
     rooms = set()
@@ -734,13 +735,17 @@ def request_room_filter(building):
                         str(i["floor_number"])
                     ] = [i["room_number"]]
             else:
-                if i["room_number"] not in rooms:
-                    rooms.add(i["room_number"])
-                    structure["wing"][str(i["wing_number"])]["floor"][
-                        str(i["floor_number"])
-                    ].append(i["room_number"])
-                else:
-                    continue
+                # # everything in the if below is probalby unnecessary
+                # if i["room_number"] not in rooms:
+                #     rooms.add(i["room_number"])
+                #     structure["wing"][str(i["wing_number"])]["floor"][
+                #         str(i["floor_number"])
+                #     ].append(i["room_number"])
+                # else:
+                structure["wing"][str(i["wing_number"])]["floor"][
+                    str(i["floor_number"])
+                ].append(i["room_number"])
+                   
         structure["wing"][str(i["wing_number"])]["floors"] = list(floors)
     structure["wings"] = list(wings)
 
