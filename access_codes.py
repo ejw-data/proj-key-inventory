@@ -1,4 +1,5 @@
 from query import get_access_code
+import numpy as np
 
 
 def asc_length(e):
@@ -70,9 +71,36 @@ def reduce_results(matrix: list, requested: list) -> list:
 # next filter any lists that have any elements not contained in lst
 
 
+# maybe add message to dictionary
+def flatten_list(data):
+    flat_list = []
+    if data is None:
+        pass
+    else:
+        for tuple_or_number in data:
+            if isinstance(tuple_or_number, tuple):
+                for item in tuple_or_number:
+                    flat_list.append(item)
+            else:
+                flat_list.append(tuple_or_number)
+    return flat_list
+
+
+def flatten_dict(data):
+    flat_list = set()
+    if data is None:
+        pass
+    else:
+        for obj in data:
+            for i in obj["value"]:
+                flat_list.add(i)
+    return list(flat_list)
+
+
 def find_codes(requested_rooms, room_access_codes):
     best_fit = tuple()
     stored_codes = tuple()
+    missing_room_removed_at_start = []
     loop_limit = 5
     # missing_codes = requested_rooms  # probably not needeed
     no_break = True
@@ -104,68 +132,150 @@ def find_codes(requested_rooms, room_access_codes):
             best_fit = (stored_codes, (), 0, [{stored_codes[0]: list(requested_rooms)}])
             no_break = False
             break
-        # no single code found
-        else:
-            if len(requested_rooms) == 1:
-                # no exact matches found
-                if resultant_codes == 0:
-                    print("Code not found - ")
-                    # request key and notify person
-                    stored_codes = stored_codes + tuple([resultant_codes])
+        # single room requested and no codes found
+        # request for key code to be created
+        elif (len(requested_rooms) == 1) and (resultant_codes == 0):
+            # no exact matches found
+            print("Code not found - ")
+            # request key and notify person
+            stored_codes = stored_codes + tuple([resultant_codes])
 
-                    if best_fit:
-                        current_status = best_fit[3] + [{"Request in Progress": requested_rooms[0]}]
-                    else:
-                        current_status = [{"Request in Progress": requested_rooms[0]}]
-
-                    # best fit:  codes found, rooms not found, number of rooms not found, dict of code/rooms found
-                    best_fit = (
-                        stored_codes,
-                        requested_rooms,
-                        1,
-                        current_status
-                    )
-                    no_break = False
-                    break
+            if best_fit:
+                current_status = best_fit[3] + [
+                    {"Request in Progress": requested_rooms[0]}
+                ]
             else:
-                print(
-                    "Multiple rooms requested and no match - need to check combinations for matches."
-                )
-        # code may be a combination of codes, go to section b
+                current_status = [{"Request in Progress": requested_rooms[0]}]
 
-        # proess to follow if there is multiple access codes available
+            # best fit:  codes found, rooms not found, number of rooms not found, dict of code/rooms found
+            best_fit = (stored_codes, requested_rooms, 1, current_status)
+            no_break = False
+            break
+
+        print(
+            "Multiple rooms requested and no single match - need to check code combinations for matches."
+        )
+        # code may be a combination of codes, go to section b
+        # process to follow if there is multiple access codes available
         print("section b, check if multiple access codes available")
         # print(room_access_codes)
         filtered_codes = reduce_results(room_access_codes, requested_rooms)
+
+        # ####################################################################################################
+        # if any of the rooms do not exist in filtered codes then remove them from the search
+        # so it wont cause problems and add them to the missing rooms.
+        # then seach for room combinations
+
+        missing_room_removed_at_start = []
+        temp = []
+        flattened_filtered_codes = flatten_dict(filtered_codes)
+        for i, room in enumerate(requested_rooms):
+            if room not in flattened_filtered_codes:
+                missing_room_removed_at_start.append(room)
+                print("issue: ", i, room)
+            else:
+                temp.append(room)
+        requested_rooms = tuple(temp)
+        # make sure missing_rooms does not needed added back later to record their status
+        print("missing_room_removed: ", missing_room_removed_at_start)
+        print("modified requested_rooms: ", requested_rooms)
         # for loop code combos
         filtered_codes.sort(reverse=True, key=asc_length)
-        # print("special sorting test: ", filtered_codes)
-        difference = len(requested_rooms)
-        # best fit needs dictionary of rooms per access code
-        best_fit = (
-            None,
-            requested_rooms,
-            difference,
-            [{"Request in Progress": requested_rooms[0]}],
+        print("special sorting test: ", filtered_codes)
+        # print("filtered codes: ", np.ravel([i["value"] for i in filtered_codes]))
+
+        ######################################################################################################
+        # after rooms removed, do a single room check..
+        if len(requested_rooms) != 0:
+            resultant_codes = get_access_code(requested_rooms)
+        else:
+            resultant_codes = 0
+
+        print(
+            "Zero indicates multiple codes needed and/or code needs created: ",
+            resultant_codes,
         )
+
+        # single access code found for all requested rooms
+        if resultant_codes != 0:
+            stored_codes = stored_codes + tuple([resultant_codes])
+            # best fit:  codes found, rooms not found, number of rooms not found, dict of code/rooms found
+            best_fit = (stored_codes, (), 0, [{stored_codes[0]: list(requested_rooms)}])
+            no_break = False
+            break
+        # single room requested and no codes found
+        # request for key code to be created
+        elif (len(requested_rooms) == 1) and (resultant_codes == 0):
+            # no exact matches found
+            print("Code not found - ")
+            # request key and notify person
+            stored_codes = stored_codes + tuple([resultant_codes])
+
+            if best_fit:
+                current_status = best_fit[3] + [
+                    {"Request in Progress": requested_rooms[0]}
+                ]
+            else:
+                current_status = [{"Request in Progress": requested_rooms[0]}]
+
+            # best fit:  codes found, rooms not found, number of rooms not found, dict of code/rooms found
+            best_fit = (stored_codes, requested_rooms, 1, current_status)
+            no_break = False
+            break
+
+        # might not be needed if I fix rejected request unit test
+        elif (len(requested_rooms) == 0) and (resultant_codes == 0):
+            best_fit = (
+                stored_codes,
+                missing_room_removed_at_start,
+                len(missing_room_removed_at_start),
+                (),
+            )
+            no_break = False
+            break
+
+        # best fit:  codes found, rooms not found, number of rooms not found, dict of code/rooms found
+        # best fit needs dictionary of rooms per access code
+        # Change:  first element was None instead of filtered_codes
+        # best_fit is just used to initialize - the values from this section are typically overwritten
+        missing_codes = missing_room_removed_at_start
+        difference = len(missing_room_removed_at_start)
+
+        if len(requested_rooms) > 0:
+            request_status = requested_rooms[0]
+        else:
+            request_status = 0
+
+        best_fit = (
+            (0,),
+            tuple(missing_codes),
+            difference,
+            [{"Request in Progress": request_status}],
+        )
+        print("test222 ", best_fit)
 
         # if filtered_codes length is 1 then assign as key and request access code for other rooms
         if len(filtered_codes) == 1:
             missing_rooms = list(requested_rooms).copy()
             # print("missing rooms", missing_rooms)
             # print(filtered_codes[0]["value"][0])
-            missing_rooms.remove(filtered_codes[0]["value"][0])
+            for only_found_rooms in filtered_codes[0]["value"]:
+                missing_rooms.remove(only_found_rooms)
             difference = len(missing_rooms)
             resultant_codes = filtered_codes[0]["id"]
             # best fit:  codes found, rooms not found, number of rooms not found, dict of code/rooms found
+
             best_fit = (
-                filtered_codes,
+                tuple([filtered_codes[0]["id"]]),
                 tuple(missing_rooms),
                 difference,
                 [{resultant_codes: list(filtered_codes[0]["value"])}],
             )
-
+            print("only one code: ", best_fit)
             # request access code to be created
+
+            no_break = False
+            break
 
         # otherwise search through list
         for i, filtered_code in enumerate(filtered_codes):
@@ -263,7 +373,7 @@ def find_codes(requested_rooms, room_access_codes):
                         # best fit:  codes found, rooms not found, number of rooms not found, dict of code/rooms found
                         best_fit = (
                             resultant_codes,
-                            missing_codes,
+                            missing_rooms,
                             difference,
                             new_dict,
                         )
@@ -299,12 +409,18 @@ def find_codes(requested_rooms, room_access_codes):
             outer_for_break = True
         loop_limit -= 1
 
+    print("Out of while loop")
+
     if best_fit[2] == 0:
         requested_spaces = list(best_fit[3])
         access_codes = list(best_fit[0])
         # add message
 
+    elif best_fit[0] is None:
+        print("No codes found")
+        pass
     else:
+        print("last check: ", best_fit)
         requested_spaces = list(best_fit[3])
         access_codes = list(best_fit[0])
         # query each code in the list to get the building number, space_owner, space_id, and access_code -
@@ -312,11 +428,10 @@ def find_codes(requested_rooms, room_access_codes):
         # part of a space_numbe_id list.
         # instead of query, extract first couple letters from room-request
 
-    # maybe add message to dictionary
     results = {
         "requested_spaces": list(best_fit[3]),
-        "access_codes": list(best_fit[0]),
-        "missing": list(best_fit[1]),
+        "access_codes": flatten_list(best_fit[0]),
+        "missing": list(best_fit[1]) + missing_room_removed_at_start,
     }
     return results
 

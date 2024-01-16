@@ -92,6 +92,12 @@ CREATE TABLE room_amenities (
 	room_seating INT
 ); 
 
+CREATE TABLE room_assignment (
+	assignment_id SERIAL PRIMARY KEY,
+	user_id INT REFERENCES users (user_id),
+	space_number_id VARCHAR REFERENCES rooms (space_number_id)
+);
+
 
 
 -- ACCESS ASSIGNMENT -------------------------------------------------------------------
@@ -115,8 +121,9 @@ CREATE TABLE request_status (
 CREATE TABLE requests (
 	request_id SERIAL PRIMARY KEY,
 	user_id INT,
-	space_number_id VARCHAR,
+	spaces_requested VARCHAR,
 	building_number INT,
+	space_owner_id INT,
 	approver_id INT,
 	access_code_id INT REFERENCES access_codes (access_code_id),
 	request_status_id INT DEFAULT 1 REFERENCES request_status (request_status_id),
