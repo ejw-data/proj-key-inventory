@@ -1,4 +1,5 @@
 from query import get_access_code
+import numpy as np
 
 
 def asc_length(e):
@@ -104,68 +105,74 @@ def find_codes(requested_rooms, room_access_codes):
             best_fit = (stored_codes, (), 0, [{stored_codes[0]: list(requested_rooms)}])
             no_break = False
             break
-        # no single code found
-        else:
-            if len(requested_rooms) == 1:
-                # no exact matches found
-                if resultant_codes == 0:
-                    print("Code not found - ")
-                    # request key and notify person
-                    stored_codes = stored_codes + tuple([resultant_codes])
+        # single room requested and no codes found
+        # request for key code to be created
+        elif (len(requested_rooms) == 1) and (resultant_codes == 0):
+            # no exact matches found
+            print("Code not found - ")
+            # request key and notify person
+            stored_codes = stored_codes + tuple([resultant_codes])
 
-                    if best_fit:
-                        current_status = best_fit[3] + [{"Request in Progress": requested_rooms[0]}]
-                    else:
-                        current_status = [{"Request in Progress": requested_rooms[0]}]
-
-                    # best fit:  codes found, rooms not found, number of rooms not found, dict of code/rooms found
-                    best_fit = (
-                        stored_codes,
-                        requested_rooms,
-                        1,
-                        current_status
-                    )
-                    no_break = False
-                    break
+            if best_fit:
+                current_status = best_fit[3] + [
+                    {"Request in Progress": requested_rooms[0]}
+                ]
             else:
-                print(
-                    "Multiple rooms requested and no match - need to check combinations for matches."
-                )
-        # code may be a combination of codes, go to section b
+                current_status = [{"Request in Progress": requested_rooms[0]}]
 
-        # proess to follow if there is multiple access codes available
+            # best fit:  codes found, rooms not found, number of rooms not found, dict of code/rooms found
+            best_fit = (stored_codes, requested_rooms, 1, current_status)
+            no_break = False
+            break
+
+        print(
+            "Multiple rooms requested and no single match - need to check code combinations for matches."
+        )
+        # code may be a combination of codes, go to section b
+        # process to follow if there is multiple access codes available
         print("section b, check if multiple access codes available")
         # print(room_access_codes)
         filtered_codes = reduce_results(room_access_codes, requested_rooms)
         # for loop code combos
         filtered_codes.sort(reverse=True, key=asc_length)
-        # print("special sorting test: ", filtered_codes)
-        difference = len(requested_rooms)
+        print("special sorting test: ", filtered_codes)
+        # print("filtered codes: ", np.ravel([i["value"] for i in filtered_codes]))
+
+        # best fit:  codes found, rooms not found, number of rooms not found, dict of code/rooms found
         # best fit needs dictionary of rooms per access code
+        # Change:  first element was None instead of filtered_codes
+        # best_fit is just used to initialize - the values from this section are typically overwritten
+        difference = len(requested_rooms)
         best_fit = (
             None,
             requested_rooms,
             difference,
             [{"Request in Progress": requested_rooms[0]}],
         )
+        print("test222 ", best_fit)
 
         # if filtered_codes length is 1 then assign as key and request access code for other rooms
         if len(filtered_codes) == 1:
             missing_rooms = list(requested_rooms).copy()
             # print("missing rooms", missing_rooms)
             # print(filtered_codes[0]["value"][0])
-            missing_rooms.remove(filtered_codes[0]["value"][0])
+            for only_found_rooms in filtered_codes[0]['value']:
+                missing_rooms.remove(only_found_rooms)
             difference = len(missing_rooms)
             resultant_codes = filtered_codes[0]["id"]
             # best fit:  codes found, rooms not found, number of rooms not found, dict of code/rooms found
+
             best_fit = (
-                filtered_codes,
+                tuple([filtered_codes[0]['id']]),
                 tuple(missing_rooms),
                 difference,
                 [{resultant_codes: list(filtered_codes[0]["value"])}],
             )
-
+            print("only one code: ", best_fit)
             # request access code to be created
+
+            no_break = False
+            break
 
         # otherwise search through list
         for i, filtered_code in enumerate(filtered_codes):
@@ -299,12 +306,15 @@ def find_codes(requested_rooms, room_access_codes):
             outer_for_break = True
         loop_limit -= 1
 
+    print("Out of while loop")
+
     if best_fit[2] == 0:
         requested_spaces = list(best_fit[3])
         access_codes = list(best_fit[0])
         # add message
 
     else:
+        print("last check: ", best_fit)
         requested_spaces = list(best_fit[3])
         access_codes = list(best_fit[0])
         # query each code in the list to get the building number, space_owner, space_id, and access_code -
@@ -313,9 +323,19 @@ def find_codes(requested_rooms, room_access_codes):
         # instead of query, extract first couple letters from room-request
 
     # maybe add message to dictionary
+    def flatten_list(data):
+        flat_list = []
+        for tuple_or_number in data:
+            if isinstance(tuple_or_number, tuple):
+                for item in tuple_or_number:
+                    flat_list.append(item)
+            else:
+                flat_list.append(tuple_or_number)
+        return flat_list
+
     results = {
         "requested_spaces": list(best_fit[3]),
-        "access_codes": list(best_fit[0]),
+        "access_codes": flatten_list(best_fit[0]),
         "missing": list(best_fit[1]),
     }
     return results

@@ -76,16 +76,16 @@ def get_access_code(room_list):
 
     # check this if it is an empty list and return zero
     # is there a case when this returns mutliple numbers? - I don't think so
-    # make this function return only a integer and if more than one integer 
+    # make this function return only a integer and if more than one integer
     # is returned then create error handling logic
     # I can simplify this to not include the list comprehension
-    print('Query results: ', results)
+    print("Query results: ", results)
 
     # temporary code for case when result list is empty
     if len(results) == 0:
         output = 0
 
-    # new code 
+    # new code
     for result in results:
         if result[0] == 0:
             output = 0
@@ -126,9 +126,15 @@ def get_profile():
         .count()
     )
 
+    # consider changing filter to use 'in' method and list of appropriate codes - 1,2,4,5,10
     pending_keys = (
         Requests.query.filter(Requests.user_id == login_user_id)
-        .filter(and_(Requests.request_status_id < 6, Requests.request_status_id != 3))
+        .filter(
+            or_(
+                and_(Requests.request_status_id < 6, Requests.request_status_id != 3),
+                Requests.request_status_id == 10,
+            )
+        )
         .count()
     )
     data = {

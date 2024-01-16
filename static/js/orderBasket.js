@@ -52,6 +52,23 @@ function clearTable(){
     })
 }
 
+function resetForm(){
+     setTimeout(function (){
+        d3.select('#building_number').property("value", "-1");
+        d3.select('#wing').property("value", "0");
+        d3.select('#wing').attr('disabled', true);
+        d3.select('#floor').property("value", "0");
+        d3.select('#floor').attr('disabled', true);
+        d3.select('#room').property("value", "0");
+        d3.select('#room').attr('disabled', true);
+        d3.select('#approver_id').property("value", "0");
+        d3.select('#approver_id').attr('disabled', true);
+        d3.select('#assignment_id').property("value", "0");
+        d3.select('#assignment_id').attr('disabled', true);
+
+
+        }, 1000);
+};
 // event runs when Request Key button is clicked
 // popup occurs through data actions
 let addKeyButton = d3.select('#add-key');
@@ -64,6 +81,7 @@ addKeyButton.on('click', i => {
 // add-key-submit only adds keys to local browser session variables
 let submitKey = d3.select('#add-key-submit')
 submitKey.on('click', i => {
+    resetForm();
     updateTable();
     activateSubmit();
 })
@@ -80,6 +98,7 @@ submitBasket.on('click', i => {
 let clearBasket = d3.select('#order-clear')
 clearBasket.on('click', i => {
     clearTable();
+    resetForm();
     activateSubmit();
 })
 
@@ -87,10 +106,17 @@ clearBasket.on('click', i => {
 let basketCloseButton = d3.select("#order-close");
 basketCloseButton.on('click', i => {
     clearTable();
+    resetForm();
     changeButton();
     addMsg();
     showForm();
-    // location.reload();
+    location.reload(true);
+});
+
+let requestButton = d3.select("#request-access-button");
+requestButton.on('click', i => {
+    clearTable();
+    resetForm();
 })
 
 

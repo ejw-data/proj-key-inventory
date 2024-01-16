@@ -17,15 +17,17 @@ VALUES (1,'requester'),
 		(3,'administrator'),
 		(4,'analyst');
 
-INSERT INTO users (user_id, first_name, last_name, title_id, role_id, email)
-VALUES (1,'erin', 'wills', 1, 1, 'ew@mysite.com', 1),
+INSERT INTO users (user_id, first_name, last_name, title_id, role_id, email, sponsor_id)
+VALUES (0,'unassigned', 'unassigned', 1,1,'unassigned', 1)
+		(1,'erin', 'wills', 1, 1, 'ew@mysite.com', 1),
 		(2,'will', 'wright', 1, 1, 'ww@mysite.com', 1),
 		(3,'andrew', 'ng', 1, 1, 'an@mysite.com', 1),
 		(4,'bob', 'turtle', 5, 3, 'bt@mysite.com', 1),
 		(5,'jake', 'powers', 9, 3, 'jp@mysite.com', 1);
 
 INSERT INTO approvers (approver_id,user_id, role_approved_by)
-VALUES (1,4, 5);
+VALUES (1,4, 5), 
+		(0,0,1);
 
 -- INSERT INTO authentication (id, username, password_hash)
 -- VALUES (1, 'ejwadmin', 'alf344t4090j0aojfsfa');
@@ -35,7 +37,8 @@ INSERT INTO buildings (building_number, building_name, building_description)
 VALUES (24, 'Chemistry', 'Chemistry Department Research Space');
 
 INSERT INTO approver_zones (building_number, approver_id)
-VALUES (24, 1);
+VALUES (24, 0),
+		(24, 1);
 
 INSERT INTO room_classification (room_type_id, room_type)
 VALUES (201, 'private office'),
@@ -48,13 +51,19 @@ VALUES ('B24010101', 24, 01, 01, 01, 210),
 		('B24020101', 24, 02, 01, 01, 201),
 		('B24020102', 24, 02, 01, 02, 220);
 
+INSERT INTO room_assignment (space_number_id, user_id)
+VALUES ('B24010101', 1),
+		('B24020101', 2),
+		('B24020102', 2);
+
 INSERT INTO room_amenities (space_number_id, room_projector, room_seating)
 VALUES ('B24010101', TRUE, 50),
 		('B24020101', FALSE, 1),
 		('B24020102', FALSE, 4);
 
 INSERT INTO access_codes (access_code_id, access_description, created_by, authorized_by)
-VALUES (1,'Classroom', 1, 1),
+VALUES (0,'Unassigned', 1, 1),
+		(1,'Classroom', 1, 1),
 		(2,'Faculty Office and Suite', 1, 1),
 		(3,'Front Suite Only', 1, 1);
 
@@ -68,7 +77,8 @@ VALUES (1,'REQUEST SUBMITTED'),
 		(6,'KEY ASSIGNED'),
 		(7,'KEY READY FOR RETURN',
 		(8,'KEY RETURNED'),
-		(9,'KEY LOST');
+		(9,'KEY LOST'),
+		(10, 'SPACE NEEDS ADDED TO SYSTEM');
 
 INSERT INTO access_pairs (access_code_id, space_number_id)
 VALUES (1, 'B24010101'),
@@ -100,7 +110,7 @@ VALUES (1,'ISSUED'),
 
 -- This will initiate some of the logic
 -- logic needs built to complete this request via forms  
-INSERT INTO requests (user_id, space_number_id, building_number, approver_id, access_code_id, status_code)
+INSERT INTO requests (user_id, spaces_requested, building_number, approver_id, access_code_id, status_code)
 VALUES (1, 'B24010101', 24, 1, 1, 1),
 		(2, 'B24010101', 24, 1, 2, 1),
 		(3, 'B24010101', 24, 1, 2, 1),

@@ -9,6 +9,7 @@ from models import (
     Rooms,
     RoomClassification,
     RoomAmenities,
+    RoomAssignment,
     Titles,
     Roles,
     AccessPairs,
@@ -24,7 +25,7 @@ from models import (
 from forms import update_order_status_form_instance
 
 from sqlalchemy.orm import aliased
-from sqlalchemy import or_, func
+from sqlalchemy import or_, func, union
 from flask_login import current_user
 import pandas as pd
 
@@ -141,9 +142,10 @@ def request_table(active):
                 Requests.request_id,
                 Users.first_name,
                 Users.last_name,
-                Requests.space_number_id,
+                Requests.spaces_requested,
                 Requests.approved,
                 RequestStatus.request_status_name,
+                Requests.access_code_id,
             )
             .filter(Requests.user_id == login_user_id)
             .join(
@@ -160,11 +162,15 @@ def request_table(active):
                 Requests.request_id,
                 Users.first_name,
                 Users.last_name,
-                Requests.space_number_id,
+                Requests.spaces_requested,
                 Requests.approved,
                 RequestStatus.request_status_name,
+                Requests.access_code_id,
             )
-            .filter(Requests.user_id == login_user_id, Requests.request_status_id < 6)
+            .filter(
+                Requests.user_id == login_user_id,
+                or_(Requests.request_status_id < 6, Requests.request_status_id == 10),
+            )
             .join(
                 RequestStatus,
                 RequestStatus.request_status_id == Requests.request_status_id,
@@ -179,9 +185,10 @@ def request_table(active):
                 Requests.request_id,
                 Users.first_name,
                 Users.last_name,
-                Requests.space_number_id,
+                Requests.spaces_requested,
                 Requests.approved,
                 RequestStatus.request_status_name,
+                Requests.access_code_id,
             )
             .filter(
                 Requests.user_id == login_user_id,
@@ -208,7 +215,8 @@ def request_table(active):
                 {
                     "Request ID": record[0],
                     "User Name": f"{record[1].title()} {record[2].title()}",
-                    "Room Code": record[3],
+                    "Room": record[3],
+                    "Room Code": record[6],
                     "Approval Status": "Approved" if bool(record[4]) else "PENDING",
                     "Request Status": record[5],
                 }
@@ -217,7 +225,8 @@ def request_table(active):
             data.append(
                 {
                     "Request ID": record[0],
-                    "Room Code": record[3],
+                    "Room": record[3],
+                    "Room Code": record[6],
                     "Approval Status": "Approved" if bool(record[4]) else "PENDING",
                     "Request Status": record[5],
                 }
@@ -312,6 +321,8 @@ def users_table():
 def users_grouped_table():
     """
     Route used to get all users access
+    Issue:  if requests table is empty then it returns an error when doing the groupby
+            - a short term fix is to put an if statement around it
     """
 
     records = (
@@ -320,7 +331,7 @@ def users_grouped_table():
             Users.first_name,
             Users.last_name,
             Users.email,
-            Requests.space_number_id,
+            Requests.spaces_requested,
         )
         .join(Requests, Requests.user_id == Users.user_id)
         .order_by(Users.last_name)
@@ -341,12 +352,17 @@ def users_grouped_table():
 
     df = pd.DataFrame(data)
 
-    users_and_spaces = (
-        df.groupby(["User ID", "First Name", "Last Name", "Email"])["Accessible Spaces"]
-        .apply(lambda x: ", ".join(x))
-        .reset_index()
-    )
-    data = users_and_spaces.to_dict(orient="records")
+    if len(df) == 0:
+        data = [{}]
+    else:
+        users_and_spaces = (
+            df.groupby(["User ID", "First Name", "Last Name", "Email"])[
+                "Accessible Spaces"
+            ]
+            .apply(lambda x: ", ".join(x))
+            .reset_index()
+        )
+        data = users_and_spaces.to_dict(orient="records")
 
     return jsonify(data)
 
@@ -356,24 +372,63 @@ def users_grouped_table():
 def buildings_grouped_table():
     """
     Route used to get all building access
+    Issue:  if requests table is empty then it returns an error when doing the groupby
+            - a short term fix is to put an if statement around it
     """
+    # BREAKS - will break due to changing data type of Requests.spaces_requested from single room name to a list of room names
+    # records = (
+    #     Users.query.with_entities(
+    #         Users.user_id,
+    #         Users.first_name,
+    #         Users.last_name,
+    #         Users.email,
+    #         Requests.spaces_requested,
+    #         RoomClassification.room_type,
+    #     )
+    #     .join(Requests, Requests.user_id == Users.user_id)
+    #     .join(Rooms, Rooms.space_number_id == Requests.spaces_requested)
+    #     .join(RoomClassification, RoomClassification.room_type_id == Rooms.room_type_id)
+    #     .order_by(Users.last_name)
+    #     .all()
+    # )
 
-    records = (
-        Users.query.with_entities(
-            Users.user_id,
+    spaces_with_codes = (Requests.query.with_entities(
+            Requests.user_id,
             Users.first_name,
             Users.last_name,
             Users.email,
-            Requests.space_number_id,
+            AccessPairs.space_number_id,
             RoomClassification.room_type,
         )
-        .join(Requests, Requests.user_id == Users.user_id)
-        .join(Rooms, Rooms.space_number_id == Requests.space_number_id)
-        .join(RoomClassification, RoomClassification.room_type_id == Rooms.room_type_id)
-        .order_by(Users.last_name)
-        .all()
+        .join(Users, Users.user_id == Requests.user_id)
+        .join(AccessPairs, AccessPairs.access_code_id == Requests.access_code_id)
+        .join(Rooms, Rooms.space_number_id == AccessPairs.space_number_id, isouter=True)
+        .join(
+            RoomClassification,
+            RoomClassification.room_type_id == Rooms.room_type_id,
+            isouter=True,
+        )
+        .where(Requests.request_status_id.not_in((3, 8)))
+    )
+    spaces_without_codes = (Requests.query.with_entities(
+            Requests.user_id,
+            Users.first_name,
+            Users.last_name,
+            Users.email,
+            Requests.spaces_requested,
+            RoomClassification.room_type,
+        )
+        .join(Users, Users.user_id == Requests.user_id)
+        .join(Rooms, Rooms.space_number_id == Requests.spaces_requested)
+        .join(
+            RoomClassification,
+            RoomClassification.room_type_id == Rooms.room_type_id)
+        .where(Requests.access_code_id == 0)
     )
 
+    query = db.union(spaces_with_codes, spaces_without_codes)
+    records = db.session.execute(query)
+ 
     data = []
     for record in records:
         data.append(
@@ -386,12 +441,15 @@ def buildings_grouped_table():
 
     df = pd.DataFrame(data)
 
-    users_and_spaces = (
-        df.groupby(["Room", "Room Type"])["People With Access"]
-        .apply(lambda x: "<br> ".join(x))
-        .reset_index()
-    )
-    data = users_and_spaces.to_dict(orient="records")
+    if len(df) == 0:
+        data = [{}]
+    else:
+        users_and_spaces = (
+            df.groupby(["Room", "Room Type"])["People With Access"]
+            .apply(lambda x: "<br> ".join(x))
+            .reset_index()
+        )
+        data = users_and_spaces.to_dict(orient="records")
 
     return jsonify(data)
 
@@ -632,7 +690,7 @@ def new():
 
 @api.route("/building/info/<building>", methods=["GET"])
 @include_login_form
-def menu_filter(building):
+def request_room_filter(building):
     """
     Used to retrieve data to update dropdown menus
     as seen in formFieldUpdate.js
@@ -653,16 +711,28 @@ def menu_filter(building):
             wings.add(i["wing_number"])
             floors.add(i["floor_number"])
             rooms.add(i["room_number"])
-            structure["wing"] = {
-                str(i["wing_number"]): {"floor": {str(i["floor_number"]): [i["room_number"]]}}
-            }
+            if "wing" not in structure:
+                structure["wing"] = {
+                    str(i["wing_number"]): {
+                        "floor": {str(i["floor_number"]): [i["room_number"]]}
+                    }
+                }
+            else:
+                structure["wing"][str(i["wing_number"])] = {
+                    "floor": {str(i["floor_number"]): [i["room_number"]]}
+                }
         else:
             if i["floor_number"] not in floors:
                 floors.add(i["floor_number"])
                 rooms.add(i["room_number"])
-                structure["wing"][str(i["wing_number"])]["floor"][str(i["floor_number"])] = [
-                    i["room_number"]
-                ]
+                if "floor" not in structure["wing"][str(i["wing_number"])]:
+                    structure["wing"][str(i["wing_number"])]["floor"] = {
+                        str(i["floor_number"]): [i["room_number"]]
+                    }
+                else:
+                    structure["wing"][str(i["wing_number"])]["floor"][
+                        str(i["floor_number"])
+                    ] = [i["room_number"]]
             else:
                 if i["room_number"] not in rooms:
                     rooms.add(i["room_number"])
@@ -671,9 +741,62 @@ def menu_filter(building):
                     ].append(i["room_number"])
                 else:
                     continue
-
+        structure["wing"][str(i["wing_number"])]["floors"] = list(floors)
     structure["wings"] = list(wings)
-    structure["wing"][str(i["wing_number"])]["floors"] = list(floors)
 
     print(structure)
     return jsonify(structure)
+
+
+@api.route("/approver/info/<building_number>", methods=["GET"])
+@include_login_form
+def request_approver_filter(building_number):
+    """
+    Used to retrieve data to update dropdown menus
+    as seen in formFieldUpdate.js
+    """
+    building_approver = (
+        Zones.query.with_entities(
+            Zones.approver_id, Users.first_name, Users.last_name, Users.email
+        )
+        .distinct()
+        .join(Approvers, Approvers.approver_id == Zones.approver_id)
+        .join(Users, Users.user_id == Approvers.user_id)
+        .filter(Zones.building_number == building_number)
+    )
+
+    approver_list = [
+        {
+            "approver_id": i.approver_id,
+            "name": f"{i.first_name.title()} {i.last_name.title()} - ({i.email})",
+        }
+        for i in building_approver
+    ]
+
+    return jsonify(approver_list)
+
+
+@api.route("/assignment/info/<space_number>", methods=["GET"])
+@include_login_form
+def request_assignee_filter(space_number):
+    """
+    Used to retrieve data to update dropdown menus
+    as seen in formFieldUpdate.js
+    """
+    space_assignee = (
+        RoomAssignment.query.with_entities(
+            RoomAssignment.user_id, Users.first_name, Users.last_name, Users.email
+        )
+        .join(Users, Users.user_id == RoomAssignment.user_id)
+        .filter(RoomAssignment.space_number_id == space_number)
+    )
+
+    assignee_list = [
+        {
+            "user_id": i.user_id,
+            "name": f"{i.first_name.title()} {i.last_name.title()} - ({i.email})",
+        }
+        for i in space_assignee
+    ]
+
+    return jsonify(assignee_list)
