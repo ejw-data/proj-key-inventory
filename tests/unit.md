@@ -91,21 +91,21 @@ The testing for this part will initially be a bit limited.  Currently, there are
 
 Note:  More testing needs to be done on the missing codes logic.  It may work fine with the above test but the code functionality is not apparent.
 
-**In the cases below, the user has had requests approved**
-*  Add same key as what has already been received - Add Code 3 - Need to add in message
+**In the cases below, the user has had requests assigned and approved**
+*  Add same key as what has already been received - Add Code 3 - Need to add a message
 *  Add key that is not in access codes - B24010201
 *  Add key that does not have it's own code but is part of another combo code - B24020102
-*  Add request that includes a key that has no individual code but as a combo of multiple keys has a code 
+*  Add request that includes a key that has no individual code but as a combo of multiple keys has a code - B24020101
     * Expected Outcome:  The key pending a code should be removed and the request should be for one access code that is waiting for approval. The assigned code is changed to be waiting return.
     * Actual Outcome:  IndexError: list index out of range - site_routes.py on line 865 - space_owner_id=filter_record[0][0]
     * Fix Applied:  Set conditional check from looking at a single item to looking at any item in a list; also updated logic for deleting keys and code requests that have not been fulfilled.  Expected outcome is now occuring.  
 
 **In the cases below, the user has had requests ready for pickup**  
+Same tests as above
 
 
-
-**In the cases below, the user has had requests assigned**
-
+**In the cases below, the user has had requests approved**
+Same tests as above
 
 
 **In the cases below, the user has had requests declined**

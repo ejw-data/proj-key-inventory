@@ -987,10 +987,13 @@ def submit_basket():
 
     # loop through missing dictionary
     # add code to access_pairs
-    if len(codes["missing"]) > 0:
-        for i in codes["missing"]:
+    # note: earlier in code the missing rooms are added twice only if the room was part of a previously rejected request
+    missing_rooms = list(set(codes['missing']))
+    print(missing_rooms)
+    if len(missing_rooms) > 0:
+        for i in missing_rooms:
             # create new table for these requests
-            if i not in rooms_without_codes: 
+            if (i not in rooms_without_codes): 
                 print("Request for new code to be generated for these rooms: ", i)
 
                 filtered_results = [

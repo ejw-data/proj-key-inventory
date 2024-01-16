@@ -184,10 +184,12 @@ def find_codes(requested_rooms, room_access_codes):
         print("special sorting test: ", filtered_codes)
         # print("filtered codes: ", np.ravel([i["value"] for i in filtered_codes]))
 
-
         ######################################################################################################
         # after rooms removed, do a single room check..
-        resultant_codes = get_access_code(requested_rooms)
+        if len(requested_rooms) != 0:
+            resultant_codes = get_access_code(requested_rooms)
+        else:
+            resultant_codes = 0
 
         print(
             "Zero indicates multiple codes needed and/or code needs created: ",
@@ -221,7 +223,16 @@ def find_codes(requested_rooms, room_access_codes):
             no_break = False
             break
 
-        
+        # might not be needed if I fix rejected request unit test
+        elif (len(requested_rooms) == 0) and (resultant_codes == 0):
+            best_fit = (
+                stored_codes,
+                missing_room_removed_at_start,
+                len(missing_room_removed_at_start),
+                (),
+            )
+            no_break = False
+            break
 
         # best fit:  codes found, rooms not found, number of rooms not found, dict of code/rooms found
         # best fit needs dictionary of rooms per access code
@@ -230,11 +241,16 @@ def find_codes(requested_rooms, room_access_codes):
         missing_codes = missing_room_removed_at_start
         difference = len(missing_room_removed_at_start)
 
+        if len(requested_rooms) > 0:
+            request_status = requested_rooms[0]
+        else:
+            request_status = 0
+
         best_fit = (
             (0,),
             tuple(missing_codes),
             difference,
-            [{"Request in Progress": requested_rooms[0]}],
+            [{"Request in Progress": request_status}],
         )
         print("test222 ", best_fit)
 
