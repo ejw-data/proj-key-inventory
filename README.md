@@ -1,5 +1,17 @@
 # proj-key-inventory
 
+Author:  Erin James Wills, ejw.data@gmail.com
+
+![Key Application](./images/key-database.png)
+
+<cite>Photo by <a href="https://unsplash.com/@contradirony?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Samantha Lam</a> on <a href="https://unsplash.com/photos/silver-and-gold-round-coins-zFy6fOPZEu0?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
+  </cite>
+
+```
+Status:  This is an ongoing project.  The original purpose of this repo was to develop a flask-sqlalchemy template that could be used for projects that need a custom login.  In the past, I have made several similar applications using different technologies.  Since I created these applications for academic groups at work, I did not keep the code and often had to use their preferred platform.  This specific repo mimics a system I built several years ago that automated some of my tasks.  This application is a bit more comprehensive than some of the past projects since I could choose a much more flexible platform.  
+
+Currently, this project works well for requesting, rejecting, and approving key requests.  Additional testing is being done to ensure the program works for when keys are ready for pickup, returned, lost, or broken.   My upcoming goals will be to refactor two functions to be more readable since these functions exploded in size and complexity as I added functionality.  My second priority is to ensure that the code works for different stages of the key process.  
+```
 ## Objective
 > Create a cloud-based space management system that will automate traditional keys systems found at universities.  Often universities use a decentralized system for managing key and key card access.  Relying on a decentralized system often creates several issues such as:
     - building managers must approve all keys and maintain their own system of tracking users leading to issues when buiding managers leave or do not have time to create a quality record system
@@ -14,7 +26,8 @@ This system is a self-serve web portal that allows building managers to add new 
 ## Features
 - User Access
     *  Login page that hashes passwords in the database
-    *  Only administrators can add users but upon first login the user much generate their own password
+    *  Only administrators can add users but upon first login the user must generate their own password
+    *  Header shows logged in user and has options for logging out and changing users.  
 
 - App Security
     *  Flask app manages security of form submissions, form validation, cookies, and access  
@@ -25,12 +38,13 @@ This system is a self-serve web portal that allows building managers to add new 
     *  Complicated manipulations created in PL/pgSQL
     *  Database triggers used to automate tasks 
     *  Multistep workflow built into table design
-    *  SQLAlchemy used to manage queries using ORM Table methods (instead of session methods)
+    *  SQLAlchemy was used to manage queries using ORM Table methods (instead of session methods)
+    *  Standard SQL was used in query that finds unique access codes - wrote query to accept varying size inputs
 
 - App Modularity
-    *  HTML tables are generated from javascript (d3.js) and apis.
-    *  Order basket updates without page reloads and utilizes api that loads updated HTML for only a section of the page
-    *  Site pages and api routes are separated into separate files
+    *  HTML tables are generated from javascript (d3.js) and APIs.
+    *  Order basket updates without page reloads and utilizes API that loads updated HTML for only a section of the page
+    *  Site pages and API routes are separated into separate files
     *  Site templates and layouts applied
     *  Custom jinja filters created to add python functionality and make code more readable
     *  App split into multiple files for ease of tracking and updating
@@ -43,10 +57,8 @@ This system is a self-serve web portal that allows building managers to add new 
     *  Order basket determines optimum selection of ordered items to show fewest dispersements - checks inventory of available keys, checks if key needs fabricated, checks to see if key needs added to system, checks to see if keys need returned.
 
 - Staff Interface - Custom Views by Role
-    * Dashboard
-    * Admin
-    * Key Shop
-    * Building Manager
+    * Dashboard, Admin, Key Shop, Building Manager
+    * To make HTML interface code more concise, created custom jinja templates
     
 - App Development Processes
     *  Used venv as a simple virtual environment
@@ -76,9 +88,10 @@ Currently there are no collaborators and advanced features will probably not be 
 ## Future Features
 - Priority Goals
     *  Deploy to the cloud - AWS, GCP, Azure (Microsoft), IBM Cloud
+    *  Refactor two functions related to finding codes and updating the database.
+    *  Add unit testing and starting dataset
     *  Add splinter synthetic monitoring and error handling that is logged
     *  Create user logs and monitor cloud performance
-    *  Add unit testing and starting dataset
     *  Add form logical tests
     *  Move queries to query.py and disperse code via functions
     *  Use font awesome for icons
