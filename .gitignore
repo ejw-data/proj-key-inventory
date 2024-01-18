@@ -9,10 +9,10 @@
 
 # Exclude files in this folder
 archive/
+prod/
 
 # Exclude these files
 config.py 
-
 
 # Mac related hidden files
 .DS_Store

@@ -18,12 +18,12 @@ VALUES (1,'requester'),
 		(4,'analyst');
 
 INSERT INTO users (user_id, first_name, last_name, title_id, role_id, email, sponsor_id)
-VALUES (0,'unassigned', 'unassigned', 1,1,'unassigned', 1)
-		(1,'erin', 'wills', 1, 1, 'ew@mysite.com', 1),
-		(2,'will', 'wright', 1, 1, 'ww@mysite.com', 1),
+VALUES (0,'unassigned', 'unassigned', 1,1,'unassigned', 1),
+		(1,'erin', 'wills', 1, 3, 'ew@mysite.com', 1),
+		(2,'will', 'wright', 1, 4, 'ww@mysite.com', 1),
 		(3,'andrew', 'ng', 1, 1, 'an@mysite.com', 1),
-		(4,'bob', 'turtle', 5, 3, 'bt@mysite.com', 1),
-		(5,'jake', 'powers', 9, 3, 'jp@mysite.com', 1);
+		(4,'bob', 'turtle', 5, 2, 'bt@mysite.com', 1),
+		(5,'jake', 'powers', 9, 2, 'jp@mysite.com', 1);
 
 INSERT INTO approvers (approver_id,user_id, role_approved_by)
 VALUES (1,4, 5), 
@@ -36,9 +36,8 @@ VALUES (1,4, 5),
 INSERT INTO buildings (building_number, building_name, building_description)
 VALUES (24, 'Chemistry', 'Chemistry Department Research Space');
 
-INSERT INTO approver_zones (building_number, approver_id)
-VALUES (24, 0),
-		(24, 1);
+INSERT INTO zones (building_number, approver_id)
+VALUES (24, 1);
 
 INSERT INTO room_classification (room_type_id, room_type)
 VALUES (201, 'private office'),
@@ -46,15 +45,19 @@ VALUES (201, 'private office'),
 		(210, 'classroom'),
 		(220, 'shared office');
 
-INSERT INTO rooms (space_number_id, building_number, floor_number, wing_number, room_number, room_type)
+INSERT INTO rooms (space_number_id, building_number, floor_number, wing_number, room_number, room_type_id)
 VALUES ('B24010101', 24, 01, 01, 01, 210),
+		('B24010201', 24, 01, 02, 01, 210),
+		('B24010202', 24, 01, 02, 02, 210),
 		('B24020101', 24, 02, 01, 01, 201),
 		('B24020102', 24, 02, 01, 02, 220);
 
 INSERT INTO room_assignment (space_number_id, user_id)
 VALUES ('B24010101', 1),
 		('B24020101', 2),
-		('B24020102', 2);
+		('B24020102', 2),
+		('B24010101', 2),
+		('B24010201', 1);
 
 INSERT INTO room_amenities (space_number_id, room_projector, room_seating)
 VALUES ('B24010101', TRUE, 50),
@@ -68,14 +71,14 @@ VALUES (0,'Unassigned', 1, 1),
 		(3,'Front Suite Only', 1, 1);
 
 -- change status_code to status_code_id
-INSERT INTO approval_status (status_code, status_code_name)
+INSERT INTO request_status (request_status_id, request_status_name)
 VALUES (1,'REQUEST SUBMITTED'),
 		(2,'REQUEST APPROVED'),
 		(3,'REQUEST REJECTED'),
 		(4,'KEY CREATED'),
 		(5,'KEY READY FOR PICKUP'),
 		(6,'KEY ASSIGNED'),
-		(7,'KEY READY FOR RETURN',
+		(7,'KEY READY FOR RETURN'),
 		(8,'KEY RETURNED'),
 		(9,'KEY LOST'),
 		(10, 'SPACE NEEDS ADDED TO SYSTEM');
@@ -108,14 +111,14 @@ VALUES (1,'ISSUED'),
 		(5,'LOST'),
 		(6,'TRANSFERRED');
 
--- This will initiate some of the logic
--- logic needs built to complete this request via forms  
-INSERT INTO requests (user_id, spaces_requested, building_number, approver_id, access_code_id, status_code)
-VALUES (1, 'B24010101', 24, 1, 1, 1),
-		(2, 'B24010101', 24, 1, 2, 1),
-		(3, 'B24010101', 24, 1, 2, 1),
-		(4, 'B24010101', 24, 1, 2, 1),
-		(5, 'B24010101', 24, 1, 3, 1);
+-- -- This will initiate some of the logic
+-- -- logic needs built to complete this request via forms  
+-- INSERT INTO requests (user_id, spaces_requested, building_number, approver_id, access_code_id, status_code)
+-- VALUES (1, 'B24010101', 24, 1, 1, 1),
+-- 		(2, 'B24010101', 24, 1, 2, 1),
+-- 		(3, 'B24010101', 24, 1, 2, 1),
+-- 		(4, 'B24010101', 24, 1, 2, 1),
+-- 		(5, 'B24010101', 24, 1, 3, 1);
 
 -- INSERT INTO key_inventory (transaction_id, key_number, key_copy, key_status_id)
 -- VALUES (1, 43221, 1, 1),

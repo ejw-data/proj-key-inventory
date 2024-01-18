@@ -11,16 +11,16 @@ def create_app():
     app.json.sort_keys = False
     app.config["SECRET_KEY"] = secret_key
 
-    ENV = "dev"
+    ENV = "prod"
 
     if ENV == "dev":
         app.debug = True
-        app.config["SQLALCHEMY_DATABASE_URI"] = path["key_inventory"]
-        app.config["SQLALCHEMY_BINDS"] = {"key_inventory": path["key_inventory"]}
+        app.config["SQLALCHEMY_DATABASE_URI"] = path["local_db"]
+        app.config["SQLALCHEMY_BINDS"] = {"key_inventory": path["local_db"]}
     elif ENV == "prod":
         app.debug = False
-        app.config["SQLALCHEMY_DATABASE_URI"] = "hidden connection string"
-        app.config["SQLALCHEMY_BINDS"] = {"key_inventory": "hidden connection string"}
+        app.config["SQLALCHEMY_DATABASE_URI"] = path["gcp_db"]
+        app.config["SQLALCHEMY_BINDS"] = {"key_inventory": path["gcp_db"]}
     else:
         print("Please select an environment:  developement or production.")
 

@@ -13,11 +13,12 @@ DROP TABLE IF EXISTS titles;
 DROP TABLE IF EXISTS roles;
 DROP TABLE IF EXISTS approvers CASCADE;
 DROP TABLE IF EXISTS request_status;
-DROP TABLE IF EXISTS approver_zones;
+DROP TABLE IF EXISTS zones; 
 DROP TABLE IF EXISTS buildings CASCADE;
 DROP TABLE IF EXISTS fabrication_status;
 DROP TABLE IF EXISTS authentication;
 DROP TABLE IF EXISTS order_status;
+DROP TABLE IF EXISTS room_assignment;
 
 -- USERS ------------------------------------------------------
 CREATE TABLE titles (
@@ -37,7 +38,7 @@ CREATE TABLE users (
 	title_id INT REFERENCES titles (title_id),
 	role_id INT REFERENCES roles (role_id),
 	email VARCHAR UNIQUE NOT NULL,
-	sponsor_id REFERENCES users (user_id)
+	sponsor_id INT
 );
 
 -- make FK for role_approved_by - may need new table
@@ -65,7 +66,7 @@ CREATE TABLE buildings (
 	building_description VARCHAR NOT NULL
 );
 
-CREATE TABLE approver_zones (
+CREATE TABLE zones (
 	building_number INT REFERENCES buildings (building_number),
 	approver_id INT REFERENCES approvers (approver_id),
 	PRIMARY KEY (building_number, approver_id)
@@ -132,7 +133,7 @@ CREATE TABLE requests (
 	approved BOOL DEFAULT FALSE,
 	approval_comment VARCHAR,
 	rejection_comment VARCHAR,
-	FOREIGN KEY (building_number, approver_id) REFERENCES approver_zones (building_number, approver_id)
+	FOREIGN KEY (building_number, approver_id) REFERENCES zones (building_number, approver_id)
 );
 -- ALTER TABLE requests ALTER COLUMN request_date SET DEFAULT now();
 -- in the future move the comment to a separate table that includes the request_id/transaction_id

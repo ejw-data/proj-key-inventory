@@ -122,6 +122,7 @@ Currently there are no collaborators and advanced features will probably not be 
 * `pip install psycopg2`
 * `pip install flask_login`
 * `pip install pandas`
+* `pip install gunicorn`
 
 * may need the `pip install ipykernel` - this is really only needed for interactive window in VSCode 
 

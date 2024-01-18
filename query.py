@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, text, and_, or_
 from flask_login import current_user
 import json
-from config import username, password, hostname, database
+from db_paths import path
 from models import Users, Titles, Roles, KeyOrders, Requests
 
 # Sample query of the database
@@ -11,10 +11,13 @@ def get_access_code(room_list):
     """
     Retrieve key access code
     """
-    # replace connection with 'path' from db_paths.py - in attempt to reduce duplications
-    engine = create_engine(
-        f"postgresql+psycopg2://{username}:{password}@{hostname}/{database}"
-    )
+    # change this in the future so it references the code in setup.py
+    ENV = "prod"
+
+    if ENV == "dev":
+        engine = create_engine(path["local_db"])
+    elif ENV == "prod":
+        engine = create_engine(path["gcp_db"])
 
     # values = ["B24010101", "B24020102", "B24020101"]
     tuple_list = tuple([(i,) for i in room_list])
