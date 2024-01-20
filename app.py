@@ -41,8 +41,14 @@ def load_user(login_id):
 
 
 # generate database if it doesn't exist
-if ~(database_exists(path["local_db"])):
-    db.create_all(bind_key=["key_inventory"])
+ENV = "prod"
+
+if ENV == "dev":
+    if ~(database_exists(path["local_db"])):
+        db.create_all(bind_key=["key_inventory"])
+# elif ENV == 'prod':
+#     if ~(database_exists(path["gcp_db"])):
+#         db.create_all(bind_key=["key_inventory"])
 
 # run app
 if __name__ == "__main__":

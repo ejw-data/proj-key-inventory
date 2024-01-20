@@ -64,3 +64,6 @@ inside folder add main.py
 inside folder add app.yaml
 
 then deploy
+
+Added Cloud SQL Admin API
+Create Credentials
