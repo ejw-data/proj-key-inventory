@@ -156,20 +156,26 @@ Currently there are no collaborators and advanced features will probably not be 
 
 ## App Images  
 
-![App](./images/login.png | width=200)  
+![App](./images/login_long.png)  
 App Login page  
+<br>
 
 ![App](./images/admin_view.png)
-Admin View
+Admin View  
+<br>
 
 ![App](./images/role_based_menus.png)
 Key Requester View  
+<br>
 
 ![App](./images/dynamic_tables.png)
 Tables dynamically generated with interactive features  
+<br>
 
 ![App](./images/basket_menu.png)
-Popup modals that dynamically update without page reloads, dropdowns populate based on current form inputs
+Popup modals that dynamically update without page reloads, dropdowns populate based on current form inputs   
+<br>
 
 ![App](./images/logout.png)  
 Logout modal
+<br>
