@@ -69,6 +69,7 @@ This system is a self-serve web portal that allows building managers to add new 
     ![App](./images/admin_view.png)
     Admin View  
     <br>
+
     ![App](./images/role_based_menus.png)
     Key Requester View  
     <br>
@@ -169,7 +170,7 @@ Currently there are no collaborators and advanced features will probably not be 
 
 
 ### Selection of Local Database or Cloud Database
-*  Update ENV variable on:
+*  Update ENV variable in these files:
     *  query.py
     *  setup.py
     *  app.py  
