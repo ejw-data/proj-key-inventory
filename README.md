@@ -48,17 +48,32 @@ This system is a self-serve web portal that allows building managers to add new 
     *  Site templates and layouts applied
     *  Custom jinja filters created to add python functionality and make code more readable
     *  App split into multiple files for ease of tracking and updating
-    *  Created standardized HTML page layouts, styles using bootstrap5
+    *  Created standardized HTML page layouts, styles using bootstrap5  
+![App](./images/dynamic_tables.png)
+Tables dynamically generated with interactive features  
+<br>
 
 - User Interface - Custom Order Process
     *  Complete shopping basket created with flask routes and D3.js
     *  Order basket entries stored in session variables 
     *  Order menus show all options if javascript is deactivated but when active the menu's filter to show only possible selections based on prior selections.
-    *  Order basket determines optimum selection of ordered items to show fewest dispersements - checks inventory of available keys, checks if key needs fabricated, checks to see if key needs added to system, checks to see if keys need returned.
+    *  Order basket determines optimum selection of ordered items to show fewest dispersements - checks inventory of available keys, checks if key needs fabricated, checks to see if key needs added to system, checks to see if keys need returned  
+
+![App](./images/basket_menu.png)
+Popup modals that dynamically update without page reloads, dropdowns populate based on current form inputs   
+<br>
 
 - Staff Interface - Custom Views by Role
     * Dashboard, Admin, Key Shop, Building Manager
-    * To make HTML interface code more concise, created custom jinja templates
+    * To make HTML interface code more concise, created custom jinja templates  
+
+![App](./images/admin_view.png)
+Admin View  
+<br>
+
+![App](./images/role_based_menus.png)
+Key Requester View  
+<br>
     
 - App Development Processes
     *  Used venv as a simple virtual environment
@@ -66,11 +81,18 @@ This system is a self-serve web portal that allows building managers to add new 
     *  Data governance by restricting data access
     *  Separated app into purpose-based files
     *  Applied Object Oriented design such that SQLAlchemy ORM and Flask extensions could be added in the future  
+    *  Utilized git branches to resolve bugs and add features
+
+![App](./images/git3.png)  
+Git Activity
 
 - Database Configuration Files
     *  Database schema, data, and pgSQL procedures were implemented as basic SQL files.  A more advanced version of the template dabase might be needed in the future.  
     *  pgAdmin access to local and cloud instances
     *  Detailed Entity Relationship Diagram (ERD) used during initial scoping and development of new features
+
+![App](./images/erd.png)  
+Database Entity Relationship Diagram (ERD)
 
 - Highly Structured Repository
     *  Flask template routes and Flask API data routes were separated into separate files using Blueprint methods
@@ -154,28 +176,13 @@ Currently there are no collaborators and advanced features will probably not be 
     *  app.py  
 
 
-## App Images  
+## Other App Images  
 
 ![App](./images/login_long.png)  
 App Login page  
 <br>
 
-![App](./images/admin_view.png)
-Admin View  
-<br>
-
-![App](./images/role_based_menus.png)
-Key Requester View  
-<br>
-
-![App](./images/dynamic_tables.png)
-Tables dynamically generated with interactive features  
-<br>
-
-![App](./images/basket_menu.png)
-Popup modals that dynamically update without page reloads, dropdowns populate based on current form inputs   
-<br>
-
-![App](./images/logout.png)  
+![App](./images/logout_long.png)  
 Logout modal
 <br>
+
