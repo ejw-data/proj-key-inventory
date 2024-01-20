@@ -8,9 +8,10 @@ Author:  Erin James Wills, ejw.data@gmail.com
   </cite>
 
 
+```txt
+Status:  This is an ongoing project with a scope that keeps evolving. Most of this work was done in late November through the end of December.  I have a handful more tasks to complete so that the program will be a full scale software tool that could manage all phases of of key inventory system, but I have some other priorities right now so I will be taking a break from this project to work on analytics projects for January, February, and maybe March.  
 ```
-Status:  This is an ongoing project with a scope that keeps evolving.  Originally it was only going to be a simple CRUD program with an html interface that would mimic a previous database project I had completed several years ago to standardize and automate a time consuming work task.  I started scoping the project in November and did most of the complicated design work during the weeks I had off around Thanksgiving and Christmas. I have a handful more tasks to complete to have a full scale software tool that could manage all phases of of key inventory system.
-```
+
 
 ## Objective
 > Create a cloud-based space management system that will automate traditional keys systems found at universities.  Often universities use a decentralized system for managing key and key card access.  Relying on a decentralized system often creates several issues such as:
@@ -20,7 +21,11 @@ Status:  This is an ongoing project with a scope that keeps evolving.  Originall
     - assessing the quality of the system can become very difficult as individual steps are not clearly demarcated  
 
 ## Summary  
-This system is a self-serve web portal that allows building managers to add new people to the system by only knowing their email address.  The user can then complete the registration process and then can request access to one or multiple spaces.  The building manager will then be notified in their dashboard view of the request that they can approve or reject or message the user for information.  The manager may want to verify information from the user's profile with their records to ensure consistency with other systems like safety systems.  Upon approval, the request is then sent to the fabrication shop or key administration ofice depending on whether the key needs made or is available in inventory.  Each stage of the process, has updates so the user requesting the key can see the progress from 'Key Requested', 'Key Approved', 'Key being Fabricated', 'Key Available, Waiting for Delivery', and 'Key Ready for Pickup'.    
+This system is a self-serve web portal that allows building managers to add new people to the system by only knowing their email address.  The user can then complete the registration process and then can request access to one or multiple spaces.  The building manager will then be notified in their dashboard view of the request that they can approve or reject or message the user for information.  The manager may want to verify information from the user's profile with their records to ensure consistency with other systems like safety systems.  Upon approval, the request is then sent to the fabrication shop or key administration ofice depending on whether the key needs made or is available in inventory.  Each stage of the process, has updates so the user requesting the key can see the progress from 'Key Requested', 'Key Approved', 'Key being Fabricated', 'Key Available, Waiting for Delivery', and 'Key Ready for Pickup'.  
+
+```text
+Originally this project was only going to be a simple CRUD program with an html interface.  The inspiration was to recreate a project I did several years ago that standardized and automated a time consuming work task.  I started scoping the project in November and did most of the complicated design work during the weeks I had off around Thanksgiving and Christmas. 
+```
 
 
 ## Current Features
@@ -49,31 +54,28 @@ This system is a self-serve web portal that allows building managers to add new 
     *  Custom jinja filters created to add python functionality and make code more readable
     *  App split into multiple files for ease of tracking and updating
     *  Created standardized HTML page layouts, styles using bootstrap5  
-![App](./images/dynamic_tables.png)
-Tables dynamically generated with interactive features  
-<br>
+    ![App](./images/dynamic_tables.png)
+    Tables dynamically generated with interactive features  
+    <br>
 
 - User Interface - Custom Order Process
     *  Complete shopping basket created with flask routes and D3.js
     *  Order basket entries stored in session variables 
     *  Order menus show all options if javascript is deactivated but when active the menu's filter to show only possible selections based on prior selections.
     *  Order basket determines optimum selection of ordered items to show fewest dispersements - checks inventory of available keys, checks if key needs fabricated, checks to see if key needs added to system, checks to see if keys need returned  
-
-![App](./images/basket_menu.png)
-Popup modals that dynamically update without page reloads, dropdowns populate based on current form inputs   
-<br>
+    ![App](./images/basket_menu.png)
+    Popup modals that dynamically update without page reloads, dropdowns populate based on current form inputs   
+    <br>
 
 - Staff Interface - Custom Views by Role
     * Dashboard, Admin, Key Shop, Building Manager
     * To make HTML interface code more concise, created custom jinja templates  
-
-![App](./images/admin_view.png)
-Admin View  
-<br>
-
-![App](./images/role_based_menus.png)
-Key Requester View  
-<br>
+    ![App](./images/admin_view.png)
+    Admin View  
+    <br>
+    ![App](./images/role_based_menus.png)
+    Key Requester View  
+    <br>
     
 - App Development Processes
     *  Used venv as a simple virtual environment
@@ -82,17 +84,15 @@ Key Requester View
     *  Separated app into purpose-based files
     *  Applied Object Oriented design such that SQLAlchemy ORM and Flask extensions could be added in the future  
     *  Utilized git branches to resolve bugs and add features
-
-![App](./images/git3.png)  
-Git Activity
+    ![App](./images/git3.png)  
+    Git Activity
 
 - Database Configuration Files
     *  Database schema, data, and pgSQL procedures were implemented as basic SQL files.  A more advanced version of the template dabase might be needed in the future.  
     *  pgAdmin access to local and cloud instances
     *  Detailed Entity Relationship Diagram (ERD) used during initial scoping and development of new features
-
-![App](./images/erd.png)  
-Database Entity Relationship Diagram (ERD)
+    ![App](./images/erd.png)  
+    Database Entity Relationship Diagram (ERD)
 
 - Highly Structured Repository
     *  Flask template routes and Flask API data routes were separated into separate files using Blueprint methods
