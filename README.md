@@ -72,6 +72,22 @@ This system is a self-serve web portal that allows building managers to add new 
     *  pgAdmin access to local and cloud instances
     *  Detailed Entity Relationship Diagram (ERD) used during initial scoping and development of new features
 
+- Highly Structured Repository
+    *  Flask template routes and Flask API data routes were separated into separate files using Blueprint methods
+    *  Route access constraints were added using python decorators
+    *  SQLAlchemy was used for database modeling and table objects contained in one file
+    *  Flask template parts are used for repeated HTML sections
+    *  Flask templates and Javascript are used to update page elements without reloading the page
+    *  HTML tables are dynamically created using D3.js 
+    *  Custom Jinja functions were used to increase the readability in the HTML
+    *  Queries are largely separated into their own file
+    *  Queries are written with SQLAlchemy Table methods instead of session methods to improve readability
+    *  String-based SQL queries were used minimally, contained in their own file, and applied where other methods would be more complicated.
+    *  WTForms is used to generate forms, validate inputs, and improve security in an objected oriented method
+    *  PostgreSQL triggers and procedures are used to automate database operations with minimal python.
+    *  SQL schema and simple data insertion files were created to easly generate test databases on multiple platforms
+
+
 ## Upcoming Features
 - Deployable to the Cloud
     *  Deployed on Google Cloud Platform with an App Engine (serverless) - everything works except for a package conflict with Flask-Login  
@@ -122,9 +138,6 @@ Currently there are no collaborators and advanced features will probably not be 
 - Stretch Goals
     *  Create app with problem reporting section - report broken doors/locks, report access issues (scanner not working), room plaque updates 
     *  Create mobile app interface that would allow QR code scanning in request and problem reporting (QR would be on each door plaque)
-
-
-
 
 
 ## Setup
