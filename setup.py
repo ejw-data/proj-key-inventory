@@ -12,7 +12,7 @@ def create_app():
     app.json.sort_keys = False
     app.config["SECRET_KEY"] = secret_key
 
-    ENV = "prod"
+    ENV = "dev"
 
     if ENV == "dev":
         app.debug = True

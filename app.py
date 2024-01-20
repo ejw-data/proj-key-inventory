@@ -41,7 +41,8 @@ def load_user(login_id):
 
 
 # generate database if it doesn't exist
-ENV = "prod"
+# database_exists() does not work on GCP Environment
+ENV = "dev"
 
 if ENV == "dev":
     if ~(database_exists(path["local_db"])):

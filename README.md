@@ -7,11 +7,11 @@ Author:  Erin James Wills, ejw.data@gmail.com
 <cite>Photo by <a href="https://unsplash.com/@contradirony?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Samantha Lam</a> on <a href="https://unsplash.com/photos/silver-and-gold-round-coins-zFy6fOPZEu0?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
   </cite>
 
-```
-Status:  This is an ongoing project.  The original purpose of this repo was to develop a flask-sqlalchemy template that could be used for projects that need a custom login.  In the past, I have made several similar applications using different technologies.  Since I created these applications for academic groups at work, I did not keep the code and often had to use their preferred platform.  This specific repo mimics a system I built several years ago that automated some of my tasks.  This application is a bit more comprehensive than some of the past projects since I could choose a much more flexible platform.  
 
-Currently, this project works well for requesting, rejecting, and approving key requests.  Additional testing is being done to ensure the program works for when keys are ready for pickup, returned, lost, or broken.   My upcoming goals will be to refactor two functions to be more readable since these functions exploded in size and complexity as I added functionality.  My second priority is to ensure that the code works for different stages of the key process.  
 ```
+Status:  This is an ongoing project with a scope that keeps evolving.  Originally it was only going to be a simple CRUD program with an html interface that would mimic a previous database project I had completed several years ago to standardize and automate a time consuming work task.  I started scoping the project in November and did most of the complicated design work during the weeks I had off around Thanksgiving and Christmas. I have a handful more tasks to complete to have a full scale software tool that could manage all phases of of key inventory system.
+```
+
 ## Objective
 > Create a cloud-based space management system that will automate traditional keys systems found at universities.  Often universities use a decentralized system for managing key and key card access.  Relying on a decentralized system often creates several issues such as:
     - building managers must approve all keys and maintain their own system of tracking users leading to issues when buiding managers leave or do not have time to create a quality record system
@@ -23,7 +23,7 @@ Currently, this project works well for requesting, rejecting, and approving key 
 This system is a self-serve web portal that allows building managers to add new people to the system by only knowing their email address.  The user can then complete the registration process and then can request access to one or multiple spaces.  The building manager will then be notified in their dashboard view of the request that they can approve or reject or message the user for information.  The manager may want to verify information from the user's profile with their records to ensure consistency with other systems like safety systems.  Upon approval, the request is then sent to the fabrication shop or key administration ofice depending on whether the key needs made or is available in inventory.  Each stage of the process, has updates so the user requesting the key can see the progress from 'Key Requested', 'Key Approved', 'Key being Fabricated', 'Key Available, Waiting for Delivery', and 'Key Ready for Pickup'.    
 
 
-## Features
+## Current Features
 - User Access
     *  Login page that hashes passwords in the database
     *  Only administrators can add users but upon first login the user must generate their own password
@@ -67,6 +67,31 @@ This system is a self-serve web portal that allows building managers to add new 
     *  Separated app into purpose-based files
     *  Applied Object Oriented design such that SQLAlchemy ORM and Flask extensions could be added in the future  
 
+- Database Configuration Files
+    *  Database schema, data, and pgSQL procedures were implemented as basic SQL files.  A more advanced version of the template dabase might be needed in the future.  
+    *  pgAdmin access to local and cloud instances
+    *  Detailed Entity Relationship Diagram (ERD) used during initial scoping and development of new features
+
+## Upcoming Features
+- Deployable to the Cloud
+    *  Deployed on Google Cloud Platform with an App Engine (serverless) - everything works except for a package conflict with Flask-Login  
+    *  May deploy to AWS, IBM and Heroku to compare the platforms ease of use
+    *  Created requirements.txt file for Python environment
+
+- Messaging System
+    *  Basic messaging is already available but could be upgraded to give more customized messages and a log of historical messages for each transaction  
+    *  Messaging will use Flask flash messaging with category filters to create a better functioning interface  
+    *  Ideally, each request will be hyperlinked to a popup box that displays the message history for that request
+
+- Refactor and Improve Logic for Managing Keys
+    *  Some test cases do not work for if keys have been lost, broken, or returned.  
+    *  Prior to implementing these logic changes, I will refactor the code to make the updates easier and more readable.  
+    *  Refactor code by moving queries to query.py and disperse code via functions
+
+- User Interface Improvment
+    *  Add image upload option per user
+    *  Use font awesome instead of svgs for icons to simplify interface development
+
 ## App Value
 The direct value of this app would be assessed by the time savings gained by the implementing institution but would also have indirect value by increasing data availability and consistency, institutionalizing policies across all units, improving user experience, defining and enforcing role responsibilities, disbursing improvements across all units at a fraction of the individual unit investment, and providing intuitive use such that cross-functional staff training can be implemented to reduce single source of authority (aka increasing availability of approvers even if on vacation, travel, re-assignment, or unfilled position).  
 
@@ -77,7 +102,7 @@ At $45 an hour, this arrives at narly a week of their time is spent on this proc
 By reducing the time spent performing documentation and reporting, staff costs for this process could be cut by 50% and the time savings could be leveraged toward revenue generating processes.  If revenue generating processes have a margin of 2% and labor costs account for 30% of the service or product cost then this would generate a possible $160,000 in additional revenue and $3,300 in net income.  The true value would be cost savings ($50,000), generated profit ($3,300), and any reduced need for additional labor that would have otherwise been needed to accomplish this new goal.  The cost savings by themselves could fund approximately 33% of the new revenue cost so the investment of $160,000 is really more like an investment of $106,700 in new capital.   
 
 ## Cost of Deployment  
-Deploying on AWS Cloud with redundant PostgreSQL servers would cost approximately $400 annually.  
+Deploying on AWS Cloud with redundant PostgreSQL servers would cost approximately $400 annually.  Deploying everything on GCP App Engine would cost about $700 annually.  
 
 ## Data
 All data used for this application was synthetically created and based on a theoretical scenario  
@@ -85,21 +110,15 @@ All data used for this application was synthetically created and based on a theo
 ## Collaborators  
 Currently there are no collaborators and advanced features will probably not be made available due to the potential for this app to be commercially distributed.  Please contact repo owner to request collaboration interest or access to the full source code and installation instructions.  
 
-## Future Features
+## Longterm Features
 - Priority Goals
-    *  Deploy to the cloud - AWS, GCP, Azure (Microsoft), IBM Cloud
-    *  Refactor two functions related to finding codes and updating the database.
     *  Add unit testing and starting dataset
     *  Add splinter synthetic monitoring and error handling that is logged
     *  Create user logs and monitor cloud performance
-    *  Add form logical tests
-    *  Move queries to query.py and disperse code via functions
-    *  Use font awesome for icons
+    *  Add form logical tests - actions to take if the form is not completely filled out (simple logic already applied)
     *  Analyze query performance
-    *  Add requirements.txt file
     *  Add repo formatting and linting checks on local commit and remote push
-    *  Add messaging system
-    *  Add image upload option per user
+    
 - Stretch Goals
     *  Create app with problem reporting section - report broken doors/locks, report access issues (scanner not working), room plaque updates 
     *  Create mobile app interface that would allow QR code scanning in request and problem reporting (QR would be on each door plaque)
@@ -123,8 +142,16 @@ Currently there are no collaborators and advanced features will probably not be 
 * `pip install flask_login`
 * `pip install pandas`
 * `pip install gunicorn`
+* `pip install pg8000`
 
 * may need the `pip install ipykernel` - this is really only needed for interactive window in VSCode 
 
 ### Activate Environment
 * `. venv/Scripts/activate`
+
+
+### Set Local Database or Cloud Database
+*  Update ENV variable on:
+    *  query.py
+    *  setup.py
+    *  app.py

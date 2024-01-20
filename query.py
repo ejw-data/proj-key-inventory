@@ -12,7 +12,7 @@ def get_access_code(room_list):
     Retrieve key access code
     """
     # change this in the future so it references the code in setup.py
-    ENV = "prod"
+    ENV = "dev"
 
     if ENV == "dev":
         engine = create_engine(path["local_db"])
