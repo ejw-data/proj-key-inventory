@@ -23,7 +23,7 @@ select * from crosstab (
 -- ------------------------------------------------------------
 
 -- drop existing structures
-DROP FUNCTION pivotcode(character varying,character varying,character varying,character varying,character varying);
+DROP FUNCTION IF EXISTS pivotcode(character varying,character varying,character varying,character varying,character varying);
 DROP TABLE IF EXISTS temp_pivot;
 DROP TABLE IF EXISTS temp_matrix;
 

@@ -1,7 +1,8 @@
 from flask import Flask
 from db_paths import path
-from config import secret_key
+import os
 
+secret_key = os.environ.get("KEY_SECRET")
 
 def create_app():
     """
@@ -15,12 +16,12 @@ def create_app():
 
     if ENV == "dev":
         app.debug = True
-        app.config["SQLALCHEMY_DATABASE_URI"] = path["key_inventory"]
-        app.config["SQLALCHEMY_BINDS"] = {"key_inventory": path["key_inventory"]}
+        app.config["SQLALCHEMY_DATABASE_URI"] = path["local_db"]
+        app.config["SQLALCHEMY_BINDS"] = {"key_inventory": path["local_db"]}
     elif ENV == "prod":
         app.debug = False
-        app.config["SQLALCHEMY_DATABASE_URI"] = "hidden connection string"
-        app.config["SQLALCHEMY_BINDS"] = {"key_inventory": "hidden connection string"}
+        app.config["SQLALCHEMY_DATABASE_URI"] = path["gcp_db"]
+        app.config["SQLALCHEMY_BINDS"] = {"key_inventory": path["gcp_db"]}
     else:
         print("Please select an environment:  developement or production.")
 

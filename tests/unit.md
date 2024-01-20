@@ -109,22 +109,19 @@ Same tests as above
 
 
 **In the cases below, the user has had requests declined**
-* Some errors needed fixed
+* Fixed some errors, but need to retest
 
 
 **In the cases below, the user has had keys returned**
-
+* Test later
 
 
 **In the cases below, the user has had keys lost**  
-
+* Test later
 
 
 **In the cases below, the user has had keys broken**
-
-
-    *  Expected Outcome:  
-    *  Actual Outcome:  
+* Test later
 
 
 
