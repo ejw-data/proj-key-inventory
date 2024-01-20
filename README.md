@@ -87,35 +87,21 @@ This system is a self-serve web portal that allows building managers to add new 
     *  PostgreSQL triggers and procedures are used to automate database operations with minimal python.
     *  SQL schema and simple data insertion files were created to easly generate test databases on multiple platforms
 
-
-## Upcoming Features
-- Deployable to the Cloud
-    *  Deployed on Google Cloud Platform with an App Engine (serverless) - everything works except for a package conflict with Flask-Login  
-    *  May deploy to AWS, IBM and Heroku to compare the platforms ease of use
-    *  Created requirements.txt file for Python environment
-
-- Messaging System
-    *  Basic messaging is already available but could be upgraded to give more customized messages and a log of historical messages for each transaction  
-    *  Messaging will use Flask flash messaging with category filters to create a better functioning interface  
-    *  Ideally, each request will be hyperlinked to a popup box that displays the message history for that request
-
-- Refactor and Improve Logic for Managing Keys
-    *  Some test cases do not work for if keys have been lost, broken, or returned.  
-    *  Prior to implementing these logic changes, I will refactor the code to make the updates easier and more readable.  
-    *  Refactor code by moving queries to query.py and disperse code via functions
-
-- User Interface Improvment
-    *  Add image upload option per user
-    *  Use font awesome instead of svgs for icons to simplify interface development
+    > To learn about future development goals, read this [article](./docs/features.md)
 
 ## App Value
-The direct value of this app would be assessed by the time savings gained by the implementing institution but would also have indirect value by increasing data availability and consistency, institutionalizing policies across all units, improving user experience, defining and enforcing role responsibilities, disbursing improvements across all units at a fraction of the individual unit investment, and providing intuitive use such that cross-functional staff training can be implemented to reduce single source of authority (aka increasing availability of approvers even if on vacation, travel, re-assignment, or unfilled position).  
+The direct value of this app would be assessed by the time savings gained by the implementing institution but would also have indirect value by:  
+*  increasing data availability and consistency 
+*  institutionalizing policies across all units 
+*  improving user experience 
+*  defining and enforcing role responsibilities 
+*  disbursing improvements across all units at a fraction of the individual unit investment
+*  providing intuitive use such that cross-functional staff training can be implemented to reduce single source of authority 
+    - aka increasing availability of approvers even if on vacation, travel, re-assignment, or unfilled position  
 
-Lets assume that an institution has 200 buildings, approvimately 200 building managers, 10,000 staff and faculty, and 1,000 part-time space users (5% of 20,000 students).  In total, the 200 building managers would need to manage requests and track data of 11,000 people with approximately 20% leaving and the equivalent new people replenshing those vacancies.  This would indicate that 4,400 changes occur annually.  At first look, this would indicate that each building manager would need to to make 22 updates but in reality of the 200 building managers, only about 40 would manage large spaces with large number of users.  This would indicate each manager makes more than 110 requests.  If the request takes 10 minutes to process the data, 5 minutes to communicate instructions and updates to the requester, and 5 minute to retrieve and hand-off keys then in total, the manager spends 2,200 minutes managing keys.  It is assumed that these numbers include time spent updating documentation, auditing records, and generating reports.  
+In a year, a building manager of a large facility might have a little over 35 hours allocated to key management (receiving requests, documenting, summary reports, etc).  This could total nearly $1,700 invested in this activity.  For a large institution that has 40 building manager then this would result in more than $65,000 spent on this activity.  
 
-At $45 an hour, this arrives at narly a week of their time is spent on this process and nearly $1,700 invested per building manager.  Given 40 building managers then this comes out to be nearly $66,000 investment annually for just the building manager's involvment.  There are still costs associated with key fabrication and key disbursement that are not included but often require significant communication and hand-off of materials with both building managers and users.  In effect, space access could easily cost more than $100,000 annually from just a labor perspective.  
-
-By reducing the time spent performing documentation and reporting, staff costs for this process could be cut by 50% and the time savings could be leveraged toward revenue generating processes.  If revenue generating processes have a margin of 2% and labor costs account for 30% of the service or product cost then this would generate a possible $160,000 in additional revenue and $3,300 in net income.  The true value would be cost savings ($50,000), generated profit ($3,300), and any reduced need for additional labor that would have otherwise been needed to accomplish this new goal.  The cost savings by themselves could fund approximately 33% of the new revenue cost so the investment of $160,000 is really more like an investment of $106,700 in new capital.   
+> For a more detailed analysis, see this [article](./docs/value.md).
 
 ## Cost of Deployment  
 Deploying on AWS Cloud with redundant PostgreSQL servers would cost approximately $400 annually.  Deploying everything on GCP App Engine would cost about $700 annually.  
@@ -126,18 +112,14 @@ All data used for this application was synthetically created and based on a theo
 ## Collaborators  
 Currently there are no collaborators and advanced features will probably not be made available due to the potential for this app to be commercially distributed.  Please contact repo owner to request collaboration interest or access to the full source code and installation instructions.  
 
-## Longterm Features
-- Priority Goals
-    *  Add unit testing and starting dataset
-    *  Add splinter synthetic monitoring and error handling that is logged
-    *  Create user logs and monitor cloud performance
-    *  Add form logical tests - actions to take if the form is not completely filled out (simple logic already applied)
-    *  Analyze query performance
-    *  Add repo formatting and linting checks on local commit and remote push
-    
-- Stretch Goals
-    *  Create app with problem reporting section - report broken doors/locks, report access issues (scanner not working), room plaque updates 
-    *  Create mobile app interface that would allow QR code scanning in request and problem reporting (QR would be on each door plaque)
+
+## Technologies
+*  Python
+    - Flask
+    - SQLAlchemy
+*  Javascript
+*  PostgreSQL
+*  HTML/CSS
 
 
 ## Setup
@@ -154,6 +136,8 @@ Currently there are no collaborators and advanced features will probably not be 
 * `pip install psycopg2`
 * `pip install flask_login`
 * `pip install pandas`
+* `pip install numpy`
+* `pip install Jinja2`
 * `pip install gunicorn`
 * `pip install pg8000`
 
@@ -163,8 +147,29 @@ Currently there are no collaborators and advanced features will probably not be 
 * `. venv/Scripts/activate`
 
 
-### Set Local Database or Cloud Database
+### Selection of Local Database or Cloud Database
 *  Update ENV variable on:
     *  query.py
     *  setup.py
-    *  app.py
+    *  app.py  
+
+
+## App Images  
+
+![App](./images/login.png | width=200)  
+App Login page  
+
+![App](./images/admin_view.png)
+Admin View
+
+![App](./images/role_based_menus.png)
+Key Requester View  
+
+![App](./images/dynamic_tables.png)
+Tables dynamically generated with interactive features  
+
+![App](./images/basket_menu.png)
+Popup modals that dynamically update without page reloads, dropdowns populate based on current form inputs
+
+![App](./images/logout.png)  
+Logout modal

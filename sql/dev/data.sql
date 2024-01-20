@@ -20,18 +20,14 @@ VALUES (1,'requester'),
 INSERT INTO users (user_id, first_name, last_name, title_id, role_id, email, sponsor_id)
 VALUES (0,'unassigned', 'unassigned', 1,1,'unassigned', 1),
 		(1,'erin', 'wills', 1, 3, 'ew@mysite.com', 1),
-		(2,'will', 'wright', 1, 4, 'ww@mysite.com', 1),
-		(3,'andrew', 'ng', 1, 1, 'an@mysite.com', 1),
+		(2,'wendy', 'warhol', 1, 4, 'ww@mysite.com', 1),
+		(3,'andy', 'newman', 1, 1, 'an@mysite.com', 1),
 		(4,'bob', 'turtle', 5, 2, 'bt@mysite.com', 1),
 		(5,'jake', 'powers', 9, 2, 'jp@mysite.com', 1);
 
 INSERT INTO approvers (approver_id,user_id, role_approved_by)
 VALUES (1,4, 5), 
 		(0,0,1);
-
--- INSERT INTO authentication (id, username, password_hash)
--- VALUES (1, 'ejwadmin', 'alf344t4090j0aojfsfa');
-
 
 INSERT INTO buildings (building_number, building_name, building_description)
 VALUES (24, 'Chemistry', 'Chemistry Department Research Space');
@@ -70,7 +66,6 @@ VALUES (0,'Unassigned', 1, 1),
 		(2,'Faculty Office and Suite', 1, 1),
 		(3,'Front Suite Only', 1, 1);
 
--- change status_code to status_code_id
 INSERT INTO request_status (request_status_id, request_status_name)
 VALUES (1,'REQUEST SUBMITTED'),
 		(2,'REQUEST APPROVED'),
@@ -96,6 +91,7 @@ VALUES (1,'IN QUEUE'),
 		(2,'SCHEDULED'),
 		(3,'COMPLETED');
 
+-- -- This was used to test functionality before SQL triggers automated the process
 -- INSERT INTO keys_created (request_id, access_code_id, key_copy, fabrication_status_id)
 -- VALUES (1, 1, 3, 3),
 -- 		(2, 1, 1, 3),
@@ -111,8 +107,7 @@ VALUES (1,'ISSUED'),
 		(5,'LOST'),
 		(6,'TRANSFERRED');
 
--- -- This will initiate some of the logic
--- -- logic needs built to complete this request via forms  
+-- -- This was used to test functionality before SQL triggers automated the process
 -- INSERT INTO requests (user_id, spaces_requested, building_number, approver_id, access_code_id, status_code)
 -- VALUES (1, 'B24010101', 24, 1, 1, 1),
 -- 		(2, 'B24010101', 24, 1, 2, 1),
@@ -133,8 +128,7 @@ VALUES (1,'READY FOR PICKUP'),
 		(3,'WAITING FOR DELIVERY'),
 		(4,'PICK UP COMPLETE');
 		
--- -- key_orders are added programatically via request trigger
--- -- key_orders will just need to be updated
+-- -- This was used to test functionality before SQL triggers automated the process
 -- INSERT INTO key_orders (transaction_id, access_code_id)
 -- VALUES (1, 3),
 -- 		(2, 1),
