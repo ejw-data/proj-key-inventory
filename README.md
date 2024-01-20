@@ -134,6 +134,9 @@ All data used for this application was synthetically created and based on a theo
 ## Collaborators  
 Currently there are no collaborators and advanced features will probably not be made available due to the potential for this app to be commercially distributed.  Please contact repo owner to request collaboration interest or access to the full source code and installation instructions.  
 
+## Workflow  
+
+![App](./images/workflow.png)
 
 ## Technologies
 *  Python
