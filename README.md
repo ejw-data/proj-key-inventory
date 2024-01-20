@@ -8,24 +8,20 @@ Author:  Erin James Wills, ejw.data@gmail.com
   </cite>
 
 
-```txt
-Status:  This is an ongoing project with a scope that keeps evolving. Most of this work was done in late November through the end of December.  I have a handful more tasks to complete so that the program will be a full scale software tool that could manage all phases of of key inventory system, but I have some other priorities right now so I will be taking a break from this project to work on analytics projects for January, February, and maybe March.  
-```
+> Status:  This is an ongoing project with a scope that keeps evolving. Most of this work was done in late November through the end of December.  I have a handful more tasks to complete so that the program will be a full scale software tool that could manage all phases of of key inventory system, but I have some other priorities right now so I will be taking a break from this project to work on analytics projects for January, February, and maybe March.  
 
 
 ## Objective
-> Create a cloud-based space management system that will automate traditional keys systems found at universities.  Often universities use a decentralized system for managing key and key card access.  Relying on a decentralized system often creates several issues such as:
-    - building managers must approve all keys and maintain their own system of tracking users leading to issues when buiding managers leave or do not have time to create a quality record system
-    - records are often duplicated between key shop/billing, building managers, and the manager of the space leading to inconsistencies and gaps in information
-    - each building will often have different standards for documenting, disbursing, and collecting the keys
-    - assessing the quality of the system can become very difficult as individual steps are not clearly demarcated  
+Create a cloud-based space management system that will automate traditional keys systems found at universities.  Often universities use a decentralized system for managing key and key card access.  Relying on a decentralized system often creates several issues such as:  
+*  building managers must approve all keys and maintain their own system of tracking users leading to issues when buiding managers leave or do not have time to create a quality record system
+*  records are often duplicated between key shop/billing, building managers, and the manager of the space leading to inconsistencies and gaps in information
+*  each building will often have different standards for documenting, disbursing, and collecting the keys
+*  assessing the quality of the system can become very difficult as individual steps are not clearly demarcated  
 
 ## Summary  
 This system is a self-serve web portal that allows building managers to add new people to the system by only knowing their email address.  The user can then complete the registration process and then can request access to one or multiple spaces.  The building manager will then be notified in their dashboard view of the request that they can approve or reject or message the user for information.  The manager may want to verify information from the user's profile with their records to ensure consistency with other systems like safety systems.  Upon approval, the request is then sent to the fabrication shop or key administration ofice depending on whether the key needs made or is available in inventory.  Each stage of the process, has updates so the user requesting the key can see the progress from 'Key Requested', 'Key Approved', 'Key being Fabricated', 'Key Available, Waiting for Delivery', and 'Key Ready for Pickup'.  
 
-```text
-Originally this project was only going to be a simple CRUD program with an html interface.  The inspiration was to recreate a project I did several years ago that standardized and automated a time consuming work task.  I started scoping the project in November and did most of the complicated design work during the weeks I had off around Thanksgiving and Christmas. 
-```
+> Originally this project was only going to be a simple CRUD program with an html interface.  The inspiration was to recreate a project I did several years ago that standardized and automated a time consuming work task.  I started scoping the project in November and did most of the complicated design work during the weeks I had off around Thanksgiving and Christmas. 
 
 
 ## Current Features
